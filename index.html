@@ -1,0 +1,194 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>St. Joseph and the Child Jesus — Opus Lilium</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,500;0,600;1,500&family=Source+Sans+3:wght@400;600&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --parchment: #EDE0B8;
+    --parchment-deep: #E2D19E;
+    --green: #3B5D45;
+    --umber: #6B4226;
+    --halo: #D9A84E;
+    --ink: #2A241C;
+  }
+
+  * { box-sizing: border-box; }
+
+  html, body {
+    margin: 0;
+    padding: 0;
+    background: var(--parchment);
+    color: var(--ink);
+    font-family: 'Source Sans 3', sans-serif;
+  }
+
+  .site-header {
+    padding: 28px 6vw 0;
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+  }
+
+  .wordmark {
+    font-family: 'Cormorant Garamond', serif;
+    font-weight: 600;
+    font-size: 1.4rem;
+    letter-spacing: 0.02em;
+    color: var(--green);
+    text-decoration: none;
+  }
+
+  .site-header nav a {
+    font-size: 0.95rem;
+    color: var(--ink);
+    text-decoration: none;
+    margin-left: 28px;
+    opacity: 0.75;
+  }
+
+  .site-header nav a:hover { opacity: 1; }
+
+  main {
+    display: flex;
+    align-items: center;
+    gap: 6vw;
+    padding: 5vh 6vw 8vh;
+    max-width: 1200px;
+    margin: 0 auto;
+  }
+
+  .art {
+    flex: 1 1 46%;
+    position: relative;
+  }
+
+  .art img {
+    width: 100%;
+    height: auto;
+    display: block;
+    border-radius: 2px;
+    box-shadow: 0 30px 60px -25px rgba(42, 36, 28, 0.45);
+  }
+
+  .details {
+    flex: 1 1 44%;
+  }
+
+  .kicker {
+    font-size: 0.98rem;
+    color: var(--umber);
+    margin: 0 0 10px;
+  }
+
+  h1 {
+    font-family: 'Cormorant Garamond', serif;
+    font-weight: 600;
+    font-size: clamp(2.4rem, 4vw, 3.4rem);
+    line-height: 1.08;
+    margin: 0 0 22px;
+    color: var(--ink);
+    max-width: 12ch;
+  }
+
+  .description {
+    font-size: 1.08rem;
+    line-height: 1.65;
+    max-width: 46ch;
+    margin: 0 0 30px;
+    color: #443c2e;
+  }
+
+  .specs {
+    list-style: none;
+    padding: 0;
+    margin: 0 0 34px;
+    border-top: 1px solid rgba(42,36,28,0.15);
+  }
+
+  .specs li {
+    display: flex;
+    justify-content: space-between;
+    padding: 12px 0;
+    border-bottom: 1px solid rgba(42,36,28,0.15);
+    font-size: 0.98rem;
+  }
+
+  .specs li span:first-child { color: #6b5f4a; }
+  .specs li span:last-child { font-weight: 600; }
+
+  .cta {
+    display: inline-block;
+    background: var(--green);
+    color: var(--parchment);
+    font-size: 1.05rem;
+    font-weight: 600;
+    text-decoration: none;
+    padding: 16px 34px;
+    border-radius: 2px;
+    transition: background 0.2s ease;
+  }
+
+  .cta:hover { background: #2e4a37; }
+
+  .cta-note {
+    margin: 14px 0 0;
+    font-size: 0.88rem;
+    color: #6b5f4a;
+  }
+
+  footer {
+    text-align: center;
+    padding: 30px 6vw 40px;
+    font-size: 0.85rem;
+    color: #6b5f4a;
+  }
+
+  @media (max-width: 820px) {
+    main { flex-direction: column; padding-top: 3vh; }
+    .art, .details { flex: 1 1 auto; width: 100%; }
+    h1 { max-width: none; }
+  }
+</style>
+</head>
+<body>
+
+<header class="site-header">
+  <a class="wordmark" href="/">Opus Lilium</a>
+  <nav>
+    <a href="#">Gallery</a>
+    <a href="#">About</a>
+  </nav>
+</header>
+
+<main>
+  <div class="art">
+    <img src="st-joseph-and-child-jesus.png" alt="Illustration of St. Joseph the Worker holding a hammer and tool pouch, with the Child Jesus reaching up to hold his tunic, both haloed">
+  </div>
+
+  <div class="details">
+    <p class="kicker">Metal Print — 11 × 17</p>
+    <h1>St. Joseph and the Child Jesus</h1>
+    <p class="description">
+      A quiet moment of guardianship: Joseph the carpenter, tools at his belt, and the small hand of Christ holding fast to him. Printed on solid aluminum for a finish that carries light the way the halos do &mdash; luminous, durable, and ready to hang.
+    </p>
+    <ul class="specs">
+      <li><span>Size</span><span>11" × 17"</span></li>
+      <li><span>Material</span><span>Aluminum metal print</span></li>
+      <li><span>Finish</span><span>Ready to hang</span></li>
+      <li><span>Made</span><span>Printed on demand</span></li>
+    </ul>
+    <a class="cta" href="https://opuslilium.printful.me/product/metal-prints" target="_blank" rel="noopener">Shop this print</a>
+    <p class="cta-note">Opens the listing on Printful, where your order is printed and shipped.</p>
+  </div>
+</main>
+
+<footer>
+  Opus Lilium &mdash; devotional art by Andre
+</footer>
+
+</body>
+</html>
