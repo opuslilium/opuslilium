@@ -3,15 +3,15 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Opus Lilium — Devotional Art</title>
+<title>Opus Lilium — A Gallery of Sacred Art</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,500;0,600;1,500&family=Source+Sans+3:wght@400;600&display=swap" rel="stylesheet">
 <style>
   :root {
-    --parchment: #EDE0B8;
+    --parchment: #FAF7F2;
     --green: #3B5D45;
     --umber: #6B4226;
-    --halo: #D9A84E;
+    --halo: #C9A24B;
     --ink: #2A241C;
   }
 
@@ -54,73 +54,158 @@
   .intro {
     max-width: 640px;
     margin: 0 auto;
-    padding: 7vh 6vw 5vh;
+    padding: 10vh 6vw 7vh;
     text-align: center;
   }
 
   .intro h1 {
     font-family: 'Cormorant Garamond', serif;
-    font-weight: 600;
-    font-size: clamp(2.2rem, 4vw, 3rem);
-    margin: 0 0 16px;
-  }
-
-  .intro p {
-    font-size: 1.05rem;
-    line-height: 1.6;
-    color: #443c2e;
+    font-weight: 500;
+    font-style: italic;
+    font-size: clamp(1.6rem, 2.6vw, 2rem);
+    letter-spacing: 0.02em;
+    color: #5c5340;
     margin: 0;
   }
 
   .gallery {
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-    gap: 40px;
-    max-width: 1100px;
+    grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+    gap: 4px;
+    max-width: 1200px;
     margin: 0 auto;
-    padding: 0 6vw 10vh;
+    padding: 0 4px 10vh;
   }
 
   .piece {
+    position: relative;
     display: block;
-    text-decoration: none;
-    color: inherit;
+    border: none;
+    background: none;
+    padding: 0;
+    cursor: pointer;
+    overflow: hidden;
   }
 
   .piece img {
     width: 100%;
-    height: auto;
+    height: 100%;
+    object-fit: cover;
+    aspect-ratio: 4 / 5;
     display: block;
+    transition: transform 0.5s ease, filter 0.4s ease;
+  }
+
+  .piece:hover img {
+    transform: scale(1.02);
+    filter: brightness(0.55);
+  }
+
+  .piece-hover {
+    position: absolute;
+    inset: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 20px;
+    opacity: 0;
+    transition: opacity 0.4s ease;
+  }
+
+  .piece:hover .piece-hover,
+  .piece:focus-visible .piece-hover { opacity: 1; }
+
+  .piece-hover span {
+    font-family: 'Cormorant Garamond', serif;
+    font-weight: 500;
+    font-style: italic;
+    font-size: 1.15rem;
+    letter-spacing: 0.02em;
+    color: #FAF7F2;
+    text-align: center;
+  }
+
+  /* Lightbox */
+
+  .lightbox-overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(20, 17, 12, 0.88);
+    display: none;
+    align-items: center;
+    justify-content: center;
+    padding: 5vh 5vw;
+    z-index: 100;
+  }
+
+  .lightbox-overlay.open {
+    display: flex;
+  }
+
+  .lightbox-box {
+    max-width: 900px;
+    width: 100%;
+    max-height: 90vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+  }
+
+  .lightbox-box img {
+    max-width: 100%;
+    max-height: 68vh;
+    object-fit: contain;
     border-radius: 2px;
-    box-shadow: 0 20px 40px -20px rgba(42, 36, 28, 0.4);
-    transition: transform 0.2s ease;
+    box-shadow: 0 30px 70px -20px rgba(0,0,0,0.6);
   }
 
-  .piece:hover img { transform: translateY(-3px); }
-
-  .piece-caption {
-    margin-top: 16px;
+  .lightbox-caption {
+    margin-top: 22px;
+    text-align: center;
   }
 
-  .piece-title {
+  .lightbox-caption h2 {
     font-family: 'Cormorant Garamond', serif;
     font-weight: 600;
-    font-size: 1.3rem;
-    margin: 0 0 4px;
+    font-size: 1.6rem;
+    color: var(--parchment);
+    margin: 0 0 16px;
   }
 
-  .piece-meta {
-    font-size: 0.92rem;
-    color: var(--umber);
-    margin: 0;
+  .lightbox-shop {
+    display: inline-block;
+    background: var(--halo);
+    color: var(--ink);
+    font-weight: 600;
+    font-size: 0.98rem;
+    text-decoration: none;
+    padding: 12px 28px;
+    border-radius: 2px;
+    transition: background 0.2s ease;
   }
+
+  .lightbox-shop:hover { background: #c99636; }
+
+  .lightbox-close {
+    position: absolute;
+    top: 24px;
+    right: 28px;
+    background: none;
+    border: none;
+    color: var(--parchment);
+    font-size: 2rem;
+    line-height: 1;
+    cursor: pointer;
+    opacity: 0.8;
+  }
+
+  .lightbox-close:hover { opacity: 1; }
 
   footer {
     text-align: center;
     padding: 30px 6vw 40px;
     font-size: 0.85rem;
     color: #6b5f4a;
-    border-top: 1px solid rgba(42,36,28,0.12);
   }
 </style>
 </head>
@@ -134,52 +219,80 @@
 </header>
 
 <div class="intro">
-  <h1>Devotional art, made to hang</h1>
-  <p>Original illustrations of the saints and holy family, brought to print &mdash; each piece linking to where you can bring it home.</p>
+  <h1>My Catholic Artworks</h1>
 </div>
 
 <div class="gallery">
 
-  <a class="piece" href="https://opuslilium.printful.me/product/metal-prints" target="_blank" rel="noopener">
-    <img src="st-joseph-and-child-jesus.png" alt="Illustration of St. Joseph the Worker holding a hammer and tool pouch, with the Child Jesus reaching up to hold his tunic, both haloed">
-    <div class="piece-caption">
-      <p class="piece-title">St. Joseph and the Child Jesus</p>
-      <p class="piece-meta">Metal print, 11 × 17</p>
+  <button class="piece" data-img="st-joseph-and-child-jesus.png" data-title="St. Joseph and the Child Jesus" data-link="https://opuslilium.printful.me/product/metal-prints">
+    <img src="st-joseph-and-child-jesus.png" alt="St. Joseph and the Child Jesus">
+    <span class="piece-hover"><span>St. Joseph and the Child Jesus</span></span>
+  </button>
+
+  <button class="piece" data-img="the-little-flower.png" data-title="The Little Flower" data-link="https://www.redbubble.com/shop/ap/33892985">
+    <img src="the-little-flower.png" alt="The Little Flower">
+    <span class="piece-hover"><span>The Little Flower</span></span>
+  </button>
+
+  <button class="piece" data-img="st-michael-the-archangel.png" data-title="St. Michael the Archangel" data-link="https://www.redbubble.com/shop/ap/34136219">
+    <img src="st-michael-the-archangel.png" alt="St. Michael the Archangel">
+    <span class="piece-hover"><span>St. Michael the Archangel</span></span>
+  </button>
+
+  <button class="piece" data-img="therese-in-heaven.png" data-title="Thérèse in Heaven" data-link="https://www.redbubble.com/shop/ap/30917104">
+    <img src="therese-in-heaven.png" alt="Thérèse in Heaven">
+    <span class="piece-hover"><span>Thérèse in Heaven</span></span>
+  </button>
+
+  <!-- To add another piece, copy the <button class="piece">...</button> block above,
+       swap the image filename (both in the button's data-img/img src), title, and link. -->
+
+</div>
+
+<div class="lightbox-overlay" id="lightbox">
+  <button class="lightbox-close" id="lightbox-close" aria-label="Close">&times;</button>
+  <div class="lightbox-box">
+    <img id="lightbox-img" src="" alt="">
+    <div class="lightbox-caption">
+      <h2 id="lightbox-title"></h2>
+      <a class="lightbox-shop" id="lightbox-link" href="#" target="_blank" rel="noopener">View this piece &rarr;</a>
     </div>
-  </a>
-
-  <a class="piece" href="https://www.redbubble.com/shop/ap/33892985" target="_blank" rel="noopener">
-    <img src="the-little-flower.png" alt="Illustration of a young girl in a brown habit and pale veil kneeling among oversized colorful flowers, looking upward">
-    <div class="piece-caption">
-      <p class="piece-title">The Little Flower</p>
-      <p class="piece-meta">Prints, stickers &amp; more &middot; Redbubble</p>
-    </div>
-  </a>
-
-  <a class="piece" href="https://www.redbubble.com/shop/ap/34136219" target="_blank" rel="noopener">
-    <img src="st-michael-the-archangel.png" alt="Illustration of St. Michael the Archangel in flight with wings spread, drawing a sword">
-    <div class="piece-caption">
-      <p class="piece-title">St. Michael the Archangel</p>
-      <p class="piece-meta">Prints, stickers &amp; more &middot; Redbubble</p>
-    </div>
-  </a>
-
-  <a class="piece" href="https://www.redbubble.com/shop/ap/30917104" target="_blank" rel="noopener">
-    <img src="therese-in-heaven.png" alt="Illustration of St. Therese of Lisieux in heaven, holding an armful of roses">
-    <div class="piece-caption">
-      <p class="piece-title">Thérèse in Heaven</p>
-      <p class="piece-meta">Prints, stickers &amp; more &middot; Redbubble</p>
-    </div>
-  </a>
-
-  <!-- To add another piece, copy the <a class="piece">...</a> block above,
-       swap the image, link, title, and meta text. -->
-
+  </div>
 </div>
 
 <footer>
   Opus Lilium &mdash; devotional art by Andre
 </footer>
+
+<script>
+  const overlay = document.getElementById('lightbox');
+  const overlayImg = document.getElementById('lightbox-img');
+  const overlayTitle = document.getElementById('lightbox-title');
+  const overlayLink = document.getElementById('lightbox-link');
+  const closeBtn = document.getElementById('lightbox-close');
+
+  document.querySelectorAll('.piece').forEach(function (btn) {
+    btn.addEventListener('click', function () {
+      overlayImg.src = btn.getAttribute('data-img');
+      overlayImg.alt = btn.getAttribute('data-title');
+      overlayTitle.textContent = btn.getAttribute('data-title');
+      overlayLink.href = btn.getAttribute('data-link');
+      overlay.classList.add('open');
+    });
+  });
+
+  function closeLightbox() {
+    overlay.classList.remove('open');
+  }
+
+  closeBtn.addEventListener('click', closeLightbox);
+  overlay.addEventListener('click', function (e) {
+    if (e.target === overlay) closeLightbox();
+  });
+  document.addEventListener('keydown', function (e) {
+    if (e.key === 'Escape') closeLightbox();
+  });
+</script>
 
 </body>
 </html>
