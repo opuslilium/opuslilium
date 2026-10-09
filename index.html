@@ -216,11 +216,65 @@
     margin: 0 0 22px;
   }
 
-  .featured img {
+  .featured > img {
     width: 100%;
     height: auto;
     display: block;
     margin: 0 auto 18px;
+    mix-blend-mode: multiply;
+  }
+
+  .latest-video {
+    display: block;
+    width: 200px;
+    margin: 34px auto 0;
+    text-decoration: none;
+    color: inherit;
+    opacity: 0.8;
+    transition: opacity 0.25s ease;
+  }
+
+  .latest-video:hover,
+  .latest-video:focus-visible { opacity: 1; }
+
+  .latest-video .featured-label {
+    margin: 0 0 10px;
+  }
+
+  .latest-video-thumb {
+    position: relative;
+    aspect-ratio: 16 / 9;
+    overflow: hidden;
+    background: rgba(42,36,28,0.08);
+  }
+
+  .latest-video-thumb img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+  }
+
+  .latest-video-thumb::after {
+    content: "";
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 0;
+    height: 0;
+    transform: translate(-35%, -50%);
+    border-left: 14px solid rgba(250,247,242,0.92);
+    border-top: 9px solid transparent;
+    border-bottom: 9px solid transparent;
+    filter: drop-shadow(0 1px 3px rgba(0,0,0,0.45));
+  }
+
+  .latest-video-title {
+    font-family: 'Cormorant Garamond', serif;
+    font-style: italic;
+    font-size: 0.95rem;
+    color: #5c5340;
+    margin: 8px 0 0;
   }
 
   .featured-title {
@@ -258,8 +312,16 @@
 
 <div class="featured">
   <p class="featured-label">Currently in progress</p>
-  <img src="st-joan-wip.png" alt="Work in progress sketch of St. Joan of Arc holding the sword of St. Catherine of Fierbois">
-  <p class="featured-title">St. Joan and the Sword of St. Catherine of Fierbois</p>
+  <img src="st-moses-the-black-wip.jpg" alt="Work in progress sketch of St. Moses the Black, a hooded, bearded figure carrying a bundle over his shoulder">
+  <p class="featured-title">St. Moses the Black</p>
+
+  <a class="latest-video" href="https://youtu.be/U09qgH4IQ9E" target="_blank" rel="noopener" aria-label="Watch the latest video: Who is St. Moses the Black?">
+    <p class="featured-label">Latest video</p>
+    <div class="latest-video-thumb">
+      <img src="https://i.ytimg.com/vi/U09qgH4IQ9E/maxresdefault.jpg" alt="" onerror="this.onerror=null;this.src='https://i.ytimg.com/vi/U09qgH4IQ9E/hqdefault.jpg'">
+    </div>
+    <p class="latest-video-title">Who is St. Moses the Black?</p>
+  </a>
 </div>
 
 <hr class="featured-divider">
