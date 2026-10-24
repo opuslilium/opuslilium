@@ -219,7 +219,7 @@ function reset(){score=0;sel=null;drag=null;busy=false;chain=0;state="idle";$("e
   "<b>Tap</b> a bomb to detonate it. <b>Swap</b> the rainbow with any tile to clear that color. Bombs caught in a blast chain.";draw()}
 // ---- Leaderboard: top 15, 3-letter initials. Shared if BOARD_URL is set, else this device only ----
 // SETUP: paste your Firebase Realtime Database URL between the quotes, e.g. "https://my-game-default-rtdb.firebaseio.com"
-const BOARD_URL="";
+const BOARD_URL="https://plain-match-default-rtdb.firebaseio.com";
 const LB_N=15;let board=[],entryScore=0,shared=false;
 const base=()=>BOARD_URL.replace(/\/$/,"")+"/lb.json";
 const norm=a=>(Array.isArray(a)?a:[]).filter(e=>e&&Number.isFinite(e.s)&&/^[A-Z]{3}$/.test(e.n)).sort((a,b)=>b.s-a.s||(a.t<b.t?-1:1)).slice(0,LB_N);
