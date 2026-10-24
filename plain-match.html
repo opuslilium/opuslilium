@@ -1,0 +1,266 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Plain Match</title>
+<meta name="robots" content="noindex,nofollow">
+<style>
+:root{--bg:#f4f1ea;--fg:#222;--mut:#777;--bd:#d8d3c6;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px);color-scheme:light}
+@media(prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#15161a;--fg:#eee;--mut:#999;--bd:#2c2e36;color-scheme:dark}}
+:root[data-theme="dark"]{--bg:#15161a;--fg:#eee;--mut:#999;--bd:#2c2e36;color-scheme:dark}
+html,body{margin:0;height:100%;background:var(--bg);color:var(--fg);font:15px system-ui,sans-serif;touch-action:pan-y;user-select:none;-webkit-user-select:none;overflow-y:auto}
+main{display:flex;flex-direction:column;align-items:center;gap:10px;padding:12px}
+#note{font-size:17px;font-style:italic;line-height:1.45;max-width:440px;margin:0;text-align:center}
+#hud{display:flex;gap:22px;font-variant-numeric:tabular-nums}
+#hud div{text-align:center}#hud b{display:block;font-size:26px}#hud span{color:var(--mut);font-size:12px}
+canvas{border:2px solid var(--bd);border-radius:8px;touch-action:none;transition:border-color .12s}
+canvas.bad{border-color:#d94a4a}
+#msg{color:var(--mut);font-size:13px;line-height:1.45;max-width:440px}
+#entry{display:flex;gap:10px;align-items:center;font-weight:700}#entry[hidden]{display:none}
+#ini{width:4.2em;font:700 22px ui-monospace,monospace;letter-spacing:.2em;text-align:center;padding:6px;border-radius:8px;border:2px solid var(--fg);background:var(--bg);color:var(--fg);user-select:text;-webkit-user-select:text}
+#lbh{color:var(--mut);font-size:12px;letter-spacing:.1em;margin-top:6px}
+#lb{font:14px ui-monospace,monospace;border-collapse:collapse;margin-bottom:24px}#lb td{padding:3px 9px}#lb td:nth-child(3){text-align:right;font-weight:700}#lb td:nth-child(4){color:var(--mut);font-size:12px}
+button{font:inherit;padding:8px 18px;border-radius:8px;border:1px solid var(--bd);background:var(--fg);color:var(--bg)}
+</style></head><body><main>
+<p id="note">Used Claude to test a concept: A match-3 game stripped down to focus on skill and speed. Purely for self-education and tinkering with AI. Enjoy. — Andre</p>
+<div id="hud"><div><b id="t">60.0</b><span>TIME</span></div><div><b id="s">0</b><span>TILES</span></div><div><b id="b">0</b><span>BEST</span></div></div>
+<canvas id="cv"></canvas>
+<div id="msg"></div>
+<button id="rs">Restart</button>
+<div id="entry" hidden><span>NEW HIGH SCORE</span><input id="ini" maxlength="3" autocomplete="off" autocapitalize="characters" placeholder="AAA"><button id="sv">Save</button></div>
+<div id="lbh">TOP 15</div>
+<table id="lb"></table>
+</main>
+<script>
+const N=8,K=5,DUR=60000,PEN=2000,DROP=90;
+const COL=["#d94a4a","#e0a030","#3fa86b","#3d7fd9","#9b59c9"];
+const cv=document.getElementById("cv"),x=cv.getContext("2d"),$=id=>document.getElementById(id);
+let g,pw,fall,sel,drag,state,endAt,score,best=0,cell,dpr,busy=false,animT=0,chain=0,lastSwap=[];
+try{best=+localStorage.getItem("bm_best")||0}catch(e){}
+const rnd=n=>Math.floor(Math.random()*n),mk=()=>Array.from({length:N},()=>Array(N).fill(0));
+
+function bad(r,c,v){
+  let h=1,w=1;
+  for(let i=c-1;i>=0&&g[r][i]===v;i--)h++;
+  for(let i=c+1;i<N&&g[r][i]===v;i++)h++;
+  for(let i=r-1;i>=0&&g[i][c]===v;i--)w++;
+  for(let i=r+1;i<N&&g[i][c]===v;i++)w++;
+  if(h>=3||w>=3)return true;
+  for(const[a,b]of[[-1,-1],[-1,1],[1,-1],[1,1]]){const r2=r+a,c2=c+b;
+    if(r2>=0&&r2<N&&c2>=0&&c2<N&&g[r2][c]===v&&g[r][c2]===v&&g[r2][c2]===v)return true}
+  return false;
+}
+function fill(){
+  for(let r=0;r<N;r++)for(let c=0;c<N;c++)if(g[r][c]<0){
+    let v,t=0;do{v=rnd(K)}while(bad(r,c,v)&&t++<30);g[r][c]=v}
+}
+function gravity(){
+  for(let c=0;c<N;c++){let w=N-1;
+    for(let r=N-1;r>=0;r--)if(g[r][c]>=0){
+      if(w!==r){g[w][c]=g[r][c];pw[w][c]=pw[r][c];g[r][c]=-1;pw[r][c]=0;fall[w][c]=w-r}w--}
+    for(let r=w;r>=0;r--)fall[r][c]=w+1}
+}
+// Find all matches (3+ runs and 2x2 boxes), group them, decide power-up spawns.
+function analyze(){
+  const G=[];
+  for(let r=0;r<N;r++)for(let c=0;c<N;){const v=g[r][c];if(v<0||v>=K){c++;continue}
+    let e=c;while(e+1<N&&g[r][e+1]===v)e++;
+    if(e-c>=2){const a=[];for(let j=c;j<=e;j++)a.push(r*N+j);G.push({k:1,a,v})}c=e+1}
+  for(let c=0;c<N;c++)for(let r=0;r<N;){const v=g[r][c];if(v<0||v>=K){r++;continue}
+    let e=r;while(e+1<N&&g[e+1][c]===v)e++;
+    if(e-r>=2){const a=[];for(let j=r;j<=e;j++)a.push(j*N+c);G.push({k:2,a,v})}r=e+1}
+  for(let r=0;r<N-1;r++)for(let c=0;c<N-1;c++){const v=g[r][c];
+    if(v>=0&&v<K&&g[r][c+1]===v&&g[r+1][c]===v&&g[r+1][c+1]===v)G.push({k:3,a:[r*N+c,r*N+c+1,(r+1)*N+c,(r+1)*N+c+1],v})}
+  const par={},f=a=>par[a]===a?a:(par[a]=f(par[a]));
+  G.forEach(o=>o.a.forEach(i=>{if(par[i]===undefined)par[i]=i}));
+  G.forEach(o=>o.a.forEach(i=>{par[f(i)]=f(o.a[0])}));
+  const comps={};
+  G.forEach(o=>{const k=f(o.a[0]);
+    const m=comps[k]||(comps[k]={cells:new Set(),h:0,v:0,b:0,best:null,col:o.v});
+    o.a.forEach(i=>m.cells.add(i));
+    if(o.k===1)m.h=1;if(o.k===2)m.v=1;if(o.k===3)m.b=1;
+    if(o.k<3&&(!m.best||o.a.length>m.best.a.length))m.best=o});
+  const cells=new Set(),spawns=[];
+  for(const m of Object.values(comps)){
+    m.cells.forEach(i=>cells.add(i));
+    const L=m.best?m.best.a.length:0;let t=0;
+    if(L>=5)t=5;else if(m.h&&m.v)t=4;else if(L===4)t=m.best.k===1?2:3;else if(m.b)t=1;
+    if(t){let i=lastSwap.find(q=>m.cells.has(q));
+      if(i===undefined){const a=m.best?m.best.a:[...m.cells];i=a[a.length>>1]}
+      spawns.push({i,t,col:t===5?5:m.col})}}
+  return{cells,spawns};
+}
+// Power-ups: 1 mini bomb 3x3, 2 row, 3 column, 4 big bomb 5x5, 5 color bomb
+function effect(r,c,t){
+  const o=[];
+  const box=k=>{for(let i=Math.max(0,r-k);i<=Math.min(N-1,r+k);i++)for(let j=Math.max(0,c-k);j<=Math.min(N-1,c+k);j++)o.push(i*N+j)};
+  if(t===1)box(1);else if(t===4)box(2);
+  else if(t===2)for(let j=0;j<N;j++)o.push(r*N+j);
+  else if(t===3)for(let i=0;i<N;i++)o.push(i*N+c);
+  else{const n=Array(K).fill(0);
+    for(let i=0;i<N;i++)for(let j=0;j<N;j++)if(g[i][j]>=0&&g[i][j]<K)n[g[i][j]]++;
+    const m=n.indexOf(Math.max(...n));
+    for(let i=0;i<N;i++)for(let j=0;j<N;j++)if(g[i][j]===m)o.push(i*N+j)}
+  return o;
+}
+function clearCells(cells,spawns){
+  const out=new Set(cells),q=[...cells];
+  while(q.length){const i=q.pop(),r=(i/N)|0,c=i%N,t=pw[r][c];if(!t)continue;pw[r][c]=0;
+    for(const j of effect(r,c,t))if(!out.has(j)){out.add(j);q.push(j)}}
+  spawns.forEach(s=>out.delete(s.i));
+  score+=out.size;
+  out.forEach(i=>{g[(i/N)|0][i%N]=-1;pw[(i/N)|0][i%N]=0});
+  spawns.forEach(s=>{g[(s.i/N)|0][s.i%N]=s.col;pw[(s.i/N)|0][s.i%N]=s.t});
+  fall=mk();gravity();fill();animT=performance.now();busy=true;
+}
+function doMatches(){
+  const a=analyze();if(!a.cells.size)return false;
+  chain++;clearCells(a.cells,a.spawns);lastSwap=[];return true;
+}
+function hasMove(){
+  for(let r=0;r<N;r++)for(let c=0;c<N;c++)if(pw[r][c]||g[r][c]===5)return true;
+  const sw=(a,b,d,e)=>{const t=g[a][b];g[a][b]=g[d][e];g[d][e]=t};
+  for(let r=0;r<N;r++)for(let c=0;c<N;c++)for(const[dr,dc]of[[0,1],[1,0]]){
+    const r2=r+dr,c2=c+dc;if(r2>=N||c2>=N)continue;
+    sw(r,c,r2,c2);const ok=analyze().cells.size>0;sw(r,c,r2,c2);if(ok)return true}
+  return false;
+}
+function newBoard(){
+  do{g=Array.from({length:N},()=>Array(N).fill(-1));pw=mk();fall=mk();fill()}while(!hasMove());
+}
+function begin(){if(state==="idle"){state="play";endAt=performance.now()+DUR}}
+function trySwap(r,c,r2,c2){
+  if(state==="over"||busy)return;begin();
+  const a=g[r][c],b=g[r2][c2];
+  if(a===5||b===5){ // color bomb: swap with any tile to clear that tile's color
+    const br=a===5?r:r2,bc=a===5?c:c2,or=a===5?r2:r,oc=a===5?c2:c,col=g[or][oc];
+    pw[br][bc]=0;const set=new Set([br*N+bc]);
+    for(let i=0;i<N;i++)for(let j=0;j<N;j++)if(col===5||g[i][j]===col)set.add(i*N+j);
+    chain=1;lastSwap=[];clearCells(set,[]);draw();return}
+  const sw=()=>{[g[r][c],g[r2][c2]]=[g[r2][c2],g[r][c]];[pw[r][c],pw[r2][c2]]=[pw[r2][c2],pw[r][c]]};
+  sw();
+  if(analyze().cells.size){lastSwap=[r*N+c,r2*N+c2];chain=0;doMatches()}
+  else{sw();endAt-=PEN;cv.classList.add("bad");setTimeout(()=>cv.classList.remove("bad"),120)}
+  draw();
+}
+function size(){
+  dpr=window.devicePixelRatio||1;
+  const s=Math.min(window.innerWidth-28,window.innerHeight-250,460);
+  cell=Math.floor(Math.max(s,240)/N);const px=cell*N;
+  cv.style.width=cv.style.height=px+"px";cv.width=cv.height=px*dpr;draw();
+}
+function shape(i,cx,cy,s){
+  x.beginPath();
+  if(i===0)x.arc(cx,cy,s,0,7);
+  else if(i===1)x.rect(cx-s*.85,cy-s*.85,s*1.7,s*1.7);
+  else if(i===2){x.moveTo(cx,cy-s);x.lineTo(cx+s,cy+s*.8);x.lineTo(cx-s,cy+s*.8);x.closePath()}
+  else if(i===3){x.moveTo(cx,cy-s*1.1);x.lineTo(cx+s,cy);x.lineTo(cx,cy+s*1.1);x.lineTo(cx-s,cy);x.closePath()}
+  else{for(let k=0;k<6;k++){const a=k*Math.PI/3;x[k?"lineTo":"moveTo"](cx+s*Math.cos(a),cy+s*Math.sin(a))}x.closePath()}
+  x.fill();
+}
+function draw(){
+  if(!g||!cell)return;
+  x.setTransform(dpr,0,0,dpr,0,0);x.clearRect(0,0,cell*N,cell*N);
+  const cs=getComputedStyle(document.documentElement),fg=cs.getPropertyValue("--fg"),bg=cs.getPropertyValue("--bg");
+  let e=1;if(busy)e=Math.pow(Math.min(1,(performance.now()-animT)/DROP),2);
+  const s=cell*.32;
+  for(let r=0;r<N;r++)for(let c=0;c<N;c++){
+    const v=g[r][c];if(v<0)continue;
+    const cx=c*cell+cell/2,cy=(r-fall[r][c]*(1-e))*cell+cell/2,t=pw[r][c];
+    x.fillStyle=v===5?fg:COL[v];shape(v,cx,cy,s);
+    if(t===1){x.fillStyle=bg;x.beginPath();x.arc(cx,cy,s*.4,0,7);x.fill()}
+    else if(t===4){x.strokeStyle=bg;x.lineWidth=s*.24;x.beginPath();x.arc(cx,cy,s*.55,0,7);x.stroke()}
+    else if(v===5){for(let k=0;k<5;k++){x.fillStyle=COL[k];x.beginPath();x.arc(cx+Math.cos(k*1.2566)*s*.5,cy+Math.sin(k*1.2566)*s*.5,s*.24,0,7);x.fill()}}
+    else if(t){x.fillStyle=bg;x.font="bold "+(s*1.5)+"px system-ui";x.textAlign="center";x.textBaseline="middle";x.fillText(t===2?"↔":"↕",cx,cy)}
+  }
+  if(sel){x.strokeStyle=fg;x.lineWidth=3;x.strokeRect(sel.c*cell+3,sel.r*cell+3,cell-6,cell-6)}
+  if(busy&&chain>=2){x.font="bold "+cell*1.2+"px system-ui";x.textAlign="center";x.textBaseline="middle";x.globalAlpha=.5;x.fillStyle=fg;x.fillText("×"+chain,cell*N/2,cell*N/2);x.globalAlpha=1}
+  $("s").textContent=score;$("b").textContent=best;
+}
+function tick(){
+  try{step()}catch(err){console.error(err);busy=false;chain=0;fall=mk()}
+  requestAnimationFrame(tick);
+}
+function step(){
+  const now=performance.now();
+  if(state==="play"){
+    const left=endAt-now;
+    if(left<=0){state="over";busy=false;chain=0;fall=mk();$("t").textContent="0.0";sel=null;
+      if(score>best){best=score;try{localStorage.setItem("bm_best",best)}catch(e){}}
+      $("msg").textContent="Done: "+score+" tiles ("+(score/60).toFixed(2)+"/sec). Restart to beat it.";draw();offer()}
+    else $("t").textContent=(left/1000).toFixed(1);
+  }
+  if(busy){
+    if(now-animT>=DROP){fall=mk();if(!doMatches()){busy=false;chain=0;if(!hasMove())newBoard()}}
+    draw();
+  }
+}
+function pos(e){const b=cv.getBoundingClientRect();return{c:Math.floor((e.clientX-b.left)/cell),r:Math.floor((e.clientY-b.top)/cell),x:e.clientX,y:e.clientY}}
+cv.addEventListener("pointerdown",e=>{
+  if(busy||state==="over")return;const q=pos(e);
+  if(q.r<0||q.c<0||q.r>=N||q.c>=N)return;
+  const t=pw[q.r][q.c];
+  if(t&&t!==5){begin();sel=null;drag=null;chain=1;lastSwap=[];clearCells(new Set([q.r*N+q.c]),[]);draw();return} // tap = detonate
+  if(sel&&Math.abs(sel.r-q.r)+Math.abs(sel.c-q.c)===1){const s=sel;sel=null;drag=null;trySwap(s.r,s.c,q.r,q.c);return}
+  sel=(sel&&sel.r===q.r&&sel.c===q.c)?null:{r:q.r,c:q.c};
+  drag={r:q.r,c:q.c,x:q.x,y:q.y};draw();
+});
+cv.addEventListener("pointermove",e=>{
+  if(!drag||busy)return;const dx=e.clientX-drag.x,dy=e.clientY-drag.y;
+  if(Math.hypot(dx,dy)<cell*.4)return;
+  let r2=drag.r,c2=drag.c;
+  if(Math.abs(dx)>Math.abs(dy))c2+=dx>0?1:-1;else r2+=dy>0?1:-1;
+  const d=drag;drag=null;sel=null;
+  if(r2>=0&&c2>=0&&r2<N&&c2<N)trySwap(d.r,d.c,r2,c2);else draw();
+});
+addEventListener("pointerup",()=>drag=null);
+function reset(){score=0;sel=null;drag=null;busy=false;chain=0;state="idle";$("entry").hidden=true;newBoard();$("t").textContent="60.0";
+  $("msg").innerHTML="Swap neighbors (tap two, or swipe) for 3+ in a row <b>or a 2×2 box</b>. Clock starts on your first move; a bad swap costs 2s.<br>"+
+  "<b>4 in a row</b> → ↔/↕ line bomb (clears row/column) · <b>2×2</b> → dot bomb (3×3) · <b>L/T/+</b> → ring bomb (5×5) · <b>5 in a row</b> → rainbow hex.<br>"+
+  "<b>Tap</b> a bomb to detonate it. <b>Swap</b> the rainbow with any tile to clear that color. Bombs caught in a blast chain.";draw()}
+// ---- Leaderboard: top 15, 3-letter initials. Shared if BOARD_URL is set, else this device only ----
+// SETUP: paste your Firebase Realtime Database URL between the quotes, e.g. "https://my-game-default-rtdb.firebaseio.com"
+const BOARD_URL="";
+const LB_N=15;let board=[],entryScore=0,shared=false;
+const base=()=>BOARD_URL.replace(/\/$/,"")+"/lb.json";
+const norm=a=>(Array.isArray(a)?a:[]).filter(e=>e&&Number.isFinite(e.s)&&/^[A-Z]{3}$/.test(e.n)).sort((a,b)=>b.s-a.s||(a.t<b.t?-1:1)).slice(0,LB_N);
+const asList=d=>d?(Array.isArray(d)?d:Object.values(d)):[];
+const fmt=t=>{const d=new Date(t);return isNaN(d)?"":d.toLocaleDateString([],{month:"short",day:"numeric"})+" "+d.toLocaleTimeString([],{hour:"numeric",minute:"2-digit"})};
+function loadLocal(){try{return norm(JSON.parse(localStorage.getItem("bm_lb")||"[]"))}catch(e){return[]}}
+function saveLocal(a){try{localStorage.setItem("bm_lb",JSON.stringify(a))}catch(e){}}
+function renderLB(){
+  const t=$("lb");t.textContent="";
+  board.forEach((e,i)=>{const tr=t.insertRow();[String(i+1).padStart(2,"0"),e.n,e.s,fmt(e.t)].forEach(v=>{tr.insertCell().textContent=v})});
+  if(!board.length)t.insertRow().insertCell().textContent="No scores yet.";
+  $("lbh").textContent="TOP 15 \u00b7 "+(shared?"SHARED":"THIS DEVICE");
+}
+async function pull(){
+  if(!BOARD_URL)return;
+  try{const r=await fetch(base(),{cache:"no-store"});if(!r.ok)throw 0;board=norm(asList(await r.json()));shared=true}
+  catch(e){shared=false;board=loadLocal()}
+  renderLB();
+}
+async function offer(){
+  entryScore=score;await pull();
+  if(entryScore>0&&state==="over"&&(board.length<LB_N||entryScore>board[board.length-1].s)){$("entry").hidden=false;$("ini").value="";$("ini").focus()}
+}
+async function submit(){
+  const n=$("ini").value.toUpperCase().replace(/[^A-Z]/g,"");
+  if(n.length!==3){$("ini").focus();return}
+  const e={s:entryScore,n,t:new Date().toISOString()};$("entry").hidden=true;
+  let ok=false;
+  if(BOARD_URL){try{
+    const r=await fetch(base(),{cache:"no-store"});const cur=norm(asList(await r.json()));const nb=norm(cur.concat(e));
+    const w=await fetch(base(),{method:"PUT",body:JSON.stringify(nb)});if(!w.ok)throw 0;board=nb;shared=true;ok=true}catch(err){}}
+  if(!ok){board=norm(board.concat(e));saveLocal(board);shared=false;if(BOARD_URL)$("lbh").textContent="SHARED BOARD UNREACHABLE \u00b7 SAVED ON THIS DEVICE"}
+  if(!BOARD_URL||!ok){renderLB();if(BOARD_URL)$("lbh").textContent="SHARED BOARD UNREACHABLE \u00b7 SAVED ON THIS DEVICE";return}
+  renderLB();
+}
+$("sv").onclick=submit;
+$("ini").addEventListener("input",e=>{e.target.value=e.target.value.toUpperCase().replace(/[^A-Z]/g,"")});
+$("ini").addEventListener("keydown",e=>{if(e.key==="Enter")submit()});
+board=loadLocal();renderLB();pull();
+$("rs").onclick=reset;
+addEventListener("keydown",e=>{if(e.target.id==="ini")return;if(e.key==="r"||e.key==="R")reset()});
+addEventListener("resize",size);
+reset();size();tick();
+</script></body></html>
