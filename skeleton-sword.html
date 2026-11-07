@@ -1,0 +1,3102 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover, user-scalable=no" />
+<meta name="color-scheme" content="dark" />
+<link rel="icon" href="data:," />
+<title>Skeleton Sword</title>
+<style>
+  :root{
+    color-scheme: dark;
+    --bg:#0e0e11; --panel:#17171c; --panel2:#1f1f26; --line:#33333d;
+    --bone:#e9e2cf; --bone-dim:#a79f8a; --gold:#d9a441; --gold-bright:#f2c14e;
+    --red:#e05252; --red-dim:rgba(224,82,82,.28); --cyan:#5ec8d8;
+    --green:#7bc47f; --ink:#f2efe6; --muted:#9a97a3;
+    --radius:10px;
+  }
+  *{box-sizing:border-box; -webkit-tap-highlight-color:transparent;}
+  html,body{height:100%;}
+  body{
+    margin:0; background:var(--bg); color:var(--ink);
+    font-family: ui-sans-system, -apple-system, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    display:flex; flex-direction:column; height:100dvh; overflow:hidden;
+    touch-action:none; overscroll-behavior:none;
+  }
+  /* ---------- HUD ---------- */
+  #hud{
+    display:flex; align-items:center; gap:14px; flex-wrap:wrap;
+    padding:8px 12px; background:var(--panel); border-bottom:1px solid var(--line);
+    z-index:5;
+  }
+  .boss-tag{font-family:Georgia,"Times New Roman",serif; font-size:13px; letter-spacing:.14em; color:var(--gold); white-space:nowrap;}
+  .bar-wrap{display:flex; align-items:center; gap:7px; min-width:0;}
+  .bar-label{font-size:11px; letter-spacing:.08em; color:var(--muted); width:26px;}
+  .bar{width:170px; max-width:32vw; height:12px; background:#2a2a33; border:1px solid var(--line); border-radius:6px; overflow:hidden;}
+  .bar > div{height:100%; transition:width .12s linear;}
+  #hp-fill{background:var(--gold); width:100%;}
+  #hp-fill.low{background:var(--red);}
+  #mp-fill{background:var(--cyan); width:100%;}
+  .hud-num{font-size:12px; color:var(--bone-dim); min-width:52px; font-variant-numeric:tabular-nums;}
+  .hud-stat{font-size:12.5px; color:var(--bone); white-space:nowrap; font-variant-numeric:tabular-nums;}
+  .hud-stat b{color:var(--gold-bright); font-weight:700;}
+  #shield-tag{font-size:11px; letter-spacing:.08em; color:var(--cyan); border:1px solid var(--cyan); border-radius:20px; padding:2px 9px; display:none;}
+  #shield-tag.on{display:inline-block;}
+  #magic-tag{font-size:11px; letter-spacing:.08em; color:#c792ea; border:1px solid #c792ea; border-radius:20px; padding:2px 9px; display:none;}
+  #magic-tag.on{display:inline-block;}
+  #buff-tag{font-size:11px; letter-spacing:.06em; color:var(--green); white-space:nowrap;}
+  .spacer{flex:1;}
+  button.ui-btn{
+    background:var(--panel2); color:var(--bone); border:1px solid var(--line);
+    border-radius:8px; padding:6px 12px; font-size:12.5px; cursor:pointer;
+  }
+  button.ui-btn:active{transform:translateY(1px);}
+  /* ---------- Stage ---------- */
+  #stage{position:relative; flex:1; min-height:0; background:#0a0a0d;}
+  canvas#game{position:absolute; inset:0; width:100%; height:100%; display:block;}
+  /* ---------- Banner / overlays ---------- */
+  #banner{
+    position:absolute; left:50%; top:16%; transform:translateX(-50%);
+    text-align:center; pointer-events:none; opacity:0; transition:opacity .25s;
+    z-index:4; width:min(92vw,560px);
+  }
+  #banner.show{opacity:1;}
+  #banner .big{font-family:Georgia,serif; font-size:clamp(22px,4.5vw,36px); color:var(--bone); text-shadow:0 2px 14px #000;}
+  #banner .small{font-size:clamp(12px,2.4vw,14.5px); color:var(--gold-bright); margin-top:6px; text-shadow:0 1px 8px #000; line-height:1.45;}
+  #overlay{
+    position:absolute; inset:0; display:flex; align-items:center; justify-content:center;
+    background:rgba(8,8,11,.78); z-index:6; padding:16px;
+  }
+  #overlay.hidden{display:none;}
+  .card{
+    background:var(--panel); border:1px solid var(--line); border-radius:14px;
+    max-width:520px; width:100%; padding:22px 24px; max-height:92%; overflow:auto;
+  }
+  .card h1{font-family:Georgia,serif; font-weight:600; font-size:26px; margin:0 0 4px; color:var(--bone);}
+  .card h1 .gold{color:var(--gold);}
+  .card p{font-size:14px; line-height:1.55; color:#cfccc2; margin:8px 0;}
+  .card p.dim{color:var(--muted); font-size:12.5px;}
+  .kit{display:grid; grid-template-columns:1fr 1fr; gap:6px 14px; margin:12px 0; font-size:13px;}
+  .kit div b{color:var(--gold-bright); font-weight:600;}
+  .kit div span{color:var(--muted);}
+  .start-btn{
+    display:block; width:100%; margin-top:14px; padding:13px; font-size:16px; font-weight:700;
+    background:var(--gold); color:#191204; border:none; border-radius:10px; cursor:pointer;
+  }
+  .start-btn:active{transform:translateY(1px);}
+  /* ---------- Bottom info ---------- */
+  #info{
+    display:flex; gap:16px; padding:5px 12px; background:var(--panel); border-top:1px solid var(--line);
+    font-size:11.5px; color:var(--muted); line-height:1.45; z-index:5;
+  }
+  #evo{flex:1.3; min-width:0;}
+  #evo .evo-head{color:var(--bone); font-size:12px; letter-spacing:.06em; margin-bottom:2px;}
+  #evo-traits{display:flex; flex-wrap:wrap; gap:4px 12px; font-variant-numeric:tabular-nums;}
+  #evo-traits span b{color:var(--cyan); font-weight:600;}
+  #evo-log{color:var(--bone-dim); white-space:nowrap; overflow:hidden; text-overflow:ellipsis;}
+  /* Controls text no longer lives on screen — it moved into the Pause · Moves panel. */
+  #keys{display:none;}
+  /* ---------- Moves / pause panel ---------- */
+  .moves-grid{display:grid; grid-template-columns:1fr 1fr; gap:10px 18px; margin-top:10px;}
+  @media (max-width:640px){ .moves-grid{grid-template-columns:1fr;} }
+  .moves-sec h4{margin:0 0 5px; font-size:11.5px; letter-spacing:.1em; color:var(--gold);}
+  .moves-sec.melee h4{color:var(--gold-bright);}
+  .move-row{display:flex; justify-content:space-between; gap:10px; font-size:12.5px; padding:3px 0; border-bottom:1px dashed rgba(255,255,255,.06);}
+  .move-row:last-child{border-bottom:none;}
+  .move-row .mk{color:var(--bone); font-weight:700; white-space:nowrap;}
+  .move-row .md{color:var(--muted); text-align:right; line-height:1.4;}
+  .move-row .md b{color:var(--cyan); font-weight:700;}
+  .moves-sec.melee .move-row .md b{color:var(--gold-bright);}
+  @media (max-width:760px){
+    #keys{display:none;}
+    .bar{width:110px;}
+    .boss-tag{display:none;}
+    #info{padding-bottom:6px;}
+  }
+  /* ---------- Menu / beats / shop / save ---------- */
+  .menu-title{font-family:Georgia,serif; font-size:34px; letter-spacing:.06em; text-align:center; color:var(--bone); margin:2px 0 2px;}
+  .menu-title .gold{color:var(--gold);}
+  .menu-sub{text-align:center; color:var(--muted); font-size:13px; margin:0 0 16px; line-height:1.5;}
+  .mode-grid{display:grid; grid-template-columns:1fr 1fr; gap:12px;}
+  .mode-btn{
+    text-align:left; background:var(--panel2); border:1px solid var(--line); border-radius:12px;
+    padding:14px 15px; cursor:pointer; color:var(--ink);
+  }
+  .mode-btn:active{transform:translateY(1px);}
+  .mode-btn:hover{border-color:var(--gold);}
+  .mode-btn .m-name{font-family:Georgia,serif; font-size:19px; color:var(--gold-bright); display:block; margin-bottom:5px;}
+  .mode-btn .m-desc{font-size:12.5px; line-height:1.5; color:#cfccc2; display:block;}
+  .menu-sec{margin-top:18px; border-top:1px solid var(--line); padding-top:14px;}
+  .menu-sec h3{margin:0 0 6px; font-size:12px; letter-spacing:.12em; color:var(--gold);}
+  .menu-sec p{font-size:12.5px; color:var(--muted); line-height:1.5; margin:4px 0 8px;}
+  textarea.savebox{
+    width:100%; min-height:64px; resize:vertical; background:#101014; color:var(--bone);
+    border:1px solid var(--line); border-radius:8px; padding:8px 10px; font-size:11.5px;
+    font-family:ui-monospace,Menlo,Consolas,monospace; word-break:break-all;
+  }
+  .btn-row{display:flex; gap:8px; flex-wrap:wrap; margin-top:8px;}
+  .btn-row .ui-btn{flex:1; padding:9px 10px; font-size:13px;}
+  .btn-row .ui-btn.primary{background:var(--gold); color:#191204; border-color:var(--gold); font-weight:700;}
+  .status-line{font-size:12px; color:var(--cyan); min-height:16px; margin-top:6px;}
+  .status-line.err{color:var(--red);}
+  .panel-wrap{
+    position:absolute; inset:0; display:flex; align-items:center; justify-content:center;
+    background:rgba(8,8,11,.82); z-index:7; padding:14px;
+  }
+  .panel-wrap.hidden{display:none;}
+  .panel{
+    background:var(--panel); border:1px solid var(--line); border-radius:14px;
+    max-width:640px; width:100%; padding:20px 22px; max-height:94%; overflow:auto;
+  }
+  .panel h2{font-family:Georgia,serif; font-weight:600; font-size:22px; margin:0 0 8px; color:var(--bone);}
+  .panel h2 .gold{color:var(--gold);}
+  .panel p{font-size:13.5px; line-height:1.55; color:#cfccc2; margin:7px 0;}
+  .panel p.dim{color:var(--muted); font-size:12.5px;}
+  .beat-line{font-size:14px; line-height:1.6; color:#ddd9cc; margin:9px 0; font-style:italic;}
+  .shop-head{display:flex; align-items:baseline; gap:12px; flex-wrap:wrap;}
+  .shop-bones{font-size:15px; color:var(--gold-bright); font-weight:700;}
+  .trees{display:grid; grid-template-columns:1fr 1fr; gap:12px; margin-top:12px;}
+  .tree{border:1px solid var(--line); border-radius:10px; padding:10px 12px; background:var(--panel2);}
+  .tree h4{margin:0 0 8px; font-size:13px; letter-spacing:.1em;}
+  .tier{border-top:1px dashed var(--line); padding:8px 0;}
+  .tier:first-of-type{border-top:none;}
+  .tier .t-name{font-size:13.5px; font-weight:700; color:var(--bone);}
+  .tier .t-desc{font-size:12px; color:var(--muted); line-height:1.45; margin:2px 0 6px;}
+  .tier .t-buy{
+    background:var(--gold); color:#191204; border:none; border-radius:7px; padding:6px 12px;
+    font-size:12.5px; font-weight:700; cursor:pointer;
+  }
+  .tier .t-buy:disabled{background:#3a3a44; color:#8a8794; cursor:default;}
+  .tier .t-owned{font-size:12px; color:var(--green); font-weight:700; letter-spacing:.06em;}
+  .tier.locked .t-name{color:#6d6a76; letter-spacing:.3em;}
+  @media (max-width:640px){
+    .mode-grid{grid-template-columns:1fr;}
+    .trees{grid-template-columns:1fr;}
+    .menu-title{font-size:27px;}
+  }
+  /* ---------- Ability cooldown bar ---------- */
+  #ability-bar{
+    position:absolute; left:50%; transform:translateX(-50%); bottom:10px;
+    display:flex; gap:6px; z-index:4; pointer-events:none; flex-wrap:wrap; justify-content:center; max-width:96vw;
+  }
+  .ab{
+    position:relative; overflow:hidden; min-width:60px; padding:4px 7px 5px; border-radius:8px;
+    background:rgba(23,23,28,.62); border:1px solid rgba(255,255,255,.10); font-size:10px; text-align:center;
+  }
+  .ab .ab-fill{position:absolute; left:0; top:0; bottom:0; width:100%; background:rgba(217,164,65,.20);}
+  .ab span{position:relative;}
+  .ab-key{color:var(--gold-bright); font-weight:800; margin-right:4px;}
+  .ab-name{color:var(--bone);}
+  .ab-cd{display:block; font-size:9.5px; letter-spacing:.09em; color:var(--muted); margin-top:1px; font-variant-numeric:tabular-nums;}
+  .ab.ready{border-color:var(--gold);}
+  .ab.ready .ab-cd{color:var(--green); font-weight:700;}
+  .ab.cd{opacity:.75;}
+  .ab.cd .ab-cd{color:var(--red); font-weight:700;}
+  .ab.locked{opacity:.45;}
+  .ab.nomp .ab-cd{color:var(--cyan); font-weight:700;}
+  @media (max-width:760px){
+    #ability-bar{bottom:auto; top:6px;}
+    .ab{min-width:52px; padding:3px 5px 4px; font-size:9.5px;}
+  }
+  /* ---------- Touch controls ---------- */
+  #touch{position:absolute; inset:0; pointer-events:none; z-index:5; display:none;}
+  body.touch #touch, body.coarse #touch{display:block;}
+  @media (pointer:coarse){ #touch{display:block;} }
+  #stick{
+    position:absolute; left:18px; bottom:18px; width:124px; height:124px; border-radius:50%;
+    background:rgba(255,255,255,.06); border:1.5px solid rgba(255,255,255,.22); pointer-events:auto;
+  }
+  #stick-knob{
+    position:absolute; left:50%; top:50%; width:54px; height:54px; border-radius:50%;
+    background:rgba(233,226,207,.28); border:1.5px solid rgba(233,226,207,.55);
+    transform:translate(-50%,-50%);
+  }
+  #touch-btns{position:absolute; right:14px; bottom:14px; display:flex; align-items:flex-end; gap:10px; pointer-events:none;}
+  .tcol{display:flex; flex-direction:column; gap:10px; pointer-events:none;}
+  .tbtn{
+    pointer-events:auto; user-select:none; -webkit-user-select:none;
+    width:62px; height:62px; border-radius:50%; border:1.5px solid rgba(255,255,255,.3);
+    background:rgba(23,23,28,.72); color:var(--bone); font-size:12px; font-weight:700; letter-spacing:.04em;
+    display:flex; align-items:center; justify-content:center; text-align:center;
+  }
+  .tbtn.big{width:78px; height:78px; font-size:14px; border-color:var(--gold); color:var(--gold-bright);}
+  .tbtn.small{width:52px; height:52px; font-size:10.5px;}
+  .tbtn.pressed{background:rgba(217,164,65,.45);}
+  .tbtn.cd{opacity:.38;}
+</style>
+</head>
+<body>
+
+<div id="hud">
+  <div class="boss-tag">⚔ THE FINAL BOSS</div>
+  <div class="bar-wrap"><div class="bar-label">HP</div><div class="bar"><div id="hp-fill"></div></div><div class="hud-num" id="hp-num">206 / 206</div></div>
+  <div class="bar-wrap"><div class="bar-label">MP</div><div class="bar"><div id="mp-fill"></div></div><div class="hud-num" id="mp-num">100 / 100</div></div>
+  <span id="shield-tag">🛡 SHIELD UP</span>
+  <span id="magic-tag">✦ MAGIC MODE</span>
+  <span id="buff-tag"></span>
+  <div class="spacer"></div>
+  <div class="hud-stat" id="mode-stat">Mode <b id="mode-num">SURVIVAL</b></div>
+  <div class="hud-stat" id="bones-stat" style="display:none">🦴 Bones <b id="bones-num">0</b></div>
+  <div class="hud-stat">Wave <b id="wave-num">–</b></div>
+  <div class="hud-stat">Generation <b id="gen-num">1</b></div>
+  <div class="hud-stat">Skeletons left <b id="left-num">0</b></div>
+  <button class="ui-btn" id="save-btn" type="button">💾 Save state</button>
+  <button class="ui-btn" id="pause-btn" type="button">❚❚ Pause · Moves</button>
+  <button class="ui-btn" id="restart-btn" type="button">Restart</button>
+  <button class="ui-btn" id="menu-btn" type="button">Menu</button>
+</div>
+
+<div id="stage">
+  <canvas id="game"></canvas>
+
+  <div id="banner"><div class="big" id="banner-big"></div><div class="small" id="banner-small"></div></div>
+
+  <div id="ability-bar">
+    <div class="ab ready" id="ab-atk" data-mode="phys"><div class="ab-fill"></div><span class="ab-key">J</span><span class="ab-name">Sword</span><span class="ab-cd">READY</span></div>
+    <div class="ab ready" id="ab-spell" data-mode="phys"><div class="ab-fill"></div><span class="ab-key">K</span><span class="ab-name">Arrows · FREE</span><span class="ab-cd">READY</span></div>
+    <div class="ab ready" id="ab-shock" data-mode="phys"><div class="ab-fill"></div><span class="ab-key">U</span><span class="ab-name">Shock · 30 MP</span><span class="ab-cd">READY</span></div>
+    <div class="ab ready" id="ab-beam" data-mode="phys"><div class="ab-fill"></div><span class="ab-key">F</span><span class="ab-name">Beam · 55 MP</span><span class="ab-cd">READY</span></div>
+    <div class="ab ready" id="ab-flash" data-mode="phys"><div class="ab-fill"></div><span class="ab-key">G</span><span class="ab-name">Flash · 40 MP</span><span class="ab-cd">READY</span></div>
+    <div class="ab ready" id="ab-heal" data-mode="phys"><div class="ab-fill"></div><span class="ab-key">H</span><span class="ab-name">Heal · 32 MP</span><span class="ab-cd">READY</span></div>
+    <div class="ab ready" id="ab-dash"><div class="ab-fill"></div><span class="ab-key">B</span><span class="ab-name">Dash</span><span class="ab-cd">READY</span></div>
+    <div class="ab ready" id="ab-chain" data-mode="magic" style="display:none"><div class="ab-fill"></div><span class="ab-key">J</span><span class="ab-name">Chain ⚡ · 34 MP</span><span class="ab-cd">READY</span></div>
+    <div class="ab ready" id="ab-flame" data-mode="magic" style="display:none"><div class="ab-fill"></div><span class="ab-key">K</span><span class="ab-name">Flame · hold, drains MP</span><span class="ab-cd">READY</span></div>
+    <div class="ab ready" id="ab-ice" data-mode="magic" style="display:none"><div class="ab-fill"></div><span class="ab-key">L</span><span class="ab-name">Ice · hold, drains MP</span><span class="ab-cd">READY</span></div>
+    <div class="ab ready" id="ab-flashm" data-mode="magic" style="display:none"><div class="ab-fill"></div><span class="ab-key">G</span><span class="ab-name">Flash · 40 MP</span><span class="ab-cd">READY</span></div>
+    <div class="ab ready" id="ab-pillar" data-mode="magic" style="display:none"><div class="ab-fill"></div><span class="ab-key">O</span><span class="ab-name">Fire Pillar · 42 MP</span><span class="ab-cd">READY</span></div>
+    <div class="ab ready" id="ab-armor" data-mode="magic" style="display:none"><div class="ab-fill"></div><span class="ab-key">I</span><span class="ab-name">Armor Buff · 24 MP</span><span class="ab-cd">READY</span></div>
+    <div class="ab ready" id="ab-haste" data-mode="magic" style="display:none"><div class="ab-fill"></div><span class="ab-key">U</span><span class="ab-name">Swift Buff · 18 MP</span><span class="ab-cd">READY</span></div>
+    <div class="ab ready" id="ab-regen" data-mode="magic" style="display:none"><div class="ab-fill"></div><span class="ab-key">H</span><span class="ab-name">Regen Buff · 20 MP</span><span class="ab-cd">READY</span></div>
+    <div class="ab ready" id="ab-might" data-mode="magic" style="display:none"><div class="ab-fill"></div><span class="ab-key">M</span><span class="ab-name">Might Buff · 24 MP</span><span class="ab-cd">READY</span></div>
+    <div class="ab ready" id="ab-jump"><div class="ab-fill"></div><span class="ab-key">SPACE</span><span class="ab-name">Jump</span><span class="ab-cd">READY</span></div>
+  </div>
+
+  <div id="touch">
+    <div id="stick"><div id="stick-knob"></div></div>
+    <div id="touch-btns">
+      <div class="tcol">
+        <div class="tbtn small" id="tb-magic">MAGIC</div>
+        <div class="tbtn small" id="tb-buff">BUFF</div>
+        <div class="tbtn small" id="tb-beam">BEAM</div>
+        <div class="tbtn small" id="tb-flash">FLASH</div>
+        <div class="tbtn small" id="tb-heal">HEAL</div>
+        <div class="tbtn small" id="tb-dash">DASH</div>
+        <div class="tbtn small" id="tb-jump">JUMP</div>
+      </div>
+      <div class="tcol">
+        <div class="tbtn" id="tb-shield">SHIELD</div>
+        <div class="tbtn" id="tb-spell">SPELL</div>
+        <div class="tbtn small" id="tb-shock">SHOCK</div>
+        <div class="tbtn small" id="tb-lock">LOCK</div>
+      </div>
+      <div class="tcol">
+        <div class="tbtn small" id="tb-pound">POUND</div>
+        <div class="tbtn big" id="tb-attack">ATK</div>
+      </div>
+    </div>
+  </div>
+
+  <div id="overlay">
+    <div class="card" id="overlay-card">
+      <h1>You are the <span class="gold">final boss</span>.</h1>
+      <p>Every skeleton with a sword that you ever cut down as fodder — in every game — is back. They remember dying. And this time, between every wave, the ones that nearly got you <b>breed</b>. The next wave inherits what worked.</p>
+      <p>At first you will feel untouchable. That's the point. Watch what they learn.</p>
+      <div class="kit">
+        <div><b>Sword</b> <span>— faster tap = 1-2-3 combo; HOLD to charge a spin; MASH it = flurry</span></div>
+        <div><b>Arrows</b> <span>— K: free bow shots, no mana · tap = 1 arrow, hold &amp; release = 3–5 arrow spread · Q locks a target for precision fire</span></div>
+        <div><b>Solar Flash</b> <span>— G: full-screen light, blinds &amp; dazes the whole horde</span></div>
+        <div><b>Shockwave</b> <span>— U key. Modest AoE damage, real shove, crowd control</span></div>
+        <div><b>Shield</b> <span>— hold to block their blades</span></div>
+        <div><b>Heal</b> <span>— costs mana, quick cast, keep moving while it casts (combat only)</span></div>
+        <div><b>Jump</b> <span>— Space; in air: J dive stab (committed) · Space again / C ground pound (parry-able!) · B air dash · K midair bolt</span></div>
+        <div><b>Dash / Move</b> <span>— B dash · WASD / stick — WASD also aims every attack · SHIFT toggles magic mode</span></div>
+      </div>
+      <p class="dim">The full move list &amp; controls live under ❚❚ Pause · Moves (top bar, or Esc / P) — press it any time; the fight freezes while you read. Melee is your real damage; spells are reach and control.</p>
+      <button class="start-btn" id="start-btn" type="button">Enter the arena</button>
+    </div>
+  </div>
+
+  <div id="beat" class="panel-wrap hidden">
+    <div class="panel">
+      <h2 id="beat-title"></h2>
+      <div id="beat-lines"></div>
+      <button class="start-btn" id="beat-btn" type="button">Continue</button>
+    </div>
+  </div>
+
+  <div id="shop" class="panel-wrap hidden">
+    <div class="panel">
+      <div class="shop-head">
+        <h2 style="margin:0;">The <span class="gold">Bone Shop</span></h2>
+        <span class="shop-bones">🦴 <span id="shop-bones">0</span> bones</span>
+        <span class="status-line" id="shop-form" style="margin:0;"></span>
+      </div>
+      <p class="dim">Four trees, hidden in the dark. Each tier reveals the next. The skeletons are spending their waves the same way — evolving.</p>
+      <div class="trees" id="shop-trees"></div>
+      <button class="start-btn" id="shop-close" type="button">Return to the fight</button>
+    </div>
+  </div>
+
+  <div id="moves" class="panel-wrap hidden">
+    <div class="panel">
+      <h2>Paused — <span class="gold">Moves &amp; Controls</span></h2>
+      <p class="dim">The fight is frozen while you read. <b style="color:var(--gold-bright)">Melee is your damage</b> — the sword out-hits every spell. Every hit in the game now carries knockback and hitstun, yours and theirs. And the skeletons can parry <b>anything</b> — sword, bolt, beam, lightning, even a ground pound — because the sword is a concept.</p>
+      <div class="moves-grid">
+        <div class="moves-sec melee">
+          <h4>⚔ MELEE — HITS HARDEST</h4>
+          <div class="move-row"><span class="mk">Tap J</span><span class="md">1-2-3 combo — <b>24 / 27 / 36</b>, 3rd hit lunges</span></div>
+          <div class="move-row"><span class="mk">Hold J, release</span><span class="md">charged swing · hold ≥0.55s = Spin — <b>48</b> all around</span></div>
+          <div class="move-row"><span class="mk">Mash J</span><span class="md">5 taps in 1.1s = Hundred-Hand Flurry — <b>8</b> a tick</span></div>
+          <div class="move-row"><span class="mk">J in air</span><span class="md">Dive Stab — <b>68</b>, THE FINISHER, the hardest single hit you own. A committed 45° dive that <b>accelerates</b> as it falls: direction locked, no steering, no dashing out, once per jump, landing impact + a beat of recovery when you land</span></div>
+        </div>
+        <div class="moves-sec">
+          <h4>🕊 IN THE AIR</h4>
+          <div class="move-row"><span class="mk">Space</span><span class="md">Jump</span></div>
+          <div class="move-row"><span class="mk">Space again / C in air</span><span class="md"><b>GROUND POUND — this is the only trigger.</b> 14 dmg with a heavy shove + 0.7s stun, landing recovery. S is only movement — it never pounds. <b>It can be PARRIED now</b> — a parried pound staggers you and can eat a riposte, so pound-spam as an escape is punished</span></div>
+          <div class="move-row"><span class="mk">B in air</span><span class="md">Air dash (once per jump — not during a Dive Stab)</span></div>
+          <div class="move-row"><span class="mk">K in air</span><span class="md">Midair bolt — <b>16</b></span></div>
+        </div>
+        <div class="moves-sec">
+          <h4>✦ SPELLS &amp; SUPPORT — LIGHTER BY DESIGN</h4>
+          <div class="move-row"><span class="mk">K</span><span class="md">Arrows — <b>7</b> each · <b>FREE, no mana</b>. Tap = 1 arrow; HOLD K briefly and release = a spread of <b>3, then 5</b> arrows. Reach and chip — your sword (24–48) is still the killer. Parry-able, like everything</span></div>
+          <div class="move-row"><span class="mk">U</span><span class="md">Shockwave — <b>14</b> · 30 MP · a WIDE ring (218) with a huge radial shove + 0.85s stun: the “get off me” move. It has <b>0.32s of startup</b> — get hit during the windup and it fizzles. <b>U only</b> — E does nothing</span></div>
+          <div class="move-row"><span class="mk">G</span><span class="md">Solar Flash — 40 MP · 7s cooldown · <b>full-screen light</b>. No damage: every skeleton is DAZED (0.6s stun) then <b>BLIND for 3.6s</b> — they wander with no sense of where you are and ~65% of their swings whiff. Works in either mode</span></div>
+          <div class="move-row"><span class="mk">F</span><span class="md">Boss Beam — <b>5</b> a tick while they stand in it · 55 MP · 0.7s charge (rooted — a hit breaks it), then a 1.1s Kame-style blast that <b>TRACKS</b>: it bends toward your lock target (Q), or the nearest skeleton if you never locked one — while charging and while firing. Your sword still out-damages it up close</span></div>
+          <div class="move-row"><span class="mk">Hold L</span><span class="md">Shield — block their blades</span></div>
+          <div class="move-row"><span class="mk">H</span><span class="md">Heal — 32 MP, quick cast, works while moving, combat only (never between waves)</span></div>
+        </div>
+        <div class="moves-sec">
+          <h4>✦ MAGIC MODE — SHIFT TOGGLES (DASH IS ON B NOW)</h4>
+          <div class="move-row"><span class="mk">Shift</span><span class="md"><b>Toggle magic mode.</b> Your right hand stops swinging and starts casting; the ability bar swaps. Shift again to go back to the sword. Magic hits hard and its AoEs are big — and it is COSTLY</span></div>
+          <div class="move-row"><span class="mk">J (magic)</span><span class="md">Chain Lightning — <b>30</b>, hops to up to 5 targets, weaker each hop · 34 MP. A parry grounds out that one skeleton's share — <b>the chain jumps on through the group anyway</b></span></div>
+          <div class="move-row"><span class="mk">K (magic)</span><span class="md">Flamethrower — <b>7</b> a tick in a big cone · <b>HOLD K: no cooldown</b>, it burns until you release or your mana runs dry (drains 30 MP/s). You shuffle at 40% speed while it roars</span></div>
+          <div class="move-row"><span class="mk">L (magic)</span><span class="md">Ice Breath — <b>5</b> a tick + chill stacks · <b>HOLD L: no cooldown</b>, drains 26 MP/s until released or empty. Each stack slows them; at 5 stacks they <b>FREEZE solid for 1.7s</b></span></div>
+          <div class="move-row"><span class="mk">O (magic)</span><span class="md">Fire Pillar — <b>46</b> in a huge circle at your lock target (or 175 ahead) after a 0.4s telegraph · 42 MP</span></div>
+          <div class="move-row"><span class="mk">I / U / H / M (magic)</span><span class="md">Self-buffs, 9s each — <b>I</b> Armor −55% damage taken · 24 MP · <b>U</b> Swift +35% speed · 18 MP · <b>H</b> Regen +5 HP/s · 20 MP · <b>M</b> Might +40% damage · 24 MP</span></div>
+          <div class="move-row"><span class="mk">Touch (magic)</span><span class="md">MAGIC button toggles · SPELL=Chain · BEAM=Flame · SHOCK=Pillar · HEAL=Ice Breath · BUFF button cycles the four buffs. ATK always stays the sword</span></div>
+        </div>
+        <div class="moves-sec">
+          <h4>🎯 MOVE &amp; TARGET</h4>
+          <div class="move-row"><span class="mk">WASD / stick</span><span class="md">Move AND aim — attacks fly toward your last move direction; the cursor is ignored</span></div>
+          <div class="move-row"><span class="mk">B</span><span class="md">Dash (ground or air, once per jump in air)</span></div>
+          <div class="move-row"><span class="mk">Shift</span><span class="md">Toggle MAGIC MODE (see the magic section) — no longer dash</span></div>
+          <div class="move-row"><span class="mk">Q / X</span><span class="md">Target lock (a lone arrow homes in; pillars land on it) / clear lock — Q again cycles</span></div>
+          <div class="move-row"><span class="mk">Esc / P</span><span class="md">Open / close this panel</span></div>
+          <div class="move-row"><span class="mk">Touch</span><span class="md">Stick + ATK (hold = charge spin) · JUMP · POUND (air only) · LOCK buttons</span></div>
+        </div>
+      </div>
+      <p class="dim">Watch for: skeletons THROW their swords (evolvable SwordThrow gene) — skilled throwers lead your movement, so fake them out; a thrower must fetch its sword and takes +50% damage while unarmed. <b>Parry and Riposte are separate genes now:</b> parry decides whether they block; riposte decides whether they answer — and a skel that parries your bolt from across the field will usually hold, because you're out of range. Evolution is a fitness-weighted roulette — hits, damage, parries, ripostes and reactions count most, survival is capped. Parry rates are running high and are deliberately NOT capped — no-limit evolution is still being tested. Size &amp; speed are unbounded.</p>
+      <button class="start-btn" id="moves-close" type="button">Back to the fight</button>
+    </div>
+  </div>
+
+  <div id="savepanel" class="panel-wrap hidden">
+    <div class="panel">
+      <h2>Save <span class="gold">state</span></h2>
+      <p id="save-summary">—</p>
+      <p class="dim">This code captures the horde's evolved genes, the wave and generation, your mode — and in Story mode, your bones and unlocked kit. Send it to another player; they paste it into <b>Load a save state</b> on the front menu (or below) and face the exact horde you saved.</p>
+      <textarea class="savebox" id="save-code" readonly></textarea>
+      <div class="btn-row">
+        <button class="ui-btn primary" id="save-copy" type="button">Copy save code</button>
+        <button class="ui-btn" id="save-download" type="button">Download as file</button>
+      </div>
+      <div class="status-line" id="save-status"></div>
+      <div class="menu-sec">
+        <h3>LOAD A SAVE STATE</h3>
+        <textarea class="savebox" id="load-code" placeholder="Paste a save code here (starts with SS1.)…"></textarea>
+        <div class="btn-row">
+          <button class="ui-btn primary" id="load-btn" type="button">Load this save</button>
+          <label class="ui-btn" for="load-file" style="flex:1; text-align:center; padding:9px 10px;">Load from file…</label>
+          <input type="file" id="load-file" accept=".txt,.json,text/plain" style="display:none" />
+        </div>
+        <div class="status-line" id="load-status"></div>
+      </div>
+      <button class="start-btn" id="save-close" type="button">Back to the game</button>
+    </div>
+  </div>
+</div>
+
+<div id="info">
+  <div id="evo">
+    <div class="evo-head">NATURAL SELECTION — HORDE AVERAGES THIS WAVE</div>
+    <div id="evo-traits"><span>Awaiting first wave…</span></div>
+    <div id="evo-log"></div>
+  </div>
+  <div id="keys"></div>
+</div>
+
+<script>
+"use strict";
+/* ============================================================
+   SKELETON SWORD — v0.1
+   You are the final boss. The horde evolves by natural selection:
+   each skeleton carries behavioral genes; fitness = damage dealt,
+   hits landed, survival, parries & dodges. Top genes breed.
+   ============================================================ */
+var canvas = document.getElementById('game');
+var ctx = canvas.getContext('2d');
+var stage = document.getElementById('stage');
+
+var WORLD = 920;              // square field, world units
+var TAU = Math.PI * 2;
+function clamp(v,a,b){ return v<a?a:(v>b?b:v); }
+function rand(a,b){ return a + Math.random()*(b-a); }
+function dist2(ax,ay,bx,by){ var dx=ax-bx, dy=ay-by; return dx*dx+dy*dy; }
+function angleLerp(a,b,t){ var d=(b-a)%TAU; if(d>Math.PI)d-=TAU; if(d<-Math.PI)d+=TAU; return a+d*t; }
+
+/* ---------- iso projection ---------- */
+var view = { scale:1, ox:0, oy:0 };
+function fitCanvas(){
+  var r = stage.getBoundingClientRect();
+  var dpr = Math.min(window.devicePixelRatio||1, 2);
+  canvas.width = Math.max(300, Math.round(r.width*dpr));
+  canvas.height = Math.max(300, Math.round(r.height*dpr));
+  view.scale = Math.min(r.width, r.height*1.55) / (WORLD*1.42);
+  view.ox = r.width/2; view.oy = r.height/2 - WORLD*view.scale*0.06;
+  view.dpr = dpr;
+}
+function w2s(x,y){ // world -> screen (CSS px)
+  return { x: view.ox + (x-y)*view.scale, y: view.oy + (x+y - WORLD)*0.5*view.scale };
+}
+function screenDirToWorld(dx,dy){ // screen direction -> world direction
+  var wx = dy + dx*0.5, wy = dy - dx*0.5;
+  var m = Math.hypot(wx,wy) || 1; return { x: wx/m, y: wy/m };
+}
+
+/* ---------- audio (tiny synth, optional) ---------- */
+var AC = null;
+function beep(freq, dur, type, vol){
+  try{
+    if(!AC) AC = new (window.AudioContext||window.webkitAudioContext)();
+    if(AC.state === 'suspended') AC.resume();
+    var o = AC.createOscillator(), g = AC.createGain();
+    o.type = type||'square'; o.frequency.value = freq;
+    g.gain.setValueAtTime(vol||0.05, AC.currentTime);
+    g.gain.exponentialRampToValueAtTime(0.0001, AC.currentTime + (dur||0.08));
+    o.connect(g); g.connect(AC.destination); o.start(); o.stop(AC.currentTime + (dur||0.08));
+  }catch(e){}
+}
+
+/* ---------- genes ---------- */
+/* --- Identity mutation: names, colours, sword length — all VERY gradual ---
+   A name is 3–6 letters. Each generation, a child usually keeps a parent's
+   name untouched; sometimes ONE letter drifts. Same with colour: the bone
+   hue and blade hue wander a few degrees a generation, rarely more. Nothing
+   dramatic happens in one wave — but run a lineage to wave 500 and the
+   survivors are genuinely one of a kind. */
+var NAME_SEEDS = ['BOB','REX','ULA','MORT','SKEL','OSSI','RIB','TIB','FEMUR','ULNA','MAX','VERA','COSTA','PELV','HUMER','STERN'];
+var LETTERS = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ';
+function randomSkelName(){
+  if(Math.random() < 0.55) return NAME_SEEDS[Math.floor(Math.random()*NAME_SEEDS.length)];
+  var n = 3 + Math.floor(Math.random()*3), s = '';
+  for(var i=0;i<n;i++) s += LETTERS[Math.floor(Math.random()*26)];
+  return s;
+}
+function mutateName(name){
+  name = (name && typeof name === 'string' && name.length >= 2) ? name : randomSkelName();
+  var r = Math.random();
+  if(r < 0.62) return name; // most children keep the name exactly — drift is slow on purpose
+  var pos = Math.floor(Math.random()*name.length);
+  var out = name.slice(0,pos) + LETTERS[Math.floor(Math.random()*26)] + name.slice(pos+1);
+  if(r > 0.96 && out.length < 7) out += LETTERS[Math.floor(Math.random()*26)]; // rare: grows a letter
+  else if(r > 0.93 && out.length > 3) out = out.slice(0, out.length-1);        // rare: loses one
+  return out;
+}
+function driftHue(h, amt){ return ((h + rand(-amt, amt)) % 360 + 360) % 360; }
+
+function baseGenes(){
+  // Generation 1: classic fodder. Slow to react, almost never defends.
+  return {
+    speed:      rand(0.85, 1.05),
+    size:       rand(0.9, 1.1),     // body scale — NO upper bound by design (comedy + chaos)
+    vitality:   rand(0.85, 1.05),  // HP multiplier — gen 1 is true fodder (~20 HP); toughness evolves later
+    attackRange:rand(0.9, 1.1),
+    attackSpeed:rand(0.9, 1.1),    // windup / recovery speed multiplier
+    parryWindow:rand(0.8, 1.1),    // parry duration multiplier
+    reaction:   rand(0.05, 0.22),  // chance to REACT to ANY player input
+    throwSkill: rand(0.02, 0.12),  // sword-throwing: frequency + how well they LEAD a moving target
+    aggression: rand(0.25, 0.45),
+    dodge:      rand(0.0, 0.06),
+    parry:      rand(0.0, 0.05),   // chance to PARRY anything — sword, bolt, beam, magic, ground pound
+    riposte:    rand(0.0, 0.08),   // SEPARATE stat: chance to answer a successful parry with a riposte (only if you're in range)
+    dash:       rand(0.0, 0.08),
+    feint:      rand(0.0, 0.04),
+    strafe:     rand(0.15, 0.4),   // lateral / shimmy tendency
+    nerve:      rand(0.3, 0.55),
+    swordLen:   rand(0.85, 1.15),  // blade length multiplier — long = reach + windup, short = fast
+    name:       randomSkelName(),  // identity — mutates one letter at a time across generations
+    boneHue:    rand(38, 52),      // bone colour hue — drifts a few degrees per generation
+    bladeHue:   rand(200, 225),    // blade tint hue — drifts just as slowly
+    eyeGlow:    rand(0, 0.25)      // 0 = dark sockets … 1 = glowing eyes; creeps up or down slowly
+  };
+}
+function breed(a, b){
+  var g = {}, keys = Object.keys(a);
+  // identity fields ride along even if one parent predates them
+  ['name','boneHue','bladeHue','eyeGlow','swordLen'].forEach(function(k){ if(keys.indexOf(k) < 0) keys.push(k); });
+  for(var i=0;i<keys.length;i++){
+    var k = keys[i];
+    var v = Math.random()<0.5 ? a[k] : b[k];
+    if(k === 'name'){ g[k] = mutateName(typeof v === 'string' ? v : null); continue; }
+    if(k === 'boneHue'){ g[k] = driftHue(typeof v === 'number' ? v : rand(38,52), Math.random() < 0.07 ? 26 : 7); continue; }
+    if(k === 'bladeHue'){ g[k] = driftHue(typeof v === 'number' ? v : rand(200,225), Math.random() < 0.07 ? 30 : 8); continue; }
+    if(k === 'eyeGlow'){ g[k] = clamp((typeof v === 'number' ? v : 0.1) + rand(-0.07, 0.09), 0, 1); continue; }
+    // Physical traits mutate MULTIPLICATIVELY and are unbounded above —
+    // tiny speedsters and giants are the fun. Only a tiny floor stops zero/negative.
+    if(k==='speed' || k==='size' || k==='attackRange' || k==='attackSpeed' || k==='parryWindow' || k==='vitality' || k==='swordLen'){
+      var mut = (Math.random()<0.12) ? rand(0.65, 1.55) : rand(0.88, 1.16);
+      v = (typeof v === 'number' ? v : 1) * mut;
+      if(v < 0.12) v = 0.12 + Math.random()*0.1;
+      if(k === 'swordLen' && v < 0.3) v = 0.3; // a dagger at worst — still a sword
+    } else {
+      v = (typeof v === 'number' ? v : 0) + rand(-0.09, 0.09);
+      if(Math.random()<0.08) v += rand(-0.15, 0.22); // occasional wild swing
+      v = clamp(v, 0, 0.92);
+    }
+    g[k] = v;
+  }
+  return g;
+}
+/* Windup scale from blade length: a long sword is slow to swing, a short one is quick.
+   Effective attack speed already lives in attackSpeed; length bends it further. */
+function lenWindup(g){ var L = (g && g.swordLen) || 1; return 0.62 + 0.38 * L; }
+/* --- Reaction system: ANY player input can trigger a RANDOM response --- */
+var REACTION_CHOICES = ['dodge','parry','dashIn','lateral','feint','jump','stab','swipe','retreat','hold','throwSword'];
+function emitPlayerAction(type){
+  if(!player || G.state!=='fight') return;
+  skels.forEach(function(s){
+    if(s.dead || s.reactionCd>0) return;
+    var d = Math.hypot(player.x-s.x, player.y-s.y);
+    if(d>340) return;
+    // RNG gate: the reaction gene is a probability, never a guarantee
+    if(Math.random() > (s.genes.reaction||0.15)) return;
+    s.reactionCd = rand(0.5,1.3);
+    s.reactions = (s.reactions||0)+1;
+    var choice = REACTION_CHOICES[Math.floor(Math.random()*REACTION_CHOICES.length)];
+    var toP = Math.atan2(player.y-s.y, player.x-s.x);
+    if(choice==='dodge'){
+      s.dodgeTime=0.34; s.dodges=(s.dodges||0); var side=Math.random()<0.5?1:-1;
+      var da = toP + (Math.random()<0.5?Math.PI:side*rand(0.6,1.6));
+      s.dodgeDx=Math.cos(da); s.dodgeDy=Math.sin(da); floater(s.x,s.y-22,'react: roll','#a79f8a');
+    } else if(choice==='parry'){
+      s.parryTime=0.42*(s.genes.parryWindow||1); s.face=toP; s.state='parry'; s.stateT=s.parryTime;
+    } else if(choice==='dashIn'){
+      s.dodgeTime=0.28; s.dodgeDx=Math.cos(toP); s.dodgeDy=Math.sin(toP); floater(s.x,s.y-22,'react: dash in!','#f2c14e');
+    } else if(choice==='lateral'){
+      s.dodgeTime=0.3; var la=toP+(Math.random()<0.5?Math.PI/2:-Math.PI/2)+rand(-0.4,0.4);
+      s.dodgeDx=Math.cos(la); s.dodgeDy=Math.sin(la); floater(s.x,s.y-22,'react: sidestep','#a79f8a');
+    } else if(choice==='retreat'){
+      s.dodgeTime=0.26; s.dodgeDx=Math.cos(toP+Math.PI+rand(-0.5,0.5)); s.dodgeDy=Math.sin(toP+Math.PI+rand(-0.5,0.5));
+    } else if(choice==='feint' && s.state==='approach'){ s.state='feint'; s.stateT=0.3; }
+    else if(choice==='jump' && s.state==='approach' && s.atkCd<=0.2){ s.atkType='jump'; s.state='jumpWindup'; s.stateT=0.46*lenWindup(s.genes)/(s.genes.attackSpeed||1); s.windupHitDone=false; }
+    else if(choice==='stab' && s.state==='approach' && s.atkCd<=0.2){ s.atkType='stab'; s.state='stabWindup'; s.stateT=0.34*lenWindup(s.genes)/(s.genes.attackSpeed||1); s.windupHitDone=false; s.stabDx=Math.cos(toP); s.stabDy=Math.sin(toP); }
+    else if(choice==='swipe' && s.state==='approach' && s.atkCd<=0.2){ s.atkType='swipe'; s.state='swipeWindup'; s.stateT=0.30*lenWindup(s.genes)/(s.genes.attackSpeed||1); s.windupHitDone=false; s.swipeDir=Math.random()<0.5?-1:1; }
+    else if(choice==='throwSword' && s.hasSword && s.state==='approach' && d>120 && d<440){ doThrow(s); }
+    // 'hold' = deliberately does nothing — RNG includes freezing up
+  });
+}
+
+/* ---------- game state ---------- */
+var G = {
+  running:false, paused:false, over:false,
+  wave:0, generation:1, time:0, betweenTimer:0, state:'menu', // menu | fight | between | over
+  genePool:[], lastAverages:null, logLines:[],
+  shake:0, flash:0,
+  mode:'survival',           // 'survival' | 'story'
+  bones:0, totalBones:0,     // story-mode currency (totalBones drives the bone-form)
+  duel:false,                // story: master duel in progress
+  pendingGenes:null          // exact gene set from a loaded save state, used once
+  // NOTE: no saved "wasPaused" snapshot anymore — paused is derived from which
+  // panels are actually open (see closeMoves/closeSavePanel). Snapshots wedged shut.
+};
+
+var player = null;
+function newPlayer(){
+  return {
+    x: WORLD/2, y: WORLD/2, r: 22,
+    hp: 206, maxHp: 206, mp: 100, maxMp: 100, // 206 HP — the number of bones in the adult human body. Always.
+    face: -Math.PI/2, speed: 265,
+    atkCd:0, atkAnim:0, atkDidHit:false,
+    spellCd:0, shockCd:0, shockWindup:0, flashCd:0, arrowCharge:0, arrowCharging:false,
+    beamCd:0, beamCharge:0, beamTime:0, beamHitT:0, beamDir:0, healCd:0, healCast:0, dashCd:0, dashTime:0, dashDx:0, dashDy:0,
+    magicMode:false, // SHIFT toggles this: right-hand keys become spells & buffs instead of sword kit
+    chainCd:0, flameCd:0, flameTime:0, flameHitT:0, pillarCd:0, iceCd:0, iceTime:0, iceHitT:0,
+    buffArmorT:0, buffHasteT:0, buffPowerT:0, buffRegenT:0, buffCd:0, buffCycle:0,
+    charging:false, charge:0, spinAnim:0, spinDidHit:false,
+    airT:0, airDur:0.55, jumpH:0, airDashUsed:false, pounding:false,
+    diagTime:0, diagAnim:0, diagDidHit:false, diagUsed:false, diagLanding:false, diagVx:0, diagVy:0, recoverT:0, vx:0, vy:0,
+    combo:0, comboT:0, swingStep:0, swingDmg:19, swingRange:96,
+    taps:[], flurryTime:0, flurryHitT:0, flurryCd:0, lockTarget:null,
+    shielding:false, stagger:0, hurtFlash:0, alive:true,
+    boneStage:0,
+    // Kit unlocks. Survival starts with the core kit on (extras are Story purchases).
+    unlocks:{ spell:true, shock:true, beam:true, flash:true, heal:true, dash:true,
+              fire3:false, ice1:false, ice2:false, ice3:false,
+              aegis:false, heart:false, mob2:false, mob3:false }
+  };
+}
+var BONE_STAGES = [
+  { at:0,   name:'The Final Boss' },
+  { at:50,  name:'Bone-Touched' },
+  { at:120, name:'Half-Bone' },
+  { at:220, name:'Bone Knight' },
+  { at:350, name:'THE SKELETON SWORD' }
+];
+function boneStageFor(total){
+  var st = 0;
+  for(var i=0;i<BONE_STAGES.length;i++) if(total >= BONE_STAGES[i].at) st = i;
+  return st;
+}
+function checkBoneStage(announce){
+  if(!player) return;
+  var st = boneStageFor(G.totalBones);
+  if(st > player.boneStage){
+    player.boneStage = st;
+    if(announce !== false) banner('Your form changes', BONE_STAGES[st].name + ' — the bones show through a little more. The skeletons nod, approving.');
+  }
+}
+function snap8(a){ return Math.round(a/(Math.PI/4))*(Math.PI/4); }
+
+var skels = [], projectiles = [], particles = [], floaters = [], shockwaves = [], thrownSwords = [], pillars = [], lightnings = [];
+var nextSkelId = 1;
+
+function makeSkel(genes, x, y){
+  if(genes.riposte === undefined) genes.riposte = rand(0.0, 0.1); // saves from before the parry/riposte split
+  if(genes.parry === undefined) genes.parry = rand(0.0, 0.05);
+  // older saves predate identity & blade-length genes — seed them gently
+  if(typeof genes.name !== 'string' || !genes.name) genes.name = randomSkelName();
+  if(typeof genes.swordLen !== 'number') genes.swordLen = rand(0.85, 1.15);
+  if(typeof genes.boneHue !== 'number') genes.boneHue = rand(38, 52);
+  if(typeof genes.bladeHue !== 'number') genes.bladeHue = rand(200, 225);
+  if(typeof genes.eyeGlow !== 'number') genes.eyeGlow = rand(0, 0.25);
+  var hpBonus = Math.min(18, Math.max(0,(G.wave-1))*2);
+  var sz = genes.size || 1;
+  var baseHp = Math.max(8, Math.round((20 + hpBonus) * (genes.vitality || 1))); // early waves: 1–2 sword hits. Fodder, as it should be.
+  return {
+    id: nextSkelId++, x:x, y:y, r: Math.max(5, 15*sz), genes:genes,
+    hp: baseHp, maxHp: baseHp,
+    face: Math.PI/2, state:'approach', stateT: rand(0,0.3),
+    atkCd: rand(0.4, 1.4), windupHitDone:false, atkType:'basic',
+    dodgeTime:0, dodgeDx:0, dodgeDy:0,
+    parryTime:0, strafeDir: Math.random()<0.5?-1:1, strafeT: rand(1,2.5),
+    reactionCd:0, reactions:0, moveAng: rand(0,TAU), moveT: rand(0.2,0.9),
+    slowT:0, stunT:0, kbVx:0, kbVy:0, chillStacks:0, chillT:0, freezeT:0, ripostes:0,
+    blindT:0, unarmedT:0, nameDriftT: rand(14, 30),
+    isMaster:false, hasSword:true, swordRef:null, throws:0,
+    jumpT:0, jumpFromX:0, jumpFromY:0, jumpToX:0, jumpToY:0, jumpH:0,
+    stabDx:0, stabDy:0, swipeDir:1, riposteHitDone:false,
+    bornAt: G.time, fitness:0, dmgDealt:0, hits:0, parries:0, dodges:0,
+    hurtFlash:0, dead:false
+  };
+}
+
+function waveSize(n){ return 8; }
+
+function spawnWave(){
+  G.wave++;
+  if(G.wave > 1) G.generation++;
+  var n = waveSize(G.wave);
+  var genesList = [];
+  if(G.pendingGenes && G.pendingGenes.length){
+    // A loaded save state: the recipient faces the EXACT horde that was saved.
+    for(var pi=0;pi<n;pi++) genesList.push(JSON.parse(JSON.stringify(G.pendingGenes[pi % G.pendingGenes.length])));
+    G.pendingGenes = null;
+  } else if(G.genePool.length === 0){
+    for(var i=0;i<n;i++) genesList.push(baseGenes());
+  } else {
+    for(var j=0;j<n;j++){
+      var a = G.genePool[Math.floor(Math.random()*G.genePool.length)];
+      var b = G.genePool[Math.floor(Math.random()*G.genePool.length)];
+      genesList.push(breed(a,b));
+    }
+  }
+  skels = []; thrownSwords = [];
+  for(var k=0;k<n;k++){
+    var ang = (k/n)*TAU + rand(-0.3,0.3);
+    var rad = WORLD*0.42;
+    var x = clamp(WORLD/2 + Math.cos(ang)*rad, 50, WORLD-50);
+    var y = clamp(WORLD/2 + Math.sin(ang)*rad, 50, WORLD-50);
+    skels.push(makeSkel(genesList[k], x, y));
+  }
+  G.state = 'fight';
+  showAverages(genesList);
+  banner('Wave ' + G.wave, G.wave === 1
+    ? 'Dead souls of every PvE enemy you ever farmed. They look… slow.'
+    : 'Bred from the ones that hurt you most. Generation ' + G.generation + '.');
+  updateHUD();
+}
+
+function showAverages(list){
+  if(!list.length) return;
+  var keys = ['dodge','parry','riposte','dash','feint','strafe','aggression','reaction','throwSkill'];
+  var labels = {dodge:'Dodge', parry:'Parry', riposte:'Riposte', dash:'Dash', feint:'Feint', strafe:'Shimmy', aggression:'Aggression', reaction:'Reaction', throwSkill:'SwordThrow'};
+  var html = '', avgs = {};
+  keys.forEach(function(k){
+    var s=0; list.forEach(function(g){ s+=g[k]||0; }); var avg=s/list.length; avgs[k]=avg;
+    html += '<span>' + labels[k] + ' <b>' + Math.round(avg*100) + '%</b></span>';
+  });
+  ['speed','size','attackRange','attackSpeed','parryWindow','vitality','swordLen'].forEach(function(k){
+    var s=0; list.forEach(function(g){ s+=g[k]||1; }); var avg=s/list.length; avgs[k]=avg;
+    var lbl={speed:'Speed',size:'Size',attackRange:'Range',attackSpeed:'AtkSpd',parryWindow:'ParryWin',vitality:'HP',swordLen:'SwordLen'}[k];
+    html += '<span>' + lbl + ' <b>' + avg.toFixed(2) + '×</b></span>';
+  });
+  document.getElementById('evo-traits').innerHTML = html;
+  if(G.lastAverages){
+    var risen = null, best = 0.04;
+    keys.forEach(function(k){ var d = avgs[k]-G.lastAverages[k]; if(d>best){ best=d; risen=labels[k]; } });
+    if(risen) logLine('↑ ' + risen + ' is spreading through the horde (+' + Math.round(best*100) + '%).');
+  }
+  G.lastAverages = avgs;
+}
+
+function logLine(t){
+  G.logLines.push(t); if(G.logLines.length>3) G.logLines.shift();
+  document.getElementById('evo-log').textContent = G.logLines[G.logLines.length-1] || '';
+}
+
+function selectAndBreed(){
+  var all = G.allWaveSkels || [];
+  if(!all.length){ G.genePool = []; return; }
+  all.forEach(function(s){
+    var survival = Math.min(G.time - s.bornAt, 14); // CAPPED — survival alone must not dominate (the old runaway problem)
+    var engagement = s.dmgDealt*2.2 + s.hits*7 + s.parries*6 + (s.ripostes||0)*7 + s.dodges*3 + (s.reactions||0)*1.2;
+    s.fitness = engagement + survival*0.35;
+    if(s.hits===0 && s.dmgDealt<=0) s.fitness *= 0.35; // lived long but never touched the boss? weak genes
+    s.fitness = Math.max(0.5, s.fitness) + 1.5; // baseline so EVERYONE keeps a lottery ticket — selection is RNG, not forced
+  });
+  // Fitness-weighted ROULETTE: fitter skels are favoured, never guaranteed. Pure RNG excitement.
+  var pool = [], total = all.reduce(function(a,s){return a+s.fitness;},0);
+  var keep = Math.max(3, Math.ceil(all.length*0.6));
+  for(var i=0;i<keep;i++){
+    var roll = Math.random()*total, acc=0, pick=all[all.length-1];
+    for(var j=0;j<all.length;j++){ acc+=all[j].fitness; if(roll<=acc){ pick=all[j]; break; } }
+    pool.push(pick.genes);
+  }
+  G.genePool = pool;
+  var sorted = all.slice().sort(function(a,b){return b.fitness-a.fitness;});
+  var best = sorted[0];
+  logLine('Roulette selection (RNG, fitness-favoured): top scorer #' + best.id + ' — ' + Math.round(best.dmgDealt) + ' dmg, ' +
+    best.hits + ' hits, ' + best.parries + ' parries, ' + (best.ripostes||0) + ' ripostes, ' + (best.reactions||0) + ' reactions. But the wheel decides who breeds.');
+}
+
+/* ---------- UI helpers ---------- */
+var bannerTimer = null;
+function banner(big, small){
+  document.getElementById('banner-big').textContent = big;
+  document.getElementById('banner-small').textContent = small || '';
+  var b = document.getElementById('banner'); b.classList.add('show');
+  if(bannerTimer) clearTimeout(bannerTimer);
+  bannerTimer = setTimeout(function(){ b.classList.remove('show'); }, 3400);
+}
+function updateHUD(){
+  if(!player) return;
+  document.getElementById('hp-fill').style.width = clamp(player.hp/player.maxHp*100,0,100) + '%';
+  document.getElementById('hp-fill').className = player.hp < 60 ? 'low' : '';
+  document.getElementById('hp-num').textContent = Math.max(0,Math.ceil(player.hp)) + ' / ' + player.maxHp;
+  document.getElementById('mp-fill').style.width = clamp(player.mp/player.maxMp*100,0,100) + '%';
+  document.getElementById('mp-num').textContent = Math.floor(player.mp) + ' / ' + player.maxMp;
+  document.getElementById('wave-num').textContent = G.duel ? 'DUEL' : (G.wave || '–');
+  document.getElementById('gen-num').textContent = G.generation;
+  document.getElementById('mode-num').textContent = G.mode === 'story' ? 'STORY' : 'SURVIVAL';
+  var bs = document.getElementById('bones-stat');
+  bs.style.display = G.mode === 'story' ? '' : 'none';
+  document.getElementById('bones-num').textContent = G.bones;
+  document.getElementById('left-num').textContent = skels.filter(function(s){return !s.dead;}).length;
+  document.getElementById('shield-tag').className = player.shielding ? 'on' : '';
+  document.getElementById('shield-tag').id = 'shield-tag';
+  var mt = document.getElementById('magic-tag'); if(mt) mt.className = player.magicMode ? 'on' : '';
+  var bt = [];
+  if(player.buffArmorT > 0) bt.push('🛡 ARMOR ' + Math.ceil(player.buffArmorT) + 's');
+  if(player.buffHasteT > 0) bt.push('💨 SWIFT ' + Math.ceil(player.buffHasteT) + 's');
+  if(player.buffPowerT > 0) bt.push('🔥 MIGHT ' + Math.ceil(player.buffPowerT) + 's');
+  if(player.buffRegenT > 0) bt.push('💚 REGEN ' + Math.ceil(player.buffRegenT) + 's');
+  var bte = document.getElementById('buff-tag'); if(bte) bte.textContent = bt.join('  ·  ');
+  refreshAbilityBar();
+}
+/* --- Cooldown clarity: every ability shows READY / seconds-left / LOCKED / NO MP --- */
+function setAB(id, frac, txt, cls){
+  var el = document.getElementById(id); if(!el) return;
+  el.className = 'ab ' + cls;
+  el.querySelector('.ab-fill').style.width = clamp(frac * 100, 0, 100) + '%';
+  el.querySelector('.ab-cd').textContent = txt;
+}
+function refreshAbilityBar(){
+  if(!player) return;
+  var story = G.mode === 'story';
+  function chip(id, cd, max, locked, mpOk){
+    if(locked){ setAB(id, 0, 'LOCKED', 'locked'); return; }
+    if(cd > 0){ setAB(id, 1 - cd / max, cd.toFixed(1) + 's', 'cd'); return; }
+    if(!mpOk){ setAB(id, 1, 'NO MP', 'nomp'); return; }
+    setAB(id, 1, 'READY', 'ready');
+  }
+  if(player.flurryTime > 0) setAB('ab-atk', 1, 'FLURRY!', 'ready');
+  else if(player.flurryCd > 0 && player.atkCd <= 0) setAB('ab-atk', 1 - player.flurryCd / 3, 'flurry ' + player.flurryCd.toFixed(1) + 's', 'cd');
+  else chip('ab-atk', player.atkCd, 0.45, false, true);
+  if(player.arrowCharging) setAB('ab-spell', player.arrowCharge / 0.42, player.arrowCharge >= 0.42 ? '5 ARROWS — RELEASE!' : (player.arrowCharge >= 0.16 ? '3 ARROWS…' : 'DRAWING…'), 'nomp');
+  else chip('ab-spell', player.spellCd, 0.3, story && !player.unlocks.spell, true); // arrows are FREE — no mana, ever
+  if(player.shockWindup > 0) setAB('ab-shock', 1 - player.shockWindup / 0.32, 'WINDING UP…', 'nomp');
+  else chip('ab-shock', player.shockCd, 1.6, story && !player.unlocks.shock, player.mp >= 30);
+  if(player.flashCd > 0) chip('ab-flash', player.flashCd, 7, story && !player.unlocks.flash, player.mp >= 40);
+  else chip('ab-flash', 0, 7, story && !player.unlocks.flash, player.mp >= 40);
+  var fm = document.getElementById('ab-flashm'); if(fm && player.magicMode) setAB('ab-flashm', player.flashCd > 0 ? 1 - player.flashCd / 7 : 1, player.flashCd > 0 ? player.flashCd.toFixed(1) + 's' : 'READY', player.flashCd > 0 ? 'cd' : 'ready');
+  if(player.beamTime > 0) setAB('ab-beam', 1, 'BEAMING!', 'ready');
+  else if(player.beamCharge > 0) setAB('ab-beam', 1 - player.beamCharge / 0.7, 'CHARGING…', 'nomp');
+  else chip('ab-beam', player.beamCd, 6, story && !player.unlocks.beam, player.mp >= 55);
+  chip('ab-heal', Math.max(player.healCd, player.healCast), 4.5, story && !player.unlocks.heal, player.mp >= 32);
+  chip('ab-dash', player.dashCd, player.unlocks.mob3 ? 0.45 : 0.9, story && !player.unlocks.dash, true);
+  if(player.airT > 0) setAB('ab-jump', 1 - player.airT / player.airDur, 'AIR!', 'ready');
+  else chip('ab-jump', 0, 1, false, true);
+  // SHIFT magic toggle swaps the whole bar: physical chips hide, magic chips show
+  var allChips = document.querySelectorAll('#ability-bar .ab[data-mode]');
+  for(var ci2 = 0; ci2 < allChips.length; ci2++){
+    var cm = allChips[ci2].getAttribute('data-mode');
+    allChips[ci2].style.display = (cm === 'magic') === !!player.magicMode ? '' : 'none';
+  }
+  if(player.magicMode){
+    chip('ab-chain', player.chainCd, 1.6, story && !player.unlocks.spell, player.mp >= 34);
+    if(player.flameTime > 0) setAB('ab-flame', player.mp / player.maxMp, 'BURNING — MP ' + Math.floor(player.mp), 'ready'); // held channel: the bar IS the mana
+    else if(story && !player.unlocks.shock) setAB('ab-flame', 0, 'LOCKED', 'locked');
+    else setAB('ab-flame', 1, player.mp > 1 ? 'READY — HOLD' : 'NO MP', player.mp > 1 ? 'ready' : 'nomp');
+    if(player.iceTime > 0) setAB('ab-ice', player.mp / player.maxMp, 'FREEZING — MP ' + Math.floor(player.mp), 'ready');
+    else if(story && !player.unlocks.ice1) setAB('ab-ice', 0, 'LOCKED', 'locked');
+    else setAB('ab-ice', 1, player.mp > 1 ? 'READY — HOLD' : 'NO MP', player.mp > 1 ? 'ready' : 'nomp');
+    chip('ab-pillar', player.pillarCd, 3.6, story && !player.unlocks.fire3, player.mp >= 42);
+    function buffChip(id, key, cost, locked){
+      if(locked){ setAB(id, 0, 'LOCKED', 'locked'); return; }
+      if(player[key] > 0){ setAB(id, player[key] / 9, 'ON · ' + player[key].toFixed(1) + 's', 'ready'); return; }
+      chip(id, player.buffCd, 0.8, false, player.mp >= cost);
+    }
+    buffChip('ab-armor', 'buffArmorT', 24, story && !player.unlocks.aegis);
+    buffChip('ab-haste', 'buffHasteT', 18, story && !player.unlocks.mob2);
+    buffChip('ab-regen', 'buffRegenT', 20, story && !player.unlocks.heal);
+    buffChip('ab-might', 'buffPowerT', 24, story && !player.unlocks.fire3);
+  }
+  var tmap = { 'tb-spell': player.spellCd, 'tb-shock': player.shockCd, 'tb-beam': player.beamCd, 'tb-heal': player.healCd, 'tb-dash': player.dashCd, 'tb-attack': player.atkCd };
+  Object.keys(tmap).forEach(function(id){ var el = document.getElementById(id); if(el) el.classList.toggle('cd', tmap[id] > 0); });
+}
+
+/* ---------- input ---------- */
+var keys = {};
+var stickVec = { x:0, y:0, active:false };
+var mouse = { x:0, y:0, down:false, seen:false };
+var touchShield = false;
+var touchFlameHeld = false, touchIceHeld = false; // touch hold state for the mana-drain channels
+
+window.addEventListener('keydown', function(e){
+  // ESCAPE ALWAYS WORKS — handled before everything, even with focus sitting in a
+  // save-code box or on a button. This is the guaranteed unstick path: Esc closes
+  // whichever panel is open; with nothing open, it opens the pause panel.
+  if(e.code === 'Escape'){
+    var mvEl = document.getElementById('moves'), svEl = document.getElementById('savepanel');
+    if(mvEl && !mvEl.classList.contains('hidden')) closeMoves();
+    else if(svEl && !svEl.classList.contains('hidden')) closeSavePanel();
+    else toggleMoves();
+    return;
+  }
+  if(e.target && (e.target.tagName === 'TEXTAREA' || e.target.tagName === 'INPUT')) return; // typing a save code is not combat
+  if(['ArrowUp','ArrowDown','ArrowLeft','ArrowRight','Space'].indexOf(e.code)>=0) e.preventDefault();
+  keys[e.code] = true;
+  if(e.repeat) return;
+  var magic = player && player.magicMode;
+  if(e.code === 'KeyP'){ toggleMoves(); return; }
+  if(e.code === 'Space'){ if(player && player.airT > 0) tryGroundPound(); else tryJump(); }
+  if(e.code === 'ShiftLeft' || e.code === 'ShiftRight') toggleMagic(); // SHIFT = magic toggle now. It is NOT dash anymore.
+  if(e.code === 'KeyB') tryDash(); // dash lives on B now — ground or air
+  if(e.code === 'KeyC') tryGroundPound(); // GROUND POUND trigger, stated plainly: Space again or C while airborne. S is movement only — never a pound.
+  if(e.code === 'KeyH'){ if(magic) castBuff('regen'); else tryHeal(); }
+  if(e.code === 'KeyK'){ if(magic) tryFlame(); else startArrowCharge(); }
+  if(e.code === 'KeyG') tryFlash(); // SOLAR FLASH — full-screen blind, either mode
+  if(e.code === 'KeyL'){ if(magic) tryIce(); } // physical L is hold-to-shield, handled in update
+  if(e.code === 'KeyU'){ if(magic) castBuff('haste'); else tryShockwave(); } // shockwave is on U. ONLY U. E does nothing.
+  if(e.code === 'KeyI'){ if(magic) castBuff('armor'); }
+  if(e.code === 'KeyO'){ if(magic) tryPillar(); }
+  if(e.code === 'KeyM'){ if(magic) castBuff('might'); }
+  if(e.code === 'KeyF') tryBeam();
+  if(e.code === 'KeyQ') cycleTarget();
+  if(e.code === 'KeyX' && player) player.lockTarget = null;
+  if(e.code === 'KeyJ'){ if(magic) tryChain(); else startCharge(); }
+  if(e.code === 'Enter' && !G.running) startGame();
+});
+window.addEventListener('keyup', function(e){ keys[e.code] = false; if(e.code === 'KeyJ') releaseAttack(); if(e.code === 'KeyK') releaseArrows(); });
+window.addEventListener('pointerup', function(){ releaseAttack(); });
+canvas.addEventListener('pointermove', function(e){
+  var r = canvas.getBoundingClientRect(); mouse.x = e.clientX - r.left; mouse.y = e.clientY - r.top; mouse.seen = true;
+});
+canvas.addEventListener('pointerdown', function(e){
+  if(e.pointerType === 'touch') return;
+  mouse.seen = true;
+  var r = canvas.getBoundingClientRect(); mouse.x = e.clientX - r.left; mouse.y = e.clientY - r.top;
+  if(e.button === 0) startCharge();
+  if(e.button === 2) trySpell();
+});
+canvas.addEventListener('contextmenu', function(e){ e.preventDefault(); });
+
+/* touch joystick */
+(function(){
+  var stick = document.getElementById('stick'), knob = document.getElementById('stick-knob');
+  var pid = null;
+  function setKnob(dx,dy){ knob.style.transform = 'translate(calc(-50% + ' + dx + 'px), calc(-50% + ' + dy + 'px))'; }
+  stick.addEventListener('pointerdown', function(e){ pid = e.pointerId; stick.setPointerCapture(pid); move(e); document.body.classList.add('touch'); });
+  stick.addEventListener('pointermove', function(e){ if(e.pointerId===pid) move(e); });
+  function move(e){
+    var r = stick.getBoundingClientRect();
+    var dx = e.clientX - (r.left + r.width/2), dy = e.clientY - (r.top + r.height/2);
+    var m = Math.hypot(dx,dy), max = 40;
+    if(m > max){ dx = dx/m*max; dy = dy/m*max; }
+    setKnob(dx,dy);
+    stickVec.x = dx/max; stickVec.y = dy/max; stickVec.active = Math.hypot(stickVec.x,stickVec.y) > 0.18;
+  }
+  function end(e){ if(e.pointerId===pid){ pid=null; stickVec.x=0; stickVec.y=0; stickVec.active=false; setKnob(0,0); } }
+  stick.addEventListener('pointerup', end); stick.addEventListener('pointercancel', end);
+})();
+function bindBtn(id, down, up){
+  var el = document.getElementById(id);
+  el.addEventListener('pointerdown', function(e){ e.preventDefault(); el.classList.add('pressed'); document.body.classList.add('touch'); down(); });
+  var release = function(){ el.classList.remove('pressed'); if(up) up(); };
+  el.addEventListener('pointerup', release); el.addEventListener('pointercancel', release); el.addEventListener('pointerleave', release);
+}
+bindBtn('tb-attack', function(){ startCharge(); }, function(){ releaseAttack(); });
+bindBtn('tb-magic',  function(){ toggleMagic(); });
+bindBtn('tb-buff',   function(){ tryBuffCycle(); });
+bindBtn('tb-spell',  function(){ if(player && player.magicMode) tryChain(); else startArrowCharge(); }, function(){ releaseArrows(); });
+bindBtn('tb-beam',   function(){ if(player && player.magicMode){ touchFlameHeld = true; tryFlame(); } else tryBeam(); }, function(){ touchFlameHeld = false; });
+bindBtn('tb-flash',  function(){ tryFlash(); });
+bindBtn('tb-shock',  function(){ if(player && player.magicMode) tryPillar(); else tryShockwave(); });
+bindBtn('tb-heal',   function(){ if(player && player.magicMode){ touchIceHeld = true; tryIce(); } else tryHeal(); }, function(){ touchIceHeld = false; });
+function updateTouchLabels(){
+  var m = player && player.magicMode;
+  var set = function(id, t){ var el = document.getElementById(id); if(el) el.textContent = t; };
+  set('tb-spell', m ? 'CHAIN' : 'ARROW');
+  set('tb-beam',  m ? 'FLAME' : 'BEAM');
+  set('tb-shock', m ? 'PILLAR' : 'SHOCK');
+  set('tb-heal',  m ? 'ICE' : 'HEAL');
+  var mg = document.getElementById('tb-magic'); if(mg) mg.classList.toggle('pressed', !!m);
+}
+bindBtn('tb-dash',   function(){ tryDash(); });
+bindBtn('tb-jump',   function(){ tryJump(); });
+bindBtn('tb-pound',  function(){ tryGroundPound(); });
+bindBtn('tb-lock',   function(){ cycleTarget(); });
+bindBtn('tb-shield', function(){ touchShield = true; }, function(){ touchShield = false; });
+
+function moveInput(){
+  var sx = 0, sy = 0;
+  if(keys['KeyA'] || keys['ArrowLeft']) sx -= 1;
+  if(keys['KeyD'] || keys['ArrowRight']) sx += 1;
+  if(keys['KeyW'] || keys['ArrowUp']) sy -= 1;
+  if(keys['KeyS'] || keys['ArrowDown']) sy += 1;
+  if(stickVec.active){ sx = stickVec.x; sy = stickVec.y; }
+  var m = Math.hypot(sx,sy);
+  if(m > 1){ sx/=m; sy/=m; }
+  if(sx===0 && sy===0) return null;
+  return screenDirToWorld(sx,sy);
+}
+
+/* ---------- player actions ---------- */
+function tryAttack(){ startCharge(); releaseAttack(); }
+function startCharge(){
+  if(!G.running || G.paused || G.over || !player || player.stagger > 0) return;
+  // FLURRY: mash ATK fast enough (5 presses inside 1.1s) — E. Honda / Chun-Li hands
+  player.taps.push(G.time);
+  player.taps = player.taps.filter(function(t){ return G.time - t < 1.1; });
+  if(player.airT <= 0 && player.flurryCd <= 0 && player.flurryTime <= 0 && player.taps.length >= 5){
+    player.taps = []; player.flurryTime = 0.6; player.flurryHitT = 0; player.flurryCd = 3;
+    player.charging = false; player.charge = 0;
+    floater(player.x, player.y - 50, 'HUNDRED-HAND FLURRY!', '#f2c14e');
+    beep(500, 0.2, 'sawtooth', 0.06); emitPlayerAction('flurry');
+    return;
+  }
+  if(player.atkCd > 0 || player.healCast > 0 || player.charging || player.spinAnim > 0 || player.flurryTime > 0) return;
+  if(player.beamCharge > 0 || player.beamTime > 0) return; // hands are busy holding a beam
+  if(player.airT > 0){ tryDiagStrike(); return; } // ATK in midair = diagonal strike
+  faceTarget();
+  player.charging = true; player.charge = 0;
+  emitPlayerAction('attack');
+}
+function releaseAttack(){
+  if(!player || !player.charging) return;
+  player.charging = false;
+  if(!G.running || G.paused || G.over || player.stagger > 0){ player.charge = 0; return; }
+  if(player.airT > 0){ player.charge = 0; tryDiagStrike(); return; }
+  faceTarget();
+  if(player.charge >= 0.55){
+    // SPIN ATTACK — full circle, à la Link
+    player.spinAnim = 0.38; player.spinDidHit = false; player.atkCd = 0.55;
+    beep(180, 0.18, 'sawtooth', 0.06); G.shake = Math.max(G.shake, 3);
+  } else {
+    // 1-2-3 COMBO: chained taps inside the window climb the combo; hit 3 lunges and hits harder
+    player.combo = (player.comboT > 0) ? (player.combo % 3) + 1 : 1;
+    player.comboT = 0.95;
+    player.swingStep = player.combo;
+    player.swingDmg = [0, 24, 27, 36][player.combo]; // MELEE FIRST: the combo out-damages every spell in the kit
+    player.swingRange = player.combo === 3 ? 106 : 96;
+    if(player.combo === 2) floater(player.x, player.y - 42, '2!', '#a79f8a');
+    if(player.combo === 3){
+      player.x += Math.cos(player.face) * 12; player.y += Math.sin(player.face) * 12;
+      floater(player.x, player.y - 46, '3!', '#f2c14e');
+    }
+    player.atkCd = player.combo === 3 ? 0.4 : 0.25; // basic swing is FASTER now (was 0.34)
+    player.atkAnim = 0.17; player.atkDidHit = false;
+    beep(220 + player.combo * 60, 0.05, 'sawtooth', 0.03);
+  }
+  player.charge = 0;
+  emitPlayerAction('attack');
+}
+function cycleTarget(){
+  if(!G.running || G.paused || G.over || !player) return;
+  var alive = skels.filter(function(s){ return !s.dead; });
+  if(!alive.length){ player.lockTarget = null; return; }
+  alive.sort(function(a, b){ return dist2(player.x, player.y, a.x, a.y) - dist2(player.x, player.y, b.x, b.y); });
+  var idx = player.lockTarget ? alive.indexOf(player.lockTarget) : -1;
+  player.lockTarget = alive[(idx + 1) % alive.length]; // Q again = next-nearest skeleton
+  floater(player.lockTarget.x, player.lockTarget.y - 52, '🎯 LOCKED', '#f2c14e');
+  beep(980, 0.06, 'sine', 0.04);
+  emitPlayerAction('target');
+}
+function kitLocked(what){
+  floater(player.x, player.y-44, '🔒 ' + what + ' — locked. Buy it in the Bone Shop.', '#e05252');
+  beep(120, 0.12, 'square', 0.04);
+}
+function tryShockwave(){
+  if(!G.running || G.paused || G.over || !player || player.stagger > 0) return;
+  if(G.mode === 'story' && !player.unlocks.shock){ kitLocked('Shockwave'); return; }
+  if(player.shockCd > 0 || player.shockWindup > 0 || player.mp < 30 || player.healCast > 0) return;
+  // STARTUP: the "get off me" move now winds up for 0.32s first — telegraphed, committal,
+  // and interruptible (a hit during the windup fizzles it, mana already spent).
+  player.shockWindup = 0.32; player.mp -= 30;
+  floater(player.x, player.y-46, 'SHOCKWAVE — winding up…', '#f2c14e');
+  beep(90, 0.3, 'sawtooth', 0.05);
+  emitPlayerAction('shockwaveWindup');
+  updateHUD();
+}
+function fireShockwave(){
+  player.shockCd = 1.6;
+  var shockR = player.unlocks.fire3 ? 268 : 218; // WIDER (was 196/158)
+  var shockDmg = player.unlocks.fire3 ? 22 : 14; // damage stays modest — this move is about SPACE
+  // the ring spreads a touch more slowly now: speed field drives the visual expansion
+  shockwaves.push({x:player.x, y:player.y, r:24, maxR:shockR, life:0.72, max:0.72, speed:300});
+  skels.forEach(function(s){
+    if(s.dead) return;
+    var d = Math.sqrt(dist2(player.x,player.y,s.x,s.y));
+    if(d > shockR + s.r) return;
+    if(s.dodgeTime > 0){ floater(s.x, s.y-22, 'dodged!', '#a79f8a'); return; }
+    if(parryCheck(s, 'shockwave')) return; // yes, they can parry a shockwave. The sword is a concept.
+    var ang = Math.atan2(s.y-player.y, s.x-player.x);
+    damageSkel(s, shockDmg, ang, 36); // a REAL radial shove (was 11)
+    if(!s.dead && s.freezeT <= 0) s.stunT = Math.max(s.stunT || 0, 0.85); // and a real stun — breathing room, earned
+  });
+  spawnParticles(player.x, player.y, '#f2c14e', 26, 260);
+  floater(player.x, player.y-44, 'SHOCKWAVE — GET OFF ME', '#f2c14e');
+  beep(60, 0.32, 'sine', 0.1); beep(130, 0.2, 'triangle', 0.07); G.shake = Math.max(G.shake, 8);
+  emitPlayerAction('shockwave');
+  updateHUD();
+}
+/* --- SOLAR FLASH — G. A full-screen burst of light (Pokémon Flash / DBZ Solar Flare).
+   No damage. Every skeleton on the field is DAZED: briefly stunned, then BLIND for a few
+   seconds — while blind their vision range collapses (they wander instead of tracking you)
+   and most of their swings simply miss. Costly and slow to recharge: it's a reset button. --- */
+function tryFlash(){
+  if(!G.running || G.paused || G.over || !player || player.stagger > 0) return;
+  if(G.mode === 'story' && !player.unlocks.flash){ kitLocked('Solar Flash (Fire tree: Boss Beam tier)'); return; }
+  if(player.flashCd > 0 || player.mp < 40 || player.healCast > 0) return;
+  player.flashCd = 7; player.mp -= 40;
+  G.flash = 1;
+  skels.forEach(function(s){
+    if(s.dead) return;
+    s.blindT = Math.max(s.blindT || 0, 3.6);
+    if(s.freezeT <= 0) s.stunT = Math.max(s.stunT || 0, 0.6); // the daze itself
+    floater(s.x, s.y-44, '💫 DAZED — BLIND!', '#fff6c9');
+  });
+  floater(player.x, player.y-56, '☀ SOLAR FLASH!', '#fff6c9');
+  spawnParticles(player.x, player.y, '#fff6c9', 30, 320);
+  beep(1500, 0.25, 'sine', 0.07); beep(2100, 0.3, 'sine', 0.05);
+  G.shake = Math.max(G.shake, 3);
+  emitPlayerAction('flash');
+  updateHUD();
+}
+/* --- BOSS BEAM — the Kame-style beam. Gotta have beams. ---
+   Press F: 0.7s of rooted charge (a hit breaks it, MP spent), then 1.1s of
+   sustained blast. And it TRACKS now: the beam bends toward your lock target
+   (Q) — or the nearest skeleton if you never locked one — while charging and
+   while firing. No more firing down an empty straight line. Its total damage
+   still loses to the sword up close, on purpose. */
+function tryBeam(){
+  if(!G.running || G.paused || G.over || !player || player.stagger > 0) return;
+  if(G.mode === 'story' && !player.unlocks.beam){ kitLocked('Boss Beam'); return; }
+  if(player.beamCd > 0 || player.beamCharge > 0 || player.beamTime > 0) return;
+  if(player.mp < 55 || player.healCast > 0 || player.airT > 0 || player.diagTime > 0) return;
+  // Aim starts at the lock target if there is one; update() keeps bending it.
+  var blt = (player.lockTarget && !player.lockTarget.dead) ? player.lockTarget : null;
+  player.beamDir = blt ? Math.atan2(blt.y - player.y, blt.x - player.x) : player.face;
+  player.face = player.beamDir;
+  player.beamCharge = 0.7; player.mp -= 55;
+  floater(player.x, player.y - 54, 'KA… ME…', '#5ec8d8');
+  beep(160, 0.35, 'sawtooth', 0.05);
+  emitPlayerAction('beamCharge');
+  updateHUD();
+}
+function fireBeam(){
+  player.beamTime = 1.1; player.beamHitT = 0; player.beamCd = 6;
+  floater(player.x, player.y - 58, 'HAAAAA!!', '#f2c14e');
+  beep(65, 0.5, 'sawtooth', 0.09); beep(130, 0.4, 'sawtooth', 0.06);
+  G.shake = Math.max(G.shake, 7);
+  emitPlayerAction('beam');
+}
+function beamTick(){
+  var len = 470, halfW = 30;
+  var fx = Math.cos(player.beamDir), fy = Math.sin(player.beamDir); // the tracked direction, not raw facing
+  skels.forEach(function(s){
+    if(s.dead) return;
+    var rx = s.x - player.x, ry = s.y - player.y;
+    var along = rx * fx + ry * fy;
+    if(along < 0 || along > len + s.r) return;
+    var perp = Math.abs(rx * (-fy) + ry * fx);
+    if(perp > halfW + s.r * 0.5) return;
+    if(s.dodgeTime > 0) return;           // rolled out of the beam — no damage
+    if(s.parryTime > 0) return;           // holding a parry against the beam: anime-correct, no damage
+    if(rollParry(s, 0.5)){ resolveParry(s, 'beam'); return; } // snaps into a parry mid-beam — and may riposte if you're close
+    applyChill(s);
+    damageSkel(s, 5, player.beamDir, 6);     // ticks: ~45 total if a skel stands in it the whole blast
+  });
+  for(var i = 0; i < 3; i++){
+    var t = rand(0.1, 1);
+    spawnParticles(player.x + fx * len * t + rand(-14, 14), player.y + fy * len * t + rand(-14, 14), Math.random() < 0.5 ? '#5ec8d8' : '#eaf7ff', 1, 90);
+  }
+}
+/* ================= MAGIC MODE — SHIFT toggles it =================
+   Physical kit on the right hand (J sword, K bolt, U shockwave, F beam);
+   tap SHIFT and the same right hand becomes magic: J Chain Lightning,
+   K Flamethrower, L Ice Breath, O Fire Pillar — plus self-buffs on
+   I (Armor), U (Swift), H (Regen), M (Might). Magic hits HARD and its
+   AoEs are big — and every point of it costs real mana. All of it is
+   parry-able. Yes, even the lightning. The sword is a concept. */
+function toggleMagic(){
+  if(!player || !G.running || G.over) return;
+  player.magicMode = !player.magicMode;
+  floater(player.x, player.y - 56, player.magicMode ? '✦ MAGIC MODE — right hand casts' : '⚔ PHYSICAL MODE — right hand swings', player.magicMode ? '#c792ea' : '#f2c14e');
+  beep(player.magicMode ? 520 : 300, 0.09, 'triangle', 0.05);
+  emitPlayerAction('magicToggle');
+  updateTouchLabels(); updateHUD();
+}
+function magicGate(what, ok){
+  if(G.mode === 'story' && !ok){ kitLocked(what); return true; }
+  return false;
+}
+function tryChain(){
+  if(!G.running || G.paused || G.over || !player || player.stagger > 0) return;
+  if(magicGate('Chain Lightning (Fire tree: Arrows tier)', player.unlocks.spell)) return;
+  if(player.chainCd > 0 || player.mp < 34 || player.healCast > 0) return;
+  // nearest target in 350, then hops of up to 155 to fresh targets — 5 bodies max
+  var hitSet = [], cur = null, cx = player.x, cy = player.y, bestD = 350;
+  skels.forEach(function(sk){ if(sk.dead) return; var dd = Math.hypot(sk.x-player.x, sk.y-player.y); if(dd < bestD){ bestD = dd; cur = sk; } });
+  if(!cur){ floater(player.x, player.y-44, 'CHAIN — no target in reach', '#a79f8a'); return; }
+  player.chainCd = 1.6; player.mp -= 34;
+  var dmg = 30, hops = 0;
+  while(cur && hops < 5){
+    var pts = [[cx, cy]];
+    var seg = 5;
+    for(var si = 1; si < seg; si++){ var tt = si/seg; pts.push([cx + (cur.x-cx)*tt + rand(-13,13), cy + (cur.y-cy)*tt + rand(-13,13)]); }
+    pts.push([cur.x, cur.y]);
+    lightnings.push({ pts: pts, life: 0.22, max: 0.22 });
+    hitSet.push(cur);
+    // A parry grounds out THIS skeleton's share of the bolt — it does NOT stop the chain.
+    // Lightning keeps hopping through the whole group in range, parries or not.
+    var parriedThis = false;
+    if(cur.parryTime <= 0 && rollParry(cur, 0.85)){ resolveParry(cur, 'chain'); parriedThis = true; }
+    else if(cur.parryTime > 0){ resolveParry(cur, 'chain'); parriedThis = true; }
+    if(parriedThis) floater(cur.x, cur.y-44, 'PARRIED — chain jumps on!', '#5ec8d8');
+    else if(cur.dodgeTime <= 0) damageSkel(cur, Math.round(dmg), Math.atan2(cur.y-cy, cur.x-cx), 9);
+    else floater(cur.x, cur.y-22, 'dodged!', '#a79f8a');
+    cx = cur.x; cy = cur.y; dmg *= 0.82; hops++;
+    var nxt = null, nd = 155;
+    skels.forEach(function(sk){ if(sk.dead || hitSet.indexOf(sk) >= 0) return; var dd = Math.hypot(sk.x-cx, sk.y-cy); if(dd < nd){ nd = dd; nxt = sk; } });
+    cur = nxt;
+  }
+  spawnParticles(player.x, player.y, '#c792ea', 10, 150);
+  beep(1180, 0.08, 'sawtooth', 0.05); beep(700, 0.12, 'sawtooth', 0.04);
+  emitPlayerAction('chain'); updateHUD();
+}
+function tryFlame(){
+  // HELD CHANNEL: no cooldown, no upfront cost. Hold K (magic) and it burns,
+  // draining mana every second, until you let go or the mana runs dry.
+  if(!G.running || G.paused || G.over || !player || player.stagger > 0) return;
+  if(magicGate('Flamethrower (Fire tree: Shockwave)', player.unlocks.shock)) return;
+  if(player.flameTime > 0 || player.mp <= 1 || player.healCast > 0) return;
+  player.flameTime = 0.2; player.flameHitT = 0; // sustained in update() while held
+  floater(player.x, player.y-50, 'FLAMETHROWER — HOLD!', '#e07840');
+  beep(110, 0.3, 'sawtooth', 0.07);
+  emitPlayerAction('flame'); updateHUD();
+}
+function flameTick(){
+  var range = 198, arc = 0.62;
+  skels.forEach(function(sk){
+    if(sk.dead) return;
+    var d = Math.sqrt(dist2(player.x, player.y, sk.x, sk.y));
+    if(d > range + sk.r) return;
+    var ang = Math.atan2(sk.y-player.y, sk.x-player.x);
+    var diff = Math.abs(((ang - player.face)%TAU + TAU*1.5)%TAU - Math.PI);
+    if(diff > arc) return;
+    if(sk.parryTime > 0) return; // holding the parry against the flames — the blade glows, nothing burns
+    if(rollParry(sk, 0.3)){ resolveParry(sk, 'flame'); return; }
+    if(sk.dodgeTime > 0) return;
+    damageSkel(sk, 7, ang, 4); // ~66 total across a full channel, if they just stand in it
+  });
+  for(var i=0;i<4;i++){
+    var fa = player.face + rand(-0.5,0.5), fd = rand(40, range);
+    spawnParticles(player.x + Math.cos(fa)*fd, player.y + Math.sin(fa)*fd, Math.random()<0.6 ? '#e07840' : '#f2c14e', 1, 80);
+  }
+}
+function tryIce(){
+  // HELD CHANNEL, same deal as the flamethrower: hold L (magic), mana drains, breath flows.
+  if(!G.running || G.paused || G.over || !player || player.stagger > 0) return;
+  if(magicGate('Ice Breath (Ice tree: Frostbite)', player.unlocks.ice1)) return;
+  if(player.iceTime > 0 || player.mp <= 1 || player.healCast > 0) return;
+  player.iceTime = 0.2; player.iceHitT = 0; // sustained in update() while held
+  floater(player.x, player.y-50, 'ICE BREATH — HOLD!', '#5ec8d8');
+  beep(900, 0.2, 'sine', 0.05);
+  emitPlayerAction('ice'); updateHUD();
+}
+function iceTick(){
+  var range = 182, arc = 0.68;
+  skels.forEach(function(sk){
+    if(sk.dead || sk.freezeT > 0) return;
+    var d = Math.sqrt(dist2(player.x, player.y, sk.x, sk.y));
+    if(d > range + sk.r) return;
+    var ang = Math.atan2(sk.y-player.y, sk.x-player.x);
+    var diff = Math.abs(((ang - player.face)%TAU + TAU*1.5)%TAU - Math.PI);
+    if(diff > arc) return;
+    if(sk.parryTime > 0) return; // parrying the cold — frost rimes the blade, not the bones
+    if(rollParry(sk, 0.3)){ resolveParry(sk, 'ice'); return; }
+    if(sk.dodgeTime > 0) return;
+    damageSkel(sk, 5, ang, 4);
+    sk.chillStacks = Math.min(6, (sk.chillStacks || 0) + 1); sk.chillT = 2.4; // stacks: slower… slower… FROZEN
+    if(sk.chillStacks >= 5){
+      sk.chillStacks = 0; sk.freezeT = 1.7; sk.stunT = 0;
+      floater(sk.x, sk.y-40, '❄ FROZEN SOLID!', '#5ec8d8');
+      spawnParticles(sk.x, sk.y, '#5ec8d8', 14, 130);
+      beep(1250, 0.14, 'sine', 0.05);
+    } else {
+      floater(sk.x, sk.y-30, '❄ chill ×' + sk.chillStacks, '#5ec8d8');
+    }
+  });
+  for(var i=0;i<3;i++){
+    var ia = player.face + rand(-0.55,0.55), id2 = rand(36, range);
+    spawnParticles(player.x + Math.cos(ia)*id2, player.y + Math.sin(ia)*id2, '#bdeef7', 1, 70);
+  }
+}
+function tryPillar(){
+  if(!G.running || G.paused || G.over || !player || player.stagger > 0) return;
+  if(magicGate('Fire Pillar (Fire tree: Ember Heart)', player.unlocks.fire3)) return;
+  if(player.pillarCd > 0 || player.mp < 42 || player.healCast > 0) return;
+  var lt = (player.lockTarget && !player.lockTarget.dead) ? player.lockTarget : null;
+  var px = lt ? lt.x : player.x + Math.cos(player.face) * 175;
+  var py = lt ? lt.y : player.y + Math.sin(player.face) * 175;
+  px = clamp(px, 60, WORLD-60); py = clamp(py, 60, WORLD-60);
+  player.pillarCd = 3.6; player.mp -= 42;
+  pillars.push({ x:px, y:py, r:108, t:0.38, dmg:46 });
+  floater(px, py-30, '🔥 PILLAR INCOMING', '#e07840');
+  beep(200, 0.2, 'triangle', 0.05);
+  emitPlayerAction('pillar'); updateHUD();
+}
+function pillarErupt(pl){
+  shockwaves.push({ x:pl.x, y:pl.y, r:20, maxR:pl.r, life:0.3, max:0.3 });
+  skels.forEach(function(sk){
+    if(sk.dead) return;
+    var d = Math.sqrt(dist2(pl.x, pl.y, sk.x, sk.y));
+    if(d > pl.r + sk.r) return;
+    if(sk.dodgeTime > 0){ floater(sk.x, sk.y-22, 'dodged!', '#a79f8a'); return; }
+    if(parryCheck(sk, 'pillar')) return; // standing IN a fire pillar, parrying it. Respect.
+    damageSkel(sk, pl.dmg, Math.atan2(sk.y-pl.y, sk.x-pl.x), 22);
+  });
+  spawnParticles(pl.x, pl.y, '#e07840', 26, 260);
+  spawnParticles(pl.x, pl.y, '#f2c14e', 14, 180);
+  G.shake = Math.max(G.shake, 6); beep(55, 0.3, 'sine', 0.09);
+}
+/* --- SELF-BUFFS — cast in magic mode, paid in mana, timed in seconds --- */
+var BUFFS = {
+  armor: { name:'IRON ARMOR',  cost:24, dur:9, key:'buffArmorT', unlock:'aegis', tree:'Shielding tree: Aegis Form', color:'#5ec8d8', desc:'-55% damage taken' },
+  haste: { name:'SWIFT',       cost:18, dur:9, key:'buffHasteT', unlock:'mob2',  tree:'Mobility tree: Swift Boots', color:'#7bc47f', desc:'+35% move speed' },
+  might: { name:'MIGHT',       cost:24, dur:9, key:'buffPowerT', unlock:'fire3', tree:'Fire tree: Ember Heart',     color:'#e07840', desc:'+40% damage dealt' },
+  regen: { name:'REGEN',       cost:20, dur:9, key:'buffRegenT', unlock:'heal',  tree:'Shielding tree: Mend',       color:'#7bc47f', desc:'+5 HP / second' }
+};
+function castBuff(kind){
+  if(!G.running || G.paused || G.over || !player || player.stagger > 0) return;
+  var b = BUFFS[kind]; if(!b) return;
+  if(magicGate(b.name + ' buff (' + b.tree + ')', player.unlocks[b.unlock])) return;
+  if(player.buffCd > 0 || player.mp < b.cost) return;
+  player.buffCd = 0.8; player.mp -= b.cost; player[b.key] = b.dur;
+  floater(player.x, player.y-52, '✦ ' + b.name + ' — ' + b.desc, b.color);
+  spawnParticles(player.x, player.y, b.color, 14, 130);
+  beep(760, 0.12, 'sine', 0.05);
+  emitPlayerAction('buff'); updateHUD();
+}
+function tryBuffCycle(){ // touch: one BUFF button walks the four buffs
+  if(!player) return;
+  var order = ['armor','haste','might','regen'];
+  for(var i=0;i<4;i++){
+    var k = order[(player.buffCycle + i) % 4];
+    if(player[BUFFS[k].key] <= 0){ player.buffCycle = (player.buffCycle + i + 1) % 4; castBuff(k); return; }
+  }
+  castBuff(order[player.buffCycle % 4]);
+}
+
+/* --- ARROWS — physical K is a bow now, not a spell ---
+   NO mana cost. Tap K: one arrow. Hold K a moment and release: the shot
+   SPREADS — 3 arrows past a short charge, 5 past a longer one. Each arrow
+   hits for 7 (9 with Ember Heart) — decidedly less than any sword swing
+   (24–48). The bow is for reach, chip, and kiting. The sword is for killing. */
+function trySpell(){ startArrowCharge(); releaseArrows(); } // legacy instant path (mouse right-click): a single tap arrow
+function startArrowCharge(){
+  if(!G.running || G.paused || G.over || !player || player.stagger > 0) return;
+  if(G.mode === 'story' && !player.unlocks.spell){ kitLocked('Arrows (Fire tree, first tier)'); return; }
+  if(player.arrowCharging || player.spellCd > 0 || player.healCast > 0) return;
+  if(player.beamCharge > 0 || player.beamTime > 0) return;
+  player.arrowCharging = true; player.arrowCharge = 0;
+  faceTarget();
+  emitPlayerAction('arrowDraw');
+}
+function releaseArrows(){
+  if(!player || !player.arrowCharging) return;
+  player.arrowCharging = false;
+  if(!G.running || G.paused || G.over || player.stagger > 0){ player.arrowCharge = 0; return; }
+  var lt = (player.lockTarget && !player.lockTarget.dead) ? player.lockTarget : null;
+  var aim = lt ? Math.atan2(lt.y - player.y, lt.x - player.x) : player.face;
+  player.face = aim;
+  var n = player.arrowCharge >= 0.42 ? 5 : (player.arrowCharge >= 0.16 ? 3 : 1);
+  var spreadStep = 0.13;
+  var dmg = player.unlocks.fire3 ? 9 : 7;
+  for(var i = 0; i < n; i++){
+    var a = aim + (i - (n - 1) / 2) * spreadStep;
+    projectiles.push({ x: player.x + Math.cos(a)*26, y: player.y + Math.sin(a)*26,
+      vx: Math.cos(a)*660, vy: Math.sin(a)*660, r: 8, life: 0.95, dead:false,
+      dmg: dmg, kind:'arrow', homing: (n === 1 ? lt : null) }); // a lone locked arrow still homes; a spread is a spread
+  }
+  player.arrowCharge = 0;
+  player.spellCd = 0.3;
+  if(n > 1) floater(player.x, player.y-44, n + '-ARROW SPREAD!', '#e9e2cf');
+  beep(520, 0.07, 'triangle', 0.045);
+  emitPlayerAction('spell');
+  updateHUD();
+}
+function tryHeal(){
+  if(!G.running || G.paused || G.over || !player) return;
+  if(G.mode === 'story' && !player.unlocks.heal){ if(G.state === 'fight') kitLocked('Mend (Heal)'); return; }
+  if(G.state !== 'fight') return; // no healing between waves
+  if(player.healCd > 0 || player.mp < 32 || player.hp >= player.maxHp || player.healCast > 0) return;
+  player.healCast = 0.35; // quicker charge-up (was 0.85) — and you can keep moving while it casts, Skyrim-style
+  emitPlayerAction('heal');
+}
+function tryDash(){
+  if(!G.running || G.paused || G.over || !player || player.stagger > 0) return;
+  if(G.mode === 'story' && !player.unlocks.dash){ kitLocked('Dash'); return; }
+  if(player.dashCd > 0) return;
+  if(player.diagTime > 0 || player.recoverT > 0) return; // no dashing out of a committed dive or its landing
+  if(player.beamCharge > 0 || player.beamTime > 0) return; // and no dashing out of the beam — you planted your feet for this
+  if(player.airT > 0){ if(player.airDashUsed) return; player.airDashUsed = true; } // one air dash per jump
+  var mv = moveInput();
+  var dx = mv ? mv.x : Math.cos(player.face), dy = mv ? mv.y : Math.sin(player.face);
+  player.dashDx = dx; player.dashDy = dy; player.dashTime = 0.16; player.dashCd = player.unlocks.mob3 ? 0.45 : 0.9;
+  beep(330, 0.06, 'triangle', 0.04);
+  emitPlayerAction('dash');
+}
+/* --- JUMP and everything out of it --- */
+function tryJump(){
+  if(!G.running || G.paused || G.over || !player || player.stagger > 0) return;
+  if(player.airT > 0) return;
+  if(player.diagTime > 0 || player.recoverT > 0) return; // committed to a dive / recovering — no jump out of it
+  player.airT = player.airDur; player.airDashUsed = false; player.diagUsed = false; player.diagLanding = false;
+  beep(420, 0.07, 'triangle', 0.04);
+  floater(player.x, player.y - 56, 'AIR: SPACE again / C = POUND · J = DIVE STAB', '#a79f8a');
+  emitPlayerAction('jump');
+}
+function tryGroundPound(){
+  // THE trigger — and the only one: Space again, or C, while airborne (touch: the POUND button).
+  // S used to fire this by accident because S is also "move down". It never does now.
+  if(!G.running || G.paused || G.over || !player) return;
+  if(player.airT <= 0 || player.pounding) return;
+  if(player.diagTime > 0) return; // mid-dive you are committed — no pound out of it
+  player.pounding = true; player.airT = Math.min(player.airT, 0.09); // slam down NOW
+  floater(player.x, player.y - 48, 'GROUND POUND ↓', '#f2c14e');
+  beep(150, 0.1, 'sawtooth', 0.05);
+}
+function doGroundPound(){
+  shockwaves.push({x:player.x, y:player.y, r:16, maxR:96, life:0.3, max:0.3, speed:340});
+  var poundParried = false;
+  skels.forEach(function(s){
+    if(s.dead) return;
+    var d = Math.sqrt(dist2(player.x,player.y,s.x,s.y));
+    if(d > 96 + s.r) return;
+    if(s.dodgeTime > 0){ floater(s.x, s.y-22, 'dodged!', '#a79f8a'); return; }
+    if(parryCheck(s, 'pound')){ poundParried = true; return; } // the pound is PARRY-ABLE now — spam it and eat a riposte
+    var ang = Math.atan2(s.y-player.y, s.x-player.x);
+    damageSkel(s, 14, ang, 32); // heavier shove (was 18)
+    if(!s.dead && s.freezeT <= 0) s.stunT = Math.max(s.stunT || 0, 0.7); // a decent stun to land with it
+  });
+  player.recoverT = Math.max(player.recoverT || 0, 0.3); // landing recovery — no more pound-hop escape spam
+  if(poundParried){
+    player.stagger = Math.max(player.stagger, 0.55);
+    floater(player.x, player.y - 52, 'POUND PARRIED — PUNISHED!', '#e05252');
+  }
+  spawnParticles(player.x, player.y, '#f2c14e', 16, 180);
+  floater(player.x, player.y-44, 'GROUND POUND', '#f2c14e');
+  beep(60, 0.22, 'sine', 0.09); G.shake = Math.max(G.shake, 5);
+  emitPlayerAction('pound');
+}
+function tryDiagStrike(){
+  // DIVE STAB — the FINISHER. A committed 45° stab, not a movement tool: the direction
+  // is locked the instant you press it (no steering, no dashing out, once per jump),
+  // but the dive ACCELERATES as it falls — update() grows the speed every frame up to
+  // its cap — and it lands like a finisher should: the hardest single hit in the kit.
+  if(!player || player.diagTime > 0 || player.atkCd > 0 || player.airT <= 0 || player.diagUsed || player.recoverT > 0) return;
+  player.diagUsed = true; player.diagLanding = true;
+  player.diagTime = 0.30; player.diagAnim = 0.26; player.diagDidHit = false; player.atkCd = 0.5;
+  player.diagVx = Math.cos(player.face) * 330; player.diagVy = Math.sin(player.face) * 330; // locked 45° direction — speed ramps from here (see update)
+  player.airT = Math.min(player.airT, 0.30); // the dive pulls you down — you WILL land at the end of it
+  beep(300, 0.08, 'sawtooth', 0.05);
+  floater(player.x, player.y-48, 'DIVE STAB — FINISHER!', '#f2c14e');
+  emitPlayerAction('diagStrike');
+}
+function doDiveLanding(){
+  // Small landing impact where the dive comes down, then a recovery beat — that's the price of the stab.
+  shockwaves.push({x:player.x, y:player.y, r:10, maxR:52, life:0.18, max:0.18});
+  skels.forEach(function(s){
+    if(s.dead) return;
+    var d = Math.sqrt(dist2(player.x,player.y,s.x,s.y));
+    if(d > 52 + s.r) return;
+    if(s.dodgeTime > 0) return;
+    if(parryCheck(s, 'dive')) return;
+    damageSkel(s, 16, Math.atan2(s.y-player.y, s.x-player.x), 20);
+  });
+  spawnParticles(player.x, player.y, '#f2c14e', 8, 120);
+  floater(player.x, player.y-44, 'landing impact', '#a79f8a');
+  player.recoverT = 0.35; player.atkCd = Math.max(player.atkCd, 0.35);
+  beep(90, 0.1, 'sine', 0.05); G.shake = Math.max(G.shake, 2);
+}
+function diagHits(){
+  if(player.diagDidHit) return;
+  var range = 92, arc = 0.6; // narrow stab point at the blade tip — not a travelling arc (was 106 / 1.3)
+  skels.forEach(function(s){
+    if(s.dead) return;
+    var d = Math.sqrt(dist2(player.x,player.y,s.x,s.y));
+    if(d > range + s.r) return;
+    var ang = Math.atan2(s.y-player.y, s.x-player.x);
+    var diff = Math.abs(((ang - player.face)%TAU + TAU*1.5)%TAU - Math.PI);
+    if(diff > arc) return;
+    if(parryCheck(s, 'dive')){
+      player.stagger = 0.5; player.diagDidHit = true; return;
+    }
+    if(s.dodgeTime > 0) return;
+    applyChill(s);
+    damageSkel(s, 68, ang, 30); // FINISHER damage — the hardest single hit in the kit, well past the spin's 48
+    player.diagDidHit = true;
+  });
+}
+/* --- Skeleton sword-throwing: tactical, evolvable (throwSkill gene) --- */
+function doThrow(s){
+  if(!s.hasSword || !player) return;
+  var g = s.genes, ts = g.throwSkill || 0;
+  var d = Math.hypot(player.x-s.x, player.y-s.y) || 1;
+  var ft = d / 520; // sword flight time
+  var r = Math.random();
+  var mode = 'direct';
+  if(r < ts * 0.9) mode = 'lead';                        // skilled throwers LEAD a moving target
+  else if(r < ts * 0.9 + 0.30) mode = 'distract';        // or throw a decoy to drag your eyes/movement
+  var tx = player.x, ty = player.y;
+  if(mode === 'lead'){
+    var lf = clamp(ts * 2.4, 0.15, 1);
+    tx += (player.vx || 0) * ft * lf; ty += (player.vy || 0) * ft * lf;
+  } else if(mode === 'distract'){
+    var pa = Math.atan2(player.y - s.y, player.x - s.x) + Math.PI/2 * (Math.random() < 0.5 ? 1 : -1);
+    tx += Math.cos(pa) * rand(80, 150); ty += Math.sin(pa) * rand(80, 150);
+  }
+  var ang = Math.atan2(ty - s.y, tx - s.x);
+  var sw = { x:s.x, y:s.y, vx:Math.cos(ang)*520, vy:Math.sin(ang)*520, spin:0, traveled:0, state:'fly', owner:s };
+  thrownSwords.push(sw);
+  s.hasSword = false; s.swordRef = sw; s.state = 'unarmedWait'; s.stateT = rand(0.7, 1.3); s.unarmedT = 0;
+  s.face = ang; s.throws = (s.throws || 0) + 1;
+  floater(s.x, s.y-40, mode === 'lead' ? 'THROW — leading you!' : (mode === 'distract' ? 'DECOY THROW!' : 'SWORD THROW!'), '#f2c14e');
+  beep(500, 0.08, 'triangle', 0.04);
+}
+function faceTarget(){
+  // Facing is chosen by WASD / stick movement now — the cursor is left alone.
+  // player.face already holds the last movement direction; attacks fly that way.
+}
+function nearestSkel(x, y, maxD){
+  var best = null, bd = maxD * maxD;
+  skels.forEach(function(s){ if(s.dead) return; var d2 = dist2(x, y, s.x, s.y); if(d2 < bd){ bd = d2; best = s; } });
+  return best;
+}
+
+/* ---------- UNIVERSAL PARRY — they can parry ANYTHING now ----------
+   Sword, spin, flurry, dive, ground pound, shockwave, bolts, beam, chain
+   lightning, flamethrower, fire pillar, ice breath. The sword is a concept.
+   PARRY and RIPOSTE are separate genes: parry = will they block it?
+   riposte = after blocking, will they answer — and only if you're in range.
+   Parrying a projectile from across the field earns no riposte: they know it. */
+function rollParry(s, scale){
+  // one chance to snap into a parry stance right now. scale<1 for per-tick channels.
+  if(s.dead || s.freezeT > 0 || s.parryTime > 0) return false;
+  var chance = clamp((s.genes.parry || 0) * 1.2 * (scale === undefined ? 1 : scale), 0, 0.92);
+  if(Math.random() >= chance) return false;
+  s.parryTime = Math.max(s.parryTime, 0.42 * (s.genes.parryWindow || 1));
+  s.face = Math.atan2(player.y - s.y, player.x - s.x);
+  if(s.state === 'approach'){ s.state = 'parry'; s.stateT = s.parryTime; }
+  return true;
+}
+function resolveParry(s, kind){
+  s.parries++;
+  floater(s.x, s.y - 26, 'PARRIED!', '#5ec8d8');
+  spawnParticles(s.x, s.y, '#5ec8d8', 8, 150);
+  beep(880, 0.07, 'square', 0.04);
+  decideRiposte(s, kind);
+}
+function decideRiposte(s, kind){
+  if(s.dead || s.freezeT > 0 || s.stunT > 0.15) return;
+  if(s.state === 'riposteWindup' || s.state === 'riposteStrike') return;
+  var d = Math.hypot(player.x - s.x, player.y - s.y);
+  var ranged = (kind === 'projectile' || kind === 'chain' || kind === 'beam' || kind === 'pillar' || kind === 'shockwave');
+  if(d > 112){ // parried it — but you're nowhere near. A smart skel holds.
+    if(Math.random() < 0.35) floater(s.x, s.y - 40, 'parried — no riposte (out of range)', '#a79f8a');
+    return;
+  }
+  var chance = s.genes.riposte || 0;
+  if(ranged) chance *= 0.55; // even in range, answering a ranged parry is rarer
+  if(Math.random() < chance){
+    s.ripostes = (s.ripostes || 0) + 1;
+    triggerRiposte(s);
+  } else if(Math.random() < 0.3){
+    floater(s.x, s.y - 40, 'parried — holds', '#a79f8a');
+  }
+}
+function parryCheck(s, kind){
+  // instant attacks: already-parrying counts, otherwise one roll. Returns true if blocked.
+  if(s.parryTime > 0){ resolveParry(s, kind); return true; }
+  if(rollParry(s, 1)){ resolveParry(s, kind); return true; }
+  return false;
+}
+
+/* ---------- combat ---------- */
+function spawnParticles(x,y,color,n,spd){
+  for(var i=0;i<n;i++){
+    var a = rand(0,TAU), s = rand(spd*0.3, spd);
+    particles.push({x:x,y:y,vx:Math.cos(a)*s,vy:Math.sin(a)*s,life:rand(0.25,0.55),max:0.55,color:color,size:rand(2,4.5)});
+  }
+}
+function floater(x,y,text,color){ floaters.push({x:x,y:y,text:text,color:color,life:1}); }
+
+function playerAttackHits(){
+  // called while atkAnim active window
+  if(player.atkDidHit) return;
+  var range = player.swingRange || 96, arc = player.combo === 3 ? 1.3 : 1.15;
+  skels.forEach(function(s){
+    if(s.dead) return;
+    var d = Math.sqrt(dist2(player.x,player.y,s.x,s.y));
+    if(d > range + s.r) return;
+    var ang = Math.atan2(s.y-player.y, s.x-player.x);
+    var diff = Math.abs(((ang - player.face)%TAU + TAU*1.5)%TAU - Math.PI);
+    if(diff > arc) return;
+    // skeleton reactions happen at swing start (handled in update), here resolve:
+    if(parryCheck(s, 'sword')){
+      player.stagger = 0.55; player.atkDidHit = true;
+      G.shake = Math.max(G.shake, 3);
+      return;
+    }
+    if(s.dodgeTime > 0) return; // mid-roll: whiff
+    applyChill(s);
+    damageSkel(s, player.swingDmg || 19, ang);
+    player.atkDidHit = true;
+  });
+}
+function triggerRiposte(s){
+  if(s.dead || s.state === 'riposteWindup' || s.state === 'riposteStrike') return;
+  s.state = 'riposteWindup'; s.stateT = 0.26; s.riposteHitDone = false;
+  s.face = Math.atan2(player.y - s.y, player.x - s.x);
+  floater(s.x, s.y-36, 'RIPOSTE!', '#5ec8d8');
+}
+function spinAttackHits(){
+  if(player.spinDidHit) return;
+  // only connect mid-spin
+  if(player.spinAnim < 0.12 || player.spinAnim > 0.32) return;
+  var hitAny = false;
+  skels.forEach(function(s){
+    if(s.dead) return;
+    var d = Math.sqrt(dist2(player.x,player.y,s.x,s.y));
+    if(d > 118 + s.r) return;
+    if(parryCheck(s, 'spin')){ hitAny = true; return; }
+    if(s.dodgeTime > 0) return;
+    applyChill(s);
+    damageSkel(s, 48, Math.atan2(s.y-player.y, s.x-player.x), 20); // spin = the hardest hit in the game
+    hitAny = true;
+  });
+  if(hitAny) player.spinDidHit = true;
+}
+function applyChill(s){
+  if(player && player.unlocks.ice1 && !s.dead){
+    s.slowT = player.unlocks.ice3 ? 3.2 : 2.0;
+    floater(s.x, s.y-30, '❄ chilled', '#5ec8d8');
+  }
+}
+function damageSkel(s, dmg, ang, kb){
+  if(kb === undefined) kb = 14; // EVERY attack shoves now — hits should feel like hits
+  if(player && player.buffPowerT > 0) dmg = Math.round(dmg * 1.4); // Might buff: +40% damage
+  if(!s.hasSword) dmg = Math.round(dmg * 1.5); // unarmed (sword thrown, not yet fetched) = VULNERABLE
+  s.hp -= dmg; s.hurtFlash = 0.18;
+  s.x += Math.cos(ang)*kb; s.y += Math.sin(ang)*kb;
+  s.kbVx = (s.kbVx || 0) + Math.cos(ang) * kb * 13; // knockback slide, decays in updateSkel
+  s.kbVy = (s.kbVy || 0) + Math.sin(ang) * kb * 13;
+  // hitstun: real hits stagger them; tiny channel ticks only nudge (no perma-stun)
+  var stunDur = kb <= 4 ? 0.05 : clamp(0.09 + dmg * 0.005, 0.11, 0.34);
+  if(s.freezeT > 0) s.freezeT = Math.max(0, s.freezeT - 0.35); // heavy hits crack the ice
+  else s.stunT = Math.max(s.stunT || 0, stunDur);
+  floater(s.x, s.y-24, '-' + dmg, '#f2c14e');
+  spawnParticles(s.x, s.y, '#e9e2cf', 8, 150);
+  beep(140, 0.07, 'sawtooth', 0.05); G.shake = Math.max(G.shake, 2);
+  if(s.hp <= 0 && !s.dead){
+    s.dead = true; s.diedAt = G.time;
+    if(s.swordRef){ s.swordRef.state = 'gone'; s.swordRef = null; }
+    spawnParticles(s.x, s.y, '#e9e2cf', 22, 220);
+    floater(s.x, s.y-30, '☠', '#e9e2cf');
+    if(G.mode === 'story' && !s.isMaster){
+      G.bones += 3; G.totalBones += 3;
+      floater(s.x, s.y-46, '🦴 +3', '#f2c14e');
+      checkBoneStage();
+    }
+    updateHUD();
+  }
+}
+function damagePlayer(dmg, fromAng, kb){
+  if(kb === undefined) kb = 13; // their hits shove YOU too — weight on both sides
+  if(player.jumpH > 30){ floater(player.x, player.y-34, 'AIRBORNE — MISSED!', '#7bc47f'); return; }
+  if(player.dashTime > 0){ floater(player.x, player.y-34, 'DODGED', '#7bc47f'); return; }
+  if(player.buffArmorT > 0){ dmg *= 0.45; kb *= 0.4; } // Armor buff: heavy damage cut, barely shoved
+  if(player.shielding && player.mp > 0){ kb *= 0.35;
+    var blocked = dmg * (player.unlocks.ice2 ? 1.0 : 0.88); // Frost Aegis: full block
+    dmg -= blocked; player.mp = Math.max(0, player.mp - (player.unlocks.aegis ? 2 : 6));
+    floater(player.x, player.y-34, 'BLOCKED', '#5ec8d8');
+    spawnParticles(player.x + Math.cos(fromAng)*20, player.y + Math.sin(fromAng)*20, '#5ec8d8', 7, 140);
+    beep(520, 0.06, 'square', 0.04);
+  }
+  player.hp -= dmg; player.hurtFlash = 0.2;
+  player.x += Math.cos(fromAng) * kb; player.y += Math.sin(fromAng) * kb; clampToField(player);
+  if(player.healCast > 0){ player.healCast = 0; floater(player.x, player.y-40, 'HEAL INTERRUPTED', '#e05252'); }
+  if(player.beamCharge > 0){ player.beamCharge = 0; floater(player.x, player.y-46, 'BEAM CHARGE BROKEN', '#e05252'); }
+  if(player.shockWindup > 0){ player.shockWindup = 0; floater(player.x, player.y-46, 'SHOCKWAVE FIZZLED — HIT DURING STARTUP', '#e05252'); }
+  spawnParticles(player.x, player.y, '#e05252', 8, 160);
+  G.shake = Math.max(G.shake, 4);
+  beep(90, 0.1, 'sawtooth', 0.06);
+  if(player.hp <= 0){ player.hp = 0; player.alive = false; gameOver(); }
+  updateHUD();
+}
+
+/* Solar Flash blindness: a blind skel's melee swing mostly whiffs. */
+function blindMiss(s){
+  if((s.blindT || 0) > 0 && Math.random() < 0.65){
+    floater(s.x, s.y-36, 'BLIND SWING — WHIFF!', '#fff6c9');
+    return true;
+  }
+  return false;
+}
+
+/* ---------- skeleton AI ---------- */
+function updateSkel(s, dt){
+  if(s.dead) return;
+  s.stateT -= dt; s.atkCd -= dt;
+  if(s.reactionCd > 0) s.reactionCd -= dt;
+  if(s.hurtFlash > 0) s.hurtFlash -= dt;
+  if(s.parryTime > 0) s.parryTime -= dt;
+  if(s.blindT > 0) s.blindT -= dt; // Solar Flash blindness wears off
+  // name drift within a lifetime: every ~20s a small chance ONE letter quietly changes
+  s.nameDriftT = (s.nameDriftT || 20) - dt;
+  if(s.nameDriftT <= 0){ s.nameDriftT = rand(16, 32); if(Math.random() < 0.3) s.genes.name = mutateName(s.genes.name); }
+  // knockback slide — every hit shoves them, decaying fast
+  if(s.kbVx || s.kbVy){
+    s.x += s.kbVx * dt; s.y += s.kbVy * dt;
+    var kdec = Math.max(0, 1 - 9 * dt); s.kbVx *= kdec; s.kbVy *= kdec;
+    if(Math.abs(s.kbVx) < 4) s.kbVx = 0; if(Math.abs(s.kbVy) < 4) s.kbVy = 0;
+  }
+  // FROZEN solid by ice breath: no moves, no parries, just ice and regret
+  if(s.freezeT > 0){ s.freezeT -= dt; if(s.freezeT <= 0){ s.chillStacks = 0; floater(s.x, s.y-30, 'thawed!', '#5ec8d8'); } clampToField(s); return; }
+  // hitstun: a real hit interrupts whatever they were doing
+  if(s.stunT > 0){ s.stunT -= dt; clampToField(s); return; }
+  if(s.chillT > 0){ s.chillT -= dt; if(s.chillT <= 0) s.chillStacks = 0; }
+  var dx = player.x - s.x, dy = player.y - s.y;
+  var d = Math.hypot(dx,dy) || 1;
+  var toPlayer = Math.atan2(dy,dx);
+  var g = s.genes;
+  var spd = 118 * g.speed;
+  if(s.slowT > 0){ s.slowT -= dt; spd *= (player && player.unlocks.ice3) ? 0.45 : 0.7; } // Frostbite chill
+  if(s.chillStacks > 0) spd *= Math.max(0.35, 1 - 0.13 * s.chillStacks); // ice breath chill stacks toward a freeze
+
+  // --- reactions to the player's swing (the evolution pressure) ---
+  var playerThreat = (player.atkAnim > 0.1 || player.spinAnim > 0.05 || player.charging ||
+    player.beamCharge > 0 || player.beamTime > 0 || player.flameTime > 0 || player.iceTime > 0 || player.pounding);
+  var threatRange = 130;
+  if(!playerThreat){ // an incoming bolt or a fire pillar opening under them is also a threat
+    for(var pi2 = 0; pi2 < projectiles.length; pi2++){
+      var pr2 = projectiles[pi2];
+      var pd2 = Math.hypot(pr2.x - s.x, pr2.y - s.y);
+      if(pd2 < 180 && (pr2.vx * (s.x - pr2.x) + pr2.vy * (s.y - pr2.y)) > 0){ playerThreat = true; threatRange = 190; break; }
+    }
+    if(!playerThreat) for(var pj = 0; pj < pillars.length; pj++){
+      if(Math.hypot(pillars[pj].x - s.x, pillars[pj].y - s.y) < pillars[pj].r + 30){ playerThreat = true; threatRange = 200; break; }
+    }
+  }
+  if(playerThreat && d < threatRange && s.dodgeTime <= 0 && s.state.indexOf('windup') === -1 && s.state !== 'windup' && s.state !== 'jumpAir' && s.state !== 'stabDash'){
+    if(Math.random() < g.dodge * dt * 14){
+      s.dodgeTime = 0.34; s.dodges++;
+      var side = Math.random()<0.5 ? 1 : -1;
+      var da = toPlayer + Math.PI + side*rand(0.5,1.1); // roll away-sideways
+      s.dodgeDx = Math.cos(da); s.dodgeDy = Math.sin(da);
+      floater(s.x, s.y-22, 'roll!', '#a79f8a');
+    } else if(Math.random() < g.parry * dt * 14 && d < Math.max(110, threatRange - 30)){
+      s.parryTime = 0.42 * (g.parryWindow || 1); s.face = toPlayer; s.state = 'parry'; s.stateT = s.parryTime;
+    }
+  }
+  if(s.dodgeTime > 0){
+    s.dodgeTime -= dt;
+    s.x += s.dodgeDx * 300 * dt; s.y += s.dodgeDy * 300 * dt;
+    clampToField(s); return;
+  }
+
+  switch(s.state){
+    case 'parry':
+      s.face = angleLerp(s.face, toPlayer, 0.3);
+      if(s.stateT <= 0){ s.state = 'approach'; }
+      break;
+    case 'unarmedWait': {
+      // No sword: exposed, restless, watching where the blade fell. Cannot attack.
+      s.face = angleLerp(s.face, toPlayer, 0.2);
+      s.x += Math.cos(toPlayer + Math.PI/2 * s.strafeDir) * spd * 0.55 * dt;
+      s.y += Math.sin(toPlayer + Math.PI/2 * s.strafeDir) * spd * 0.55 * dt;
+      s.unarmedT = (s.unarmedT || 0) + dt;
+      var swRef = s.swordRef;
+      var swordGone = !swRef || swRef.state === 'gone' || swRef.state === 'taken' || thrownSwords.indexOf(swRef) < 0;
+      if(swRef && swRef.state === 'ground'){ s.state = 'fetchSword'; }
+      else if(swordGone && s.unarmedT > 1.1){
+        // FAILSAFE: the blade is truly lost (old bug's orphaned state) — a new bone
+        // sword knits itself into the empty hand. Nobody wanders forever again.
+        s.swordRef = null; s.hasSword = true; s.unarmedT = 0; s.state = 'approach'; s.atkCd = rand(0.5, 1.1);
+        floater(s.x, s.y-30, 'a new bone sword forms!', '#a79f8a');
+      } else if(s.stateT <= 0 && swordGone){
+        // still mid-flight somewhere unreachable — re-check soon rather than drifting
+        s.stateT = 0.4;
+      }
+      break;
+    }
+    case 'fetchSword': {
+      // Sprint for the fallen sword — fully vulnerable the whole way (+50% damage taken).
+      if(!s.swordRef || s.swordRef.state !== 'ground'){ s.state = s.hasSword ? 'approach' : 'unarmedWait'; break; }
+      var fx = s.swordRef.x - s.x, fy = s.swordRef.y - s.y;
+      var fd = Math.hypot(fx, fy) || 1;
+      s.face = Math.atan2(fy, fx);
+      s.x += fx/fd * spd * 1.05 * dt; s.y += fy/fd * spd * 1.05 * dt;
+      if(fd < 22){
+        s.swordRef.state = 'taken'; s.swordRef = null; s.hasSword = true; s.unarmedT = 0;
+        s.state = 'approach'; s.atkCd = rand(0.6, 1.2);
+        floater(s.x, s.y-24, 're-armed!', '#a79f8a');
+      }
+      break;
+    }
+    case 'approach': {
+      s.face = angleLerp(s.face, toPlayer, 0.18);
+      if(!s.hasSword){ s.state = (s.swordRef && s.swordRef.state === 'ground') ? 'fetchSword' : 'unarmedWait'; break; }
+      var wantDist = (62 + (1-g.nerve)*26) * (g.attackRange||1) * (g.size||1);
+      // RNG movement: periodically re-roll a direction — forward, lateral, diagonal,
+      // even backwards or a fully random heading. Direction itself is a dice roll.
+      s.moveT -= dt;
+      if(s.moveT <= 0){
+        s.moveT = rand(0.35, 1.15);
+        var mr = Math.random();
+        if(mr < 0.34) s.moveAng = toPlayer + rand(-0.5,0.5);                       // close in
+        else if(mr < 0.62) s.moveAng = toPlayer + (Math.random()<0.5?1:-1)*rand(1.1,1.9); // LATERAL — circle / sidestep
+        else if(mr < 0.76) s.moveAng = toPlayer + Math.PI + rand(-0.6,0.6);        // back off
+        else if(mr < 0.90) s.moveAng = toPlayer + (Math.random()<0.5?1:-1)*rand(0.5,1.1); // diagonal
+        else s.moveAng = rand(0, TAU);                                            // pure chaos direction
+        // shimmy gene biases re-rolls toward lateral picks
+        if(Math.random() < (g.strafe||0)*0.35) s.moveAng = toPlayer + (Math.random()<0.5?Math.PI/2:-Math.PI/2) + rand(-0.3,0.3);
+      }
+      // drift the chosen heading toward the player only weakly when far away, so RNG stays visible.
+      // BLIND (Solar Flash): vision range collapses — no drift toward you at all, pure wandering.
+      var bias = (s.blindT > 0) ? 0 : (d > wantDist + 60 ? 0.55 : 0.12);
+      if(s.blindT > 0 && Math.random() < dt * 2.2) s.moveAng = rand(0, TAU);
+      var effAng = angleLerp(s.moveAng, toPlayer, bias*dt*3);
+      var rush = (d > 190 && Math.random() < g.dash) ? 1.8 : 1;
+      var speedScale = d < wantDist - 10 ? 0.55 : 1; // too close: slower, but direction still RNG
+      s.x += Math.cos(effAng) * spd * rush * speedScale * dt;
+      s.y += Math.sin(effAng) * spd * rush * speedScale * dt;
+      if(s.hasSword && d > 150 && d < 430 && s.atkCd <= 0 && Math.random() < (g.throwSkill||0) * dt * 2.4){ doThrow(s); break; }
+      if(s.hasSword && ((d < 86*(g.attackRange||1)*(g.swordLen||1)) || (d < 128*(g.attackRange||1)*(g.swordLen||1) && Math.random() < 0.35)) && s.atkCd <= 0){
+        s.face = toPlayer;
+        var aspd = g.attackSpeed||1;
+        var lw = lenWindup(g); // long blade = longer windup; short blade = snappier (on top of attackSpeed)
+        if(Math.random() < g.feint * 0.8){ s.state = 'feint'; s.stateT = 0.3/aspd; }
+        else {
+          var roll = Math.random();
+          if(roll < 0.20 + g.aggression*0.08){ s.atkType='jump'; s.state='jumpWindup'; s.stateT=0.46*lw/aspd; s.windupHitDone=false; }
+          else if(roll < 0.47){ s.atkType='swipe'; s.state='swipeWindup'; s.stateT=0.30*lw/aspd; s.windupHitDone=false; s.swipeDir = Math.random()<0.5?-1:1; }
+          else if(roll < 0.68 && d > 42){ s.atkType='stab'; s.state='stabWindup'; s.stateT=0.34*lw/aspd; s.windupHitDone=false; s.stabDx=Math.cos(toPlayer); s.stabDy=Math.sin(toPlayer); }
+          else { s.atkType='basic'; s.state='windup'; s.stateT=0.36*lw/aspd; s.windupHitDone=false; }
+        }
+      }
+      break;
+    }
+    case 'feint':
+      // flash a fake swing, then dart sideways — punishes early shields/dodges
+      if(s.stateT <= 0){
+        var sa = toPlayer + (Math.random()<0.5?1:-1) * Math.PI/2;
+        s.dodgeTime = 0.22; s.dodgeDx = Math.cos(sa); s.dodgeDy = Math.sin(sa);
+        s.state = 'approach'; s.atkCd = rand(0.25, 0.6) * (1.2 - g.aggression*0.5);
+      }
+      break;
+    case 'windup':
+      s.face = angleLerp(s.face, toPlayer, 0.1);
+      if(s.stateT <= 0){ s.state = 'strike'; s.stateT = 0.14; }
+      break;
+    case 'strike': {
+      if(!s.windupHitDone){
+        s.windupHitDone = true;
+        var range = 74 * (s.genes.attackRange||1) * (s.genes.swordLen||1), arc = 1.05; // blade length IS reach
+        if(d < range + player.r){
+          var ang = Math.atan2(player.y-s.y, player.x-s.x);
+          var diff = Math.abs(((ang - s.face)%TAU + TAU*1.5)%TAU - Math.PI);
+          if(diff < arc && !blindMiss(s)){
+            s.hits++; var dmg = 8; s.dmgDealt += (player.shielding ? dmg*0.12 : dmg);
+            damagePlayer(dmg, ang);
+          }
+        }
+        beep(180, 0.04, 'sawtooth', 0.02);
+      }
+      if(s.stateT <= 0){ s.state = 'recover'; s.stateT = rand(0.45, 0.9) * (1.25 - g.aggression*0.55); }
+      break;
+    }
+    case 'recover':
+      s.x -= Math.cos(toPlayer)*30*dt; s.y -= Math.sin(toPlayer)*30*dt; // step back
+      if(s.stateT <= 0){ s.state = 'approach'; s.atkCd = rand(0.15, 0.7) * (1.3 - g.aggression*0.6); }
+      break;
+    case 'riposteWindup':
+      s.face = angleLerp(s.face, toPlayer, 0.35);
+      if(s.stateT <= 0){ s.state='riposteStrike'; s.stateT=0.13; }
+      break;
+    case 'riposteStrike': {
+      if(!s.riposteHitDone){
+        s.riposteHitDone = true;
+        if(d < 88 + player.r){
+          var ra = Math.atan2(player.y-s.y, player.x-s.x);
+          var rd = Math.abs(((ra - s.face)%TAU + TAU*1.5)%TAU - Math.PI);
+          if(rd < 1.2 && !blindMiss(s)){ s.hits++; var rdmg=13; s.dmgDealt += (player.shielding ? rdmg*0.12 : rdmg); damagePlayer(rdmg, ra); floater(s.x, s.y-30, 'RIPOSTE HIT', '#e05252'); }
+        }
+        beep(300, 0.05, 'sawtooth', 0.03);
+      }
+      if(s.stateT <= 0){ s.state='recover'; s.stateT=0.5; }
+      break;
+    }
+    case 'jumpWindup':
+      s.face = angleLerp(s.face, toPlayer, 0.12);
+      if(s.stateT <= 0){
+        s.state='jumpAir'; s.jumpT=0; s.jumpFromX=s.x; s.jumpFromY=s.y;
+        // land just short of / on the player
+        s.jumpToX = clamp(player.x - Math.cos(toPlayer)*18, 28, WORLD-28);
+        s.jumpToY = clamp(player.y - Math.sin(toPlayer)*18, 28, WORLD-28);
+        s.windupHitDone=false;
+      }
+      break;
+    case 'jumpAir': {
+      s.jumpT += dt/0.34;
+      var jp = Math.min(1, s.jumpT);
+      s.x = s.jumpFromX + (s.jumpToX - s.jumpFromX)*jp;
+      s.y = s.jumpFromY + (s.jumpToY - s.jumpFromY)*jp;
+      s.jumpH = Math.sin(jp*Math.PI)*44;
+      s.face = toPlayer;
+      if(jp >= 1){
+        s.jumpH = 0; s.state='recover'; s.stateT=0.62;
+        // landing slash — MORE damage than basic (15 vs 8)
+        if(!s.windupHitDone){
+          s.windupHitDone = true;
+          var jd = Math.hypot(player.x-s.x, player.y-s.y);
+          if(jd < 82 + player.r && !blindMiss(s)){ s.hits++; var jdm=15; s.dmgDealt += (player.shielding ? jdm*0.12 : jdm); damagePlayer(jdm, toPlayer); floater(s.x, s.y-32, 'JUMP SLASH', '#e05252'); }
+          spawnParticles(s.x, s.y, '#e9e2cf', 10, 150); G.shake = Math.max(G.shake, 3); beep(150, 0.07, 'sawtooth', 0.04);
+        }
+      }
+      break;
+    }
+    case 'swipeWindup':
+      s.face = angleLerp(s.face, toPlayer, 0.14);
+      if(s.stateT <= 0){ s.state='swipeStrike'; s.stateT=0.16; }
+      break;
+    case 'swipeStrike': {
+      // lateral step while swinging — wide arc punishes sidesteps
+      s.x += Math.cos(toPlayer + Math.PI/2) * s.swipeDir * 190 * dt;
+      s.y += Math.sin(toPlayer + Math.PI/2) * s.swipeDir * 190 * dt;
+      if(!s.windupHitDone){
+        s.windupHitDone = true;
+        if(d < 84 + player.r){
+          var wa = Math.atan2(player.y-s.y, player.x-s.x);
+          var wd = Math.abs(((wa - s.face)%TAU + TAU*1.5)%TAU - Math.PI);
+          if(wd < 1.75 && !blindMiss(s)){ s.hits++; var wdm=9; s.dmgDealt += (player.shielding ? wdm*0.12 : wdm); damagePlayer(wdm, wa); floater(s.x, s.y-30, 'SWIPE', '#e05252'); }
+        }
+        beep(200, 0.04, 'sawtooth', 0.02);
+      }
+      if(s.stateT <= 0){ s.state='recover'; s.stateT=rand(0.4,0.75)*(1.25-g.aggression*0.5); }
+      break;
+    }
+    case 'stabWindup':
+      s.face = angleLerp(s.face, toPlayer, 0.16);
+      s.stabDx = Math.cos(s.face); s.stabDy = Math.sin(s.face);
+      if(s.stateT <= 0){ s.state='stabDash'; s.stateT=0.22; }
+      break;
+    case 'stabDash': {
+      s.x += s.stabDx * 540 * dt; s.y += s.stabDy * 540 * dt;
+      if(!s.windupHitDone && d < 46 + player.r){
+        s.windupHitDone = true;
+        if(!blindMiss(s)){ s.hits++; var sdm=13; s.dmgDealt += (player.shielding ? sdm*0.12 : sdm); damagePlayer(sdm, Math.atan2(s.stabDy, s.stabDx)); floater(s.x, s.y-30, 'DASH STAB', '#e05252'); }
+      }
+      if(s.stateT <= 0){ if(!s.windupHitDone) s.windupHitDone=true; s.state='recover'; s.stateT=0.55; }
+      break;
+    }
+  }
+  // gentle separation so they don't stack
+  skels.forEach(function(o){
+    if(o === s || o.dead) return;
+    var q = dist2(s.x,s.y,o.x,o.y);
+    if(q < 900 && q > 0.01){ var dd = Math.sqrt(q); s.x += (s.x-o.x)/dd * 26 * dt; s.y += (s.y-o.y)/dd * 26 * dt; }
+  });
+  clampToField(s);
+}
+function clampToField(e){
+  e.x = clamp(e.x, 28, WORLD-28); e.y = clamp(e.y, 28, WORLD-28);
+}
+
+/* ---------- update ---------- */
+function update(dt){
+  G.time += dt;
+  if(G.shake > 0) G.shake = Math.max(0, G.shake - dt*14);
+  if(G.state === 'between'){
+    G.betweenTimer -= dt;
+    if(G.betweenTimer <= 0) spawnWave();
+    return;
+  }
+  if(G.state !== 'fight' || !player || !player.alive) return;
+
+  /* player */
+  var prevPX = player.x, prevPY = player.y;
+  if(player.atkCd > 0) player.atkCd -= dt;
+  if(player.spellCd > 0) player.spellCd -= dt;
+  if(player.shockCd > 0) player.shockCd -= dt;
+  if(player.chainCd > 0) player.chainCd -= dt;
+  if(player.flameCd > 0) player.flameCd -= dt;
+  if(player.pillarCd > 0) player.pillarCd -= dt;
+  if(player.iceCd > 0) player.iceCd -= dt;
+  if(player.buffCd > 0) player.buffCd -= dt;
+  if(player.buffArmorT > 0) player.buffArmorT -= dt;
+  if(player.buffHasteT > 0) player.buffHasteT -= dt;
+  if(player.buffPowerT > 0) player.buffPowerT -= dt;
+  if(player.buffRegenT > 0){ player.buffRegenT -= dt; player.hp = Math.min(player.maxHp, player.hp + 5 * dt); } // slow regen buff
+  if(player.healCd > 0) player.healCd -= dt;
+  if(player.dashCd > 0) player.dashCd -= dt;
+  if(player.comboT > 0){ player.comboT -= dt; if(player.comboT <= 0) player.combo = 0; }
+  if(player.flurryCd > 0) player.flurryCd -= dt;
+  if(player.flurryTime > 0){
+    // the flurry: a blur of small hits in the facing arc, ~8 ticks over 0.6s
+    player.flurryTime -= dt; player.flurryHitT -= dt;
+    if(player.flurryHitT <= 0){
+      player.flurryHitT = 0.07;
+      skels.forEach(function(s){
+        if(s.dead || s.dodgeTime > 0) return;
+        if(Math.sqrt(dist2(player.x, player.y, s.x, s.y)) > 102 + s.r) return;
+        var fang = Math.atan2(s.y - player.y, s.x - player.x);
+        var fdiff = Math.abs(((fang - player.face) % TAU + TAU * 1.5) % TAU - Math.PI);
+        if(fdiff > 1.25) return;
+        if(s.parryTime > 0) return; // holding a parry through the flurry
+        if(rollParry(s, 0.22)){ resolveParry(s, 'flurry'); return; }
+        damageSkel(s, 8, fang, 6);
+      });
+      spawnParticles(player.x + Math.cos(player.face) * 42, player.y + Math.sin(player.face) * 42, '#f2c14e', 3, 160);
+    }
+  }
+  if(player.stagger > 0){ player.stagger -= dt; if(player.charging){ player.charging=false; player.charge=0; } }
+  if(player.hurtFlash > 0) player.hurtFlash -= dt;
+  if(player.charging) player.charge = Math.min(1.2, player.charge + dt);
+  if(player.atkAnim > 0){ player.atkAnim -= dt; playerAttackHits(); }
+  if(player.spinAnim > 0){ player.spinAnim -= dt; spinAttackHits(); }
+  /* jump arc + landing (ground pound fires on touchdown) */
+  if(player.airT > 0){
+    player.airT -= dt;
+    var jp2 = 1 - player.airT / player.airDur;
+    player.jumpH = Math.sin(Math.PI * clamp(jp2, 0, 1)) * 46;
+    if(player.airT <= 0){
+      player.jumpH = 0;
+      if(player.diagLanding){ player.diagLanding = false; player.diagTime = 0; doDiveLanding(); }
+      else if(player.pounding){ player.pounding = false; doGroundPound(); }
+    }
+  }
+  if(player.diagAnim > 0) player.diagAnim -= dt;
+  if(player.recoverT > 0) player.recoverT -= dt;
+  /* beam: charge counts down rooted, then the blast ticks damage while it lasts */
+  if(player.beamCd > 0) player.beamCd -= dt;
+  if(player.beamCharge > 0 || player.beamTime > 0){
+    // TRACKING: the beam bends toward the lock target — or the nearest skeleton
+    // within 560 if you never locked one. Fast while charging (you're aiming),
+    // slower mid-blast (it's a river of light, not a laser pointer).
+    var bTarget = (player.lockTarget && !player.lockTarget.dead) ? player.lockTarget : nearestSkel(player.x, player.y, 560);
+    if(bTarget){
+      var bWant = Math.atan2(bTarget.y - player.y, bTarget.x - player.x);
+      var bDiff = ((bWant - player.beamDir + Math.PI * 3) % TAU) - Math.PI;
+      var bTurn = (player.beamTime > 0 ? 1.5 : 2.6) * dt;
+      player.beamDir += clamp(bDiff, -bTurn, bTurn);
+      player.face = player.beamDir;
+    }
+  }
+  if(player.beamCharge > 0){ player.beamCharge -= dt; if(player.beamCharge <= 0) fireBeam(); }
+  if(player.beamTime > 0){
+    player.beamTime -= dt; player.beamHitT -= dt;
+    if(player.beamHitT <= 0){ player.beamHitT = 0.12; beamTick(); }
+  }
+  /* HELD CHANNELS — flame & ice run while the key/button is held, draining mana.
+     No cooldowns: release (or an empty mana bar) is the only thing that stops them. */
+  if(player.flameTime > 0){
+    var flameHeld = player.magicMode && (keys['KeyK'] || touchFlameHeld);
+    player.mp -= 30 * dt; // ~3.3s of fire on a full bar — costly, as magic should be
+    if(player.mp <= 0){ player.mp = 0; player.flameTime = 0; floater(player.x, player.y-48, 'FLAME — OUT OF MANA', '#e07840'); }
+    else {
+      player.flameTime = flameHeld ? 0.2 : Math.max(0, player.flameTime - dt);
+      player.flameHitT -= dt;
+      if(player.flameTime > 0 && player.flameHitT <= 0){ player.flameHitT = 0.1; flameTick(); }
+    }
+  }
+  if(player.iceTime > 0){
+    var iceHeld = player.magicMode && (keys['KeyL'] || touchIceHeld);
+    player.mp -= 26 * dt;
+    if(player.mp <= 0){ player.mp = 0; player.iceTime = 0; floater(player.x, player.y-48, 'ICE — OUT OF MANA', '#5ec8d8'); }
+    else {
+      player.iceTime = iceHeld ? 0.2 : Math.max(0, player.iceTime - dt);
+      player.iceHitT -= dt;
+      if(player.iceTime > 0 && player.iceHitT <= 0){ player.iceHitT = 0.12; iceTick(); }
+    }
+  }
+  /* shockwave startup counts down, then the ring actually fires */
+  if(player.shockWindup > 0){
+    player.shockWindup -= dt;
+    if(player.shockWindup <= 0) fireShockwave();
+  }
+  if(player.flashCd > 0) player.flashCd -= dt;
+  if(G.flash > 0) G.flash = Math.max(0, G.flash - dt * 2.2);
+  /* arrow charge (physical K): builds while held, capped — released in releaseArrows() */
+  if(player.arrowCharging) player.arrowCharge = Math.min(0.6, player.arrowCharge + dt);
+  pillars.forEach(function(pl){ pl.t -= dt; if(pl.t <= 0 && !pl.done){ pl.done = true; pillarErupt(pl); } });
+  pillars = pillars.filter(function(pl){ return !pl.done; });
+  lightnings.forEach(function(lg){ lg.life -= dt; });
+  lightnings = lightnings.filter(function(lg){ return lg.life > 0; });
+  if(player.diagTime > 0){
+    // Locked dive DIRECTION — set once at stab start, never steered. But the SPEED
+    // ramps hard as the dive falls (×~2.9/s up to the 640 cap): a finisher accelerates.
+    player.diagTime -= dt;
+    var dSpd = Math.hypot(player.diagVx, player.diagVy);
+    if(dSpd > 0.01 && dSpd < 640){
+      var dGrow = Math.min(640 / dSpd, 1 + 2.9 * dt);
+      player.diagVx *= dGrow; player.diagVy *= dGrow;
+    }
+    player.x += player.diagVx * dt; player.y += player.diagVy * dt;
+    diagHits();
+  }
+  shockwaves.forEach(function(w){ w.r += (w.speed || 420)*dt; w.life -= dt; });
+  shockwaves = shockwaves.filter(function(w){ return w.life > 0; });
+  var wasShielding = player.shielding;
+  player.shielding = (keys['KeyL'] || touchShield) && !player.magicMode && player.stagger <= 0 && player.healCast <= 0 && player.dashTime <= 0 && !player.charging;
+  if(player.shielding && !wasShielding) emitPlayerAction('shield');
+  player.mp = clamp(player.mp + ((player.flameTime > 0 || player.iceTime > 0) ? 0 : (player.shielding ? 2 : 9)) * dt, 0, player.maxMp); // no regen while a channel is drinking the bar
+
+  if(player.healCast > 0){
+    player.healCast -= dt;
+    if(player.healCast <= 0){
+      player.hp = Math.min(player.maxHp, player.hp + 46);
+      player.mp -= 32; player.healCd = 4.5;
+      floater(player.x, player.y-38, '+46', '#7bc47f');
+      spawnParticles(player.x, player.y, '#7bc47f', 16, 120);
+      beep(740, 0.15, 'sine', 0.05); updateHUD();
+    }
+  }
+
+  var mv = moveInput();
+  if(player.dashTime > 0){
+    player.dashTime -= dt;
+    player.x += player.dashDx * 640 * dt; player.y += player.dashDy * 640 * dt;
+    player.face = Math.atan2(player.dashDy, player.dashDx);
+  } else if(mv && player.stagger <= 0 && player.diagTime <= 0 && player.recoverT <= 0 && player.beamCharge <= 0 && player.beamTime <= 0){
+    // No steering mid-dive, no moving during landing recovery, and feet stay planted for the beam — all commitments.
+    // Heal-while-moving: healCast no longer roots you (Skyrim-style)
+    var sp = player.speed * (player.unlocks.mob2 ? 1.18 : 1) * (player.buffHasteT > 0 ? 1.35 : 1) * ((player.flameTime > 0 || player.iceTime > 0) ? 0.4 : 1) * (player.shockWindup > 0 ? 0.3 : 1) * (player.arrowCharging ? 0.55 : 1) * (player.shielding ? (player.unlocks.aegis ? 0.8 : 0.45) : (player.charging ? 0.5 : 1));
+    G.moveReactT = (G.moveReactT||0) - dt;
+    if(G.moveReactT <= 0){ G.moveReactT = 0.65; emitPlayerAction('move'); }
+    player.x += mv.x * sp * dt; player.y += mv.y * sp * dt;
+    player.face = Math.atan2(mv.y, mv.x); // WASD / stick chooses facing — and therefore attack direction. Cursor ignored.
+  }
+  clampToField(player);
+  player.vx = (player.x - prevPX) / Math.max(dt, 0.001); // tracked so throwers can LEAD a moving target
+  player.vy = (player.y - prevPY) / Math.max(dt, 0.001);
+
+  /* skeletons */
+  var anyAlive = false;
+  skels.forEach(function(s){ updateSkel(s, dt); if(!s.dead) anyAlive = true; });
+  if(player.lockTarget && player.lockTarget.dead){ floater(player.lockTarget.x, player.lockTarget.y - 40, 'lock lost', '#a79f8a'); player.lockTarget = null; }
+  if(!anyAlive && G.state === 'fight'){
+    G.allWaveSkels = skels.slice();
+    selectAndBreed();
+    if(G.mode === 'story'){
+      if(G.duel){
+        // The Master falls — the story's first beat, and its first bones.
+        G.duel = false;
+        G.bones += 60; G.totalBones += 60; checkBoneStage(false);
+        G.state = 'between'; G.betweenTimer = 99999; // held until the beat/shop closes
+        showBeat('The Master Falls', [
+          '“You… learn,” he rattles, as he crumbles. “Something is different about you. Take my sword.”',
+          '“My friends are coming. They will learn from you, too — and one day, they will defeat you. Do not… underestimate us.”',
+          'He leaves behind a pile of bones. Here, bones are currency — and you just earned 60. Spend them. Grow. The horde is already breeding.'
+        ], 'Spend his bones', function(){ openShop(); });
+        banner('The Master has fallen', '+60 🦴 — his sword is yours now.');
+        updateHUD();
+        return;
+      }
+      G.bones += 5; G.totalBones += 5; checkBoneStage();
+      if(G.wave % 5 === 0){
+        G.state = 'between'; G.betweenTimer = 99999; // segment break: shop / pub / finale
+        if(G.wave === 10){
+          showBeat('The Pub — after Wave 10', [
+            'The skeletons keep a pub. Of course they do. Someone is sweeping. Someone is losing at dice. Everyone stops when you walk in.',
+            '“You fight like you MEAN it,” says the barkeep, polishing a skull. “Most bosses just… stand there. Menacingly. For years.”',
+            '“We don’t know why we love fighting,” another admits. “We just do. And lately—” he grins, all teeth, “—lately it’s been getting GOOD.”',
+            'They raise their mugs to you. To the fight. To learning. Somewhere under the floorboards, the next generation is already rattling.'
+          ], 'Raise a mug — then the Bone Shop', function(){ openShop(); });
+        } else if(G.wave === 15){
+          showBeat('THE SKELETON SWORD', [
+            'Fifteen waves. Look at them now — rolling through your shockwaves, parrying your spins, feinting at your shield. They style on you. You style back.',
+            'And look at YOU. The bones show through. Every fight, you collect a little more of them — and they collect a little more of you.',
+            'It was never about winning forever. It is the love of the fight, and the love of learning, and mastery that never sits still — on both sides of the sword.',
+            'You are becoming the Skeleton Sword, like the Master before you. The kumite has no final wave. It only has a next one.'
+          ], 'Keep fighting — to the Bone Shop', function(){ openShop(); });
+        } else {
+          openShop();
+        }
+        updateHUD();
+        return;
+      }
+      G.state = 'between'; G.betweenTimer = 1.35;
+      banner('Wave ' + G.wave + ' cleared', '+5 🦴 bones. The fallen are judged — the best return, changed. Next wave incoming…');
+      updateHUD();
+      return;
+    }
+    G.state = 'between'; G.betweenTimer = 1.35; // slight delay only — keep the player on his toes
+    // NO heal between waves in Survival Mode. HP only comes back via the in-combat Heal spell.
+    banner('Wave ' + G.wave + ' cleared', 'The fallen are judged. The best return — changed. No breather. Next wave incoming…');
+    updateHUD();
+  }
+
+  /* thrown swords — fly, maybe hit, then fall and wait to be fetched */
+  thrownSwords.forEach(function(sw){
+    if(sw.state !== 'fly') return;
+    sw.x += sw.vx * dt; sw.y += sw.vy * dt; sw.spin += dt * 22; sw.traveled += 520 * dt;
+    if(player.jumpH < 30 && dist2(sw.x, sw.y, player.x, player.y) < (10 + player.r) * (10 + player.r)){
+      // FIX (the vanishing-sword bug): a sword that HITS used to be marked 'gone' and
+      // deleted while its owner still pointed at it — the owner then waited forever for
+      // a sword that no longer existed and just wandered. Now it CLATTERS TO THE GROUND
+      // beside you, and the thrower has to come and fetch it like any other throw.
+      sw.state = 'ground';
+      sw.x = clamp(player.x - sw.vx * 0.03, 16, WORLD - 16); sw.y = clamp(player.y - sw.vy * 0.03, 16, WORLD - 16);
+      var ow = sw.owner;
+      if(ow && !ow.dead){ ow.hits++; ow.dmgDealt += (player.shielding ? 11 * 0.12 : 11); }
+      damagePlayer(11, Math.atan2(sw.vy, sw.vx));
+      floater(player.x, player.y - 40, 'THROWN SWORD HIT — blade down!', '#e05252');
+    } else if(sw.traveled > 500 || sw.x < 14 || sw.x > WORLD - 14 || sw.y < 14 || sw.y > WORLD - 14){
+      sw.state = 'ground';
+      sw.x = clamp(sw.x, 16, WORLD - 16); sw.y = clamp(sw.y, 16, WORLD - 16);
+      floater(sw.x, sw.y - 18, 'sword down!', '#a79f8a');
+    }
+  });
+  thrownSwords = thrownSwords.filter(function(sw){ return sw.state !== 'gone' && sw.state !== 'taken'; });
+
+  /* projectiles */
+  projectiles.forEach(function(p){
+    if(p.homing && !p.homing.dead){ // locked bolts steer onto their target
+      var curA = Math.atan2(p.vy, p.vx);
+      var desA = Math.atan2(p.homing.y - p.y, p.homing.x - p.x);
+      var na = angleLerp(curA, desA, clamp(7 * dt, 0, 1));
+      var pspd = Math.hypot(p.vx, p.vy);
+      p.vx = Math.cos(na) * pspd; p.vy = Math.sin(na) * pspd;
+    }
+    p.x += p.vx*dt; p.y += p.vy*dt; p.life -= dt;
+    if(p.life <= 0) p.dead = true;
+    skels.forEach(function(s){
+      if(s.dead || p.dead) return;
+      if(dist2(p.x,p.y,s.x,s.y) < (p.r + s.r)*(p.r + s.r)){
+        p.dead = true;
+        if(s.dodgeTime > 0){ floater(s.x, s.y-22, 'dodged!', '#a79f8a'); return; }
+        if(parryCheck(s, 'projectile')) return; // they parry your bolts now — and won't riposte from across the field
+        applyChill(s);
+        damageSkel(s, p.dmg || 26, Math.atan2(p.vy, p.vx), p.kind === 'arrow' ? 7 : 12);
+        spawnParticles(p.x, p.y, '#5ec8d8', 12, 180);
+      }
+    });
+    if(p.x < 10 || p.x > WORLD-10 || p.y < 10 || p.y > WORLD-10) p.dead = true;
+  });
+  projectiles = projectiles.filter(function(p){ return !p.dead; });
+
+  /* particles & floaters */
+  particles.forEach(function(pt){ pt.x += pt.vx*dt; pt.y += pt.vy*dt; pt.vx *= 0.9; pt.vy *= 0.9; pt.life -= dt; });
+  particles = particles.filter(function(pt){ return pt.life > 0; });
+  floaters.forEach(function(f){ f.y -= 26*dt; f.life -= dt; });
+  floaters = floaters.filter(function(f){ return f.life > 0; });
+
+  updateHUD();
+}
+
+/* ---------- drawing ---------- */
+function drawField(){
+  var corners = [w2s(0,0), w2s(WORLD,0), w2s(WORLD,WORLD), w2s(0,WORLD)];
+  // floor tiles
+  var tiles = 8, ts = WORLD/tiles;
+  for(var i=0;i<tiles;i++) for(var j=0;j<tiles;j++){
+    var a=w2s(i*ts,j*ts), b=w2s((i+1)*ts,j*ts), c=w2s((i+1)*ts,(j+1)*ts), d=w2s(i*ts,(j+1)*ts);
+    ctx.fillStyle = (i+j)%2===0 ? '#23222a' : '#1d1c23';
+    ctx.beginPath(); ctx.moveTo(a.x,a.y); ctx.lineTo(b.x,b.y); ctx.lineTo(c.x,c.y); ctx.lineTo(d.x,d.y); ctx.closePath(); ctx.fill();
+  }
+  ctx.strokeStyle = '#3d3a2e'; ctx.lineWidth = 3;
+  ctx.beginPath();
+  corners.forEach(function(p,i){ if(i===0) ctx.moveTo(p.x,p.y); else ctx.lineTo(p.x,p.y); });
+  ctx.closePath(); ctx.stroke();
+  // scattered bones of the fallen (set dressing)
+  ctx.strokeStyle = 'rgba(233,226,207,.13)'; ctx.lineWidth = 2;
+  var bones = [[140,700],[760,180],[420,860],[830,640],[180,180],[620,420],[300,330],[700,780]];
+  bones.forEach(function(bn){
+    var p = w2s(bn[0],bn[1]);
+    ctx.beginPath(); ctx.moveTo(p.x-7,p.y); ctx.lineTo(p.x+7,p.y-3); ctx.stroke();
+    ctx.beginPath(); ctx.arc(p.x-8,p.y-1,2.6,0,TAU); ctx.arc(p.x+8,p.y-4,2.6,0,TAU); ctx.stroke();
+  });
+}
+function wedge(x, y, face, range, arc, color){
+  var pts = [];
+  var steps = 14;
+  for(var i=0;i<=steps;i++){
+    var a = face - arc + (arc*2)*(i/steps);
+    // project wedge edge point through iso
+    pts.push(w2s(x + Math.cos(a)*range, y + Math.sin(a)*range));
+  }
+  var c = w2s(x,y);
+  ctx.fillStyle = color;
+  ctx.beginPath(); ctx.moveTo(c.x, c.y);
+  pts.forEach(function(p){ ctx.lineTo(p.x, p.y); });
+  ctx.closePath(); ctx.fill();
+}
+function shadowEllipse(x,y,r){
+  var p = w2s(x,y);
+  ctx.fillStyle = 'rgba(0,0,0,.4)';
+  ctx.beginPath(); ctx.ellipse(p.x, p.y + r*0.32, r*1.05, r*0.42, 0, 0, TAU); ctx.fill();
+}
+function drawSkel(s){
+  var p = w2s(s.x, s.y);
+  var sc = view.scale * 2.1;
+  shadowEllipse(s.x, s.y, 15*sc*0.5 + 6);
+  if(s.dead){
+    // bone pile
+    ctx.strokeStyle = 'rgba(233,226,207,.65)'; ctx.lineWidth = 2.4;
+    ctx.beginPath(); ctx.moveTo(p.x-11,p.y+3); ctx.lineTo(p.x+10,p.y-2); ctx.stroke();
+    ctx.beginPath(); ctx.moveTo(p.x-8,p.y-3); ctx.lineTo(p.x+11,p.y+4); ctx.stroke();
+    ctx.fillStyle = 'rgba(233,226,207,.8)';
+    ctx.beginPath(); ctx.arc(p.x, p.y-3, 6, 0, TAU); ctx.fill();
+    ctx.fillStyle = '#0e0e11';
+    ctx.beginPath(); ctx.arc(p.x-2.2, p.y-4, 1.5, 0, TAU); ctx.arc(p.x+2.2, p.y-4, 1.5, 0, TAU); ctx.fill();
+    return;
+  }
+  if(s.jumpH) p = {x:p.x, y:p.y - s.jumpH*0.85};
+  var roll = s.dodgeTime > 0;
+  var szScale = s.genes.size || 1;
+  // READABLE ROLL — a real tumble, not a wobble. dodgeTime counts 0.42 → 0, so
+  // rollP sweeps 0 → 1 across the roll: the whole body spins a full 360° in the
+  // direction it's rolling, dips toward the ground mid-tumble, and a dust ring
+  // plus kicked-up puffs trail behind it. You can SEE the roll happen now.
+  var rollP = roll ? clamp(1 - s.dodgeTime / 0.42, 0, 1) : 0;
+  var rollDir = ((s.dodgeDx || 0) * Math.cos(s.face) + (s.dodgeDy || 0) * Math.sin(s.face)) >= 0 ? 1 : -1;
+  if(roll){
+    ctx.strokeStyle = 'rgba(233,226,207,.35)'; ctx.lineWidth = 2;
+    ctx.beginPath(); ctx.ellipse(p.x, p.y + 4, 17 * szScale, 6 * szScale, 0, 0, TAU); ctx.stroke();
+    ctx.fillStyle = 'rgba(233,226,207,.5)';
+    for(var rd = 0; rd < 3; rd++){
+      ctx.beginPath();
+      ctx.arc(p.x - (s.dodgeDx || 0) * rd * 9 * szScale + Math.sin(rd * 2.4 + s.x) * 3, p.y + 5 - rd * 1.5, Math.max(0.8, 2.6 - rd * 0.6), 0, TAU);
+      ctx.fill();
+    }
+  }
+  ctx.save(); ctx.translate(p.x, p.y + (roll ? Math.sin(rollP * Math.PI) * 3 : 0)); ctx.scale(szScale, szScale);
+  if(roll) ctx.rotate(rollDir * rollP * TAU);
+  // body hitbox (faint dashed circle)
+  ctx.strokeStyle = 'rgba(233,226,207,.20)'; ctx.setLineDash([3,4]); ctx.lineWidth = 1;
+  ctx.beginPath(); ctx.ellipse(0, -6, 15, 12, 0, 0, TAU); ctx.stroke(); ctx.setLineDash([]);
+  // torso: bone diamond — its hue is a GENE now, drifting a few degrees a generation
+  var boneHue = (s.genes.boneHue !== undefined ? s.genes.boneHue : 45);
+  ctx.fillStyle = s.hurtFlash > 0 ? '#ff9c9c' : ('hsl(' + boneHue + ',32%,80%)');
+  ctx.beginPath(); ctx.moveTo(0,-16); ctx.lineTo(9,-4); ctx.lineTo(5,10); ctx.lineTo(-5,10); ctx.lineTo(-9,-4); ctx.closePath(); ctx.fill();
+  // ribs
+  ctx.strokeStyle = 'rgba(60,55,45,.7)'; ctx.lineWidth = 1.4;
+  ctx.beginPath(); ctx.moveTo(-6,-6); ctx.lineTo(6,-6); ctx.moveTo(-5,-1); ctx.lineTo(5,-1); ctx.moveTo(-4,4); ctx.lineTo(4,4); ctx.stroke();
+  // skull — a slightly lighter shade of the same drifting bone hue
+  ctx.fillStyle = s.hurtFlash > 0 ? '#ffb3b3' : ('hsl(' + boneHue + ',36%,88%)');
+  ctx.beginPath(); ctx.arc(0, -24, 8.5, 0, TAU); ctx.fill();
+  ctx.fillRect(-4.5, -19, 9, 4.5);
+  // eye sockets — the eyeGlow gene creeps from dark pits toward a burning stare
+  var glow = s.genes.eyeGlow || 0;
+  ctx.fillStyle = glow > 0.45 ? ('hsl(' + (50 - glow*30) + ',100%,' + (45 + glow*20) + '%)') : '#111116';
+  ctx.beginPath(); ctx.arc(-3.2, -25, 1.6 + glow*1.1, 0, TAU); ctx.arc(3.2, -25, 1.6 + glow*1.1, 0, TAU); ctx.fill();
+  ctx.fillRect(-0.8, -21.5, 1.6, 2.6);
+  if(s.isMaster){ // the Master's crown — the first Skeleton Sword
+    ctx.fillStyle = '#f2c14e';
+    ctx.beginPath();
+    ctx.moveTo(-8,-31); ctx.lineTo(-8,-37); ctx.lineTo(-4,-33); ctx.lineTo(0,-38); ctx.lineTo(4,-33); ctx.lineTo(8,-37); ctx.lineTo(8,-31);
+    ctx.closePath(); ctx.fill();
+  }
+  if(s.slowT > 0 || (s.chillStacks||0) > 0){ // chilled outline (Frostbite / ice breath stacks)
+    ctx.strokeStyle = 'rgba(94,200,216,.75)'; ctx.lineWidth = 1.6;
+    ctx.beginPath(); ctx.ellipse(0, -8, 16, 20, 0, 0, TAU); ctx.stroke();
+  }
+  if(s.freezeT > 0){ // frozen solid: an ice block where a skeleton used to be a problem
+    ctx.fillStyle = 'rgba(94,200,216,.34)';
+    ctx.strokeStyle = 'rgba(189,238,247,.95)'; ctx.lineWidth = 2;
+    ctx.beginPath(); ctx.moveTo(-14,-38); ctx.lineTo(10,-40); ctx.lineTo(15,12); ctx.lineTo(-11,14); ctx.closePath(); ctx.fill(); ctx.stroke();
+    ctx.strokeStyle = 'rgba(234,247,255,.7)'; ctx.lineWidth = 1.2;
+    ctx.beginPath(); ctx.moveTo(-10,-30); ctx.lineTo(4,-6); ctx.moveTo(9,-34); ctx.lineTo(-2,8); ctx.stroke();
+  }
+  // sword arm — angle follows state
+  var swordAng = -0.7;
+  if(s.state === 'windup' || s.state === 'jumpWindup' || s.state === 'swipeWindup' || s.state === 'riposteWindup') swordAng = -2.2;
+  if(s.state === 'strike' || s.state === 'swipeStrike' || s.state === 'riposteStrike') swordAng = 0.75;
+  if(s.state === 'jumpAir') swordAng = -2.6;
+  if(s.state === 'stabWindup') swordAng = -0.2;
+  if(s.state === 'stabDash') swordAng = 0;
+  if(s.parryTime > 0) swordAng = -1.5;
+  if(s.hasSword){ // a skel that threw its sword draws NO sword until it fetches it back
+  var dirSign = Math.cos(s.face) >= 0 ? 1 : -1;
+  var hx = 8*dirSign, hy = -6;
+  var ex = hx + Math.cos(swordAng)*dirSign*10, ey = hy + Math.sin(swordAng)*10;
+  var bladeLen = 24 * (s.genes.swordLen || 1); // the swordLen gene, drawn honestly: daggers to greatswords
+  var tx = ex + Math.cos(swordAng)*dirSign*bladeLen, ty = ey + Math.sin(swordAng)*bladeLen;
+  ctx.strokeStyle = '#c9c2ab'; ctx.lineWidth = 3;
+  ctx.beginPath(); ctx.moveTo(2*dirSign, -8); ctx.lineTo(hx, hy); ctx.stroke();  // arm
+  ctx.strokeStyle = '#8a6d2f'; ctx.lineWidth = 3.4;
+  ctx.beginPath(); ctx.moveTo(hx, hy); ctx.lineTo(ex, ey); ctx.stroke();         // grip
+  ctx.strokeStyle = 'hsl(' + (s.genes.bladeHue !== undefined ? s.genes.bladeHue : 210) + ',18%,84%)'; ctx.lineWidth = 3; // blade tint drifts too
+  ctx.beginPath(); ctx.moveTo(ex, ey); ctx.lineTo(tx, ty); ctx.stroke();         // blade
+  if(s.parryTime > 0){
+    ctx.strokeStyle = 'rgba(94,200,216,.85)'; ctx.lineWidth = 2;
+    ctx.beginPath(); ctx.arc(dirSign*15, -14, 11, -1.2, 1.2); ctx.stroke();
+  }
+  }
+  ctx.restore();
+  if(!s.hasSword){ // unarmed & vulnerable: dashed red ring + tag
+    ctx.strokeStyle = 'rgba(224,82,82,.55)'; ctx.setLineDash([4,4]); ctx.lineWidth = 1.4;
+    ctx.beginPath(); ctx.ellipse(p.x, p.y - 8, 19 * szScale, 15 * szScale, 0, 0, TAU); ctx.stroke(); ctx.setLineDash([]);
+    ctx.fillStyle = '#e05252'; ctx.font = '700 10px sans-serif'; ctx.textAlign = 'center';
+    ctx.fillText('UNARMED', p.x, p.y - 36 * szScale);
+  }
+  // attack hitbox wedge: telegraph in windup, live in strike — reach follows the blade
+  var reach = (s.genes.attackRange || 1) * (s.genes.swordLen || 1);
+  if(s.state === 'windup') wedge(s.x, s.y, s.face, 74 * reach, 1.05, 'rgba(224,82,82,.16)');
+  if(s.state === 'strike') wedge(s.x, s.y, s.face, 74 * reach, 1.05, 'rgba(224,82,82,.45)');
+  if(s.state === 'feint') wedge(s.x, s.y, s.face, 60, 0.9, 'rgba(224,82,82,.08)');
+  if(s.state === 'jumpWindup') wedge(s.x, s.y, s.face, 82, 0.9, 'rgba(224,120,40,.22)');
+  if(s.state === 'jumpAir') wedge(s.x, s.y, s.face, 82, 0.9, 'rgba(224,120,40,.40)');
+  if(s.state === 'swipeWindup') wedge(s.x, s.y, s.face, 84 * reach, 1.75, 'rgba(190,82,224,.18)');
+  if(s.state === 'swipeStrike') wedge(s.x, s.y, s.face, 84 * reach, 1.75, 'rgba(190,82,224,.42)');
+  if(s.state === 'stabWindup') wedge(s.x, s.y, s.face, 118 * reach, 0.38, 'rgba(224,200,60,.20)');
+  if(s.state === 'stabDash') wedge(s.x, s.y, s.face, 70, 0.38, 'rgba(224,200,60,.45)');
+  if(s.state === 'riposteWindup') wedge(s.x, s.y, s.face, 88 * reach, 1.2, 'rgba(94,200,216,.28)');
+  if(s.state === 'riposteStrike') wedge(s.x, s.y, s.face, 88 * reach, 1.2, 'rgba(94,200,216,.50)');
+  // hp bar
+  if(s.hp < s.maxHp){
+    var hbY = p.y - 44 * (s.genes.size||1) - 6;
+    ctx.fillStyle = '#000'; ctx.fillRect(p.x-16, hbY, 32, 4.5);
+    ctx.fillStyle = '#e05252'; ctx.fillRect(p.x-15, hbY+1, 30 * clamp(s.hp/s.maxHp,0,1), 2.5);
+  }
+  // NAME — every skeleton has one now. It mutates a letter at a time, across
+  // generations and even mid-life, so a long-lived lineage grows identities.
+  ctx.font = '700 9px ui-sans-system, sans-serif'; ctx.textAlign = 'center';
+  ctx.fillStyle = s.isMaster ? '#f2c14e' : 'rgba(233,226,207,.78)';
+  ctx.fillText(s.genes.name || '', p.x, p.y - 52 * (s.genes.size || 1) - 4);
+  if(s.blindT > 0){ // dazed by Solar Flash: marked, wandering, whiffing
+    ctx.fillStyle = '#fff6c9'; ctx.font = '700 9.5px ui-sans-system, sans-serif';
+    ctx.fillText('💫 BLIND ' + s.blindT.toFixed(0) + 's', p.x, p.y - 64 * (s.genes.size || 1) - 4);
+  }
+}
+function drawPlayer(){
+  if(!player) return;
+  var p = w2s(player.x, player.y);
+  shadowEllipse(player.x, player.y, 20);
+  p = { x: p.x, y: p.y - (player.jumpH || 0) * 0.85 }; // body rises with the jump; shadow stays on the ground
+  var snapped = snap8(player.face);
+  // --- 8-direction facing indicator (quantized, readable at a glance) ---
+  wedge(player.x, player.y, snapped, 52, 0.34, player.charging && player.charge >= 0.55 ? 'rgba(242,193,78,.50)' : 'rgba(242,193,78,.22)');
+  (function(){
+    var tip = w2s(player.x + Math.cos(snapped)*58, player.y + Math.sin(snapped)*58);
+    ctx.fillStyle = '#f2c14e';
+    ctx.beginPath(); ctx.arc(tip.x, tip.y, 4, 0, TAU); ctx.fill();
+    ctx.strokeStyle = 'rgba(242,193,78,.8)'; ctx.lineWidth = 1.6;
+    ctx.beginPath(); ctx.arc(tip.x, tip.y, 7.5, 0, TAU); ctx.stroke();
+  })();
+  // hitboxes first (under body)
+  if(player.atkAnim > 0) wedge(player.x, player.y, player.face, 96, 1.15, 'rgba(242,193,78,.35)');
+  if(player.diagAnim > 0) wedge(player.x, player.y, player.face, 92, 0.45, 'rgba(242,193,78,.45)'); // narrow stab wedge, drawn where the dive actually goes
+  if(player.spinAnim > 0) wedge(player.x, player.y, player.face, 118, Math.PI, 'rgba(242,193,78,.38)');
+  if(player.charging){
+    var cp = w2s(player.x, player.y);
+    ctx.strokeStyle = player.charge >= 0.55 ? '#f2c14e' : 'rgba(242,193,78,.5)';
+    ctx.lineWidth = 3;
+    ctx.beginPath(); ctx.ellipse(cp.x, cp.y-8, 30, 19, 0, -Math.PI/2, -Math.PI/2 + TAU*clamp(player.charge/0.55,0,1)); ctx.stroke();
+    if(player.charge >= 0.55){ ctx.fillStyle='#f2c14e'; ctx.font='700 11px sans-serif'; ctx.textAlign='center'; ctx.fillText('SPIN READY', cp.x, cp.y-52); }
+  }
+  ctx.save(); ctx.translate(p.x, p.y);
+  if(player.dashTime > 0) ctx.globalAlpha = 0.65;
+  // body hitbox ring
+  ctx.strokeStyle = 'rgba(242,193,78,.30)'; ctx.setLineDash([4,4]); ctx.lineWidth = 1;
+  ctx.beginPath(); ctx.ellipse(0, -8, 21, 16, 0, 0, TAU); ctx.stroke(); ctx.setLineDash([]);
+  // cape
+  var back = Math.atan2(Math.sin(player.face), Math.cos(player.face));
+  ctx.fillStyle = '#6e1423';
+  ctx.beginPath();
+  ctx.moveTo(-Math.cos(player.face)*2 - 13, -4); ctx.lineTo(-Math.cos(player.face)*2 + 13, -4);
+  ctx.lineTo(-Math.cos(player.face)*20 + 8, 20); ctx.lineTo(-Math.cos(player.face)*20 - 8, 20);
+  ctx.closePath(); ctx.fill();
+  // armored body: big gold diamond (you are the boss — you are bigger).
+  // As bones pile up (Story), the gold gives way to bone — you become the Skeleton Sword.
+  var bst = player.boneStage || 0;
+  ctx.fillStyle = player.hurtFlash > 0 ? '#ff8a7a' : (player.stagger > 0 ? '#8d8574' : (bst >= 4 ? '#e9e2cf' : '#c9962e'));
+  ctx.beginPath(); ctx.moveTo(0,-26); ctx.lineTo(15,-8); ctx.lineTo(9,16); ctx.lineTo(-9,16); ctx.lineTo(-15,-8); ctx.closePath(); ctx.fill();
+  ctx.strokeStyle = bst >= 4 ? '#a79f8a' : '#7a5a14'; ctx.lineWidth = 2; ctx.stroke();
+  if(bst >= 2){ // ribs show through the torso
+    ctx.strokeStyle = 'rgba(240,234,214,.85)'; ctx.lineWidth = 1.8;
+    ctx.beginPath();
+    ctx.moveTo(-8,-12); ctx.quadraticCurveTo(0,-9, 8,-12);
+    ctx.moveTo(-8,-5);  ctx.quadraticCurveTo(0,-2, 8,-5);
+    ctx.moveTo(-7,2);   ctx.quadraticCurveTo(0,5, 7,2);
+    ctx.stroke();
+  }
+  // chest gem — cyan in physical mode, violet in magic mode
+  ctx.fillStyle = player.magicMode ? '#c792ea' : '#5ec8d8';
+  ctx.beginPath(); ctx.arc(0,-6, player.magicMode ? 4.6 : 3.4, 0, TAU); ctx.fill();
+  // horned helm — bone-white skull plate from stage 3
+  ctx.fillStyle = bst >= 3 ? '#f0ead6' : '#e8c766';
+  ctx.beginPath(); ctx.arc(0, -34, 10.5, 0, TAU); ctx.fill();
+  if(bst >= 4){ // the Master's crown
+    ctx.fillStyle = '#f2c14e';
+    ctx.beginPath();
+    ctx.moveTo(-9,-43); ctx.lineTo(-9,-50); ctx.lineTo(-4.5,-45); ctx.lineTo(0,-51); ctx.lineTo(4.5,-45); ctx.lineTo(9,-50); ctx.lineTo(9,-43);
+    ctx.closePath(); ctx.fill();
+  }
+  ctx.strokeStyle = '#e8c766'; ctx.lineWidth = 3.4;
+  ctx.beginPath(); ctx.moveTo(-9,-40); ctx.quadraticCurveTo(-18,-46,-19,-36); ctx.stroke();
+  ctx.beginPath(); ctx.moveTo(9,-40); ctx.quadraticCurveTo(18,-46,19,-36); ctx.stroke();
+  if(bst >= 3){ // skull face: two dark eye sockets instead of a visor
+    ctx.fillStyle = '#111116';
+    ctx.beginPath(); ctx.arc(-3.6,-35,2.1,0,TAU); ctx.arc(3.6,-35,2.1,0,TAU); ctx.fill();
+    ctx.fillRect(-0.8,-31.5,1.6,2.6);
+  } else {
+    ctx.fillStyle = '#191204'; ctx.fillRect(-6,-33,12,3.2); // visor slit
+  }
+  if(bst >= 1){ // bone-white gauntlet on the sword hand
+    ctx.fillStyle = '#f0ead6';
+    ctx.beginPath(); ctx.arc(13*(Math.cos(snap8(player.face)) >= 0 ? 1 : -1), -8, 4.2, 0, TAU); ctx.fill();
+  }
+  // sword (right side, swings with atkAnim / spin / charge)
+  var swing = player.atkAnim > 0 ? (0.17 - player.atkAnim)/0.17 : 0;
+  var swordAng = player.swingStep === 2 ? (1.8 - swing * 2.4) : (-0.6 + swing * 2.4); // combo hit 2 swings backhand
+  if(player.flurryTime > 0) swordAng = Math.sin(G.time * 55) * 1.7; // the flurry blur
+  if(player.charging) swordAng = -2.3; // raised windup — release for spin when charged
+  if(player.spinAnim > 0) swordAng = -0.6 + ((0.38 - player.spinAnim)/0.38)*TAU;
+  var dirSign = Math.cos(snap8(player.face)) >= 0 ? 1 : -1;
+  var hx = 13*dirSign, hy = -8;
+  var ex = hx + Math.cos(swordAng)*dirSign*12, ey = hy + Math.sin(swordAng)*12;
+  var tx = ex + Math.cos(swordAng)*dirSign*36, ty = ey + Math.sin(swordAng)*36;
+  ctx.strokeStyle = '#8a6d2f'; ctx.lineWidth = 4;
+  ctx.beginPath(); ctx.moveTo(hx, hy); ctx.lineTo(ex, ey); ctx.stroke();
+  ctx.strokeStyle = '#eef2f7'; ctx.lineWidth = 4;
+  ctx.beginPath(); ctx.moveTo(ex, ey); ctx.lineTo(tx, ty); ctx.stroke();
+  // shield (left side)
+  if(player.shielding){
+    ctx.fillStyle = 'rgba(94,200,216,.35)';
+    ctx.strokeStyle = '#5ec8d8'; ctx.lineWidth = 2.4;
+    var sx = -16*dirSign, sy = -10;
+    ctx.beginPath(); ctx.ellipse(sx, sy, 10, 15, 0, 0, TAU); ctx.fill(); ctx.stroke();
+  }
+  // healing glow
+  if(player.healCast > 0){
+    ctx.strokeStyle = 'rgba(123,196,127,.9)'; ctx.lineWidth = 2.4;
+    var rr = 26 + Math.sin(G.time*14)*3;
+    ctx.beginPath(); ctx.ellipse(0,-8,rr,rr*0.6,0,0,TAU); ctx.stroke();
+  }
+  // active buff rings — armor cyan, swift green, might ember, regen leaf
+  var buffRings = [
+    [player.buffArmorT, '#5ec8d8', 30], [player.buffHasteT, '#7bc47f', 34],
+    [player.buffPowerT, '#e07840', 38], [player.buffRegenT, '#a5e8a8', 42]
+  ];
+  buffRings.forEach(function(br){
+    if(br[0] > 0){
+      ctx.strokeStyle = br[1]; ctx.globalAlpha = 0.55 + Math.sin(G.time*8)*0.2; ctx.lineWidth = 2;
+      ctx.beginPath(); ctx.ellipse(0, -6, br[2], br[2]*0.58, 0, 0, TAU); ctx.stroke(); ctx.globalAlpha = 1;
+    }
+  });
+  if(player.magicMode){ // magic mode: a slow violet rune circle at your feet
+    ctx.strokeStyle = 'rgba(199,146,234,.8)'; ctx.lineWidth = 2;
+    ctx.beginPath(); ctx.ellipse(0, 12, 24, 11, 0, G.time*1.6, G.time*1.6 + 4.4); ctx.stroke();
+  }
+  ctx.restore();
+  // hp bar
+  ctx.fillStyle = '#000'; ctx.fillRect(p.x-26, p.y-62, 52, 6);
+  ctx.fillStyle = player.hp < 60 ? '#e05252' : '#d9a441';
+  ctx.fillRect(p.x-25, p.y-61, 50 * clamp(player.hp/player.maxHp,0,1), 4);
+}
+function draw(){
+  var r = stage.getBoundingClientRect();
+  ctx.setTransform(view.dpr||1, 0, 0, view.dpr||1, 0, 0);
+  ctx.clearRect(0, 0, r.width, r.height);
+  ctx.fillStyle = '#0a0a0d'; ctx.fillRect(0, 0, r.width, r.height);
+  ctx.save();
+  if(G.shake > 0) ctx.translate(rand(-G.shake,G.shake), rand(-G.shake,G.shake));
+  drawField();
+  // depth-sorted entities
+  var ents = [];
+  if(player && player.alive) ents.push({ y: player.x + player.y, kind:'p' });
+  skels.forEach(function(s){ ents.push({ y: s.x + s.y, kind:'s', s:s }); });
+  ents.sort(function(a,b){ return a.y - b.y; });
+  ents.forEach(function(e){ if(e.kind==='p') drawPlayer(); else drawSkel(e.s); });
+  // target-lock reticle — pulsing gold brackets on the marked skeleton
+  if(player && player.lockTarget && !player.lockTarget.dead){
+    var tp = w2s(player.lockTarget.x, player.lockTarget.y);
+    var rr2 = 27 * (player.lockTarget.genes.size || 1) + Math.sin(G.time * 6) * 2;
+    ctx.strokeStyle = 'rgba(242,193,78,.9)'; ctx.lineWidth = 2;
+    for(var ci = 0; ci < 4; ci++){
+      var ca = ci * Math.PI / 2 + Math.PI / 4;
+      var cx2 = tp.x + Math.cos(ca) * rr2, cy2 = tp.y - 10 + Math.sin(ca) * rr2 * 0.7;
+      ctx.beginPath();
+      ctx.moveTo(cx2 - 6 * Math.cos(ca), cy2 - 4 * Math.sin(ca));
+      ctx.lineTo(cx2 + 6 * Math.cos(ca), cy2 + 4 * Math.sin(ca));
+      ctx.stroke();
+    }
+    ctx.fillStyle = '#f2c14e'; ctx.font = '700 9px sans-serif'; ctx.textAlign = 'center';
+    ctx.fillText('TARGET', tp.x, tp.y - 16 - rr2 * 0.7);
+  }
+  // shockwaves — expanding gold rings
+  shockwaves.forEach(function(w){
+    var wp = w2s(w.x, w.y); var a = clamp(w.life/w.max, 0, 1);
+    ctx.strokeStyle = 'rgba(242,193,78,' + (0.75*a) + ')'; ctx.lineWidth = 5;
+    ctx.beginPath(); ctx.ellipse(wp.x, wp.y, w.r*view.scale*1.4, w.r*view.scale*0.7, 0, 0, TAU); ctx.stroke();
+    ctx.strokeStyle = 'rgba(255,240,190,' + (0.5*a) + ')'; ctx.lineWidth = 2;
+    ctx.beginPath(); ctx.ellipse(wp.x, wp.y, (w.r-10)*view.scale*1.4, Math.max(2,(w.r-10)*view.scale*0.7), 0, 0, TAU); ctx.stroke();
+  });
+  // FIRE PILLARS — telegraphed eruption circles
+  pillars.forEach(function(pl){
+    var pp2 = w2s(pl.x, pl.y);
+    var prog = 1 - clamp(pl.t / 0.38, 0, 1);
+    ctx.strokeStyle = 'rgba(224,120,64,.85)'; ctx.lineWidth = 2.5; ctx.setLineDash([7,5]);
+    ctx.beginPath(); ctx.ellipse(pp2.x, pp2.y, pl.r*view.scale*1.4, pl.r*view.scale*0.7, 0, 0, TAU); ctx.stroke(); ctx.setLineDash([]);
+    ctx.fillStyle = 'rgba(224,82,40,' + (0.10 + prog*0.22) + ')';
+    ctx.beginPath(); ctx.ellipse(pp2.x, pp2.y, pl.r*view.scale*1.4*prog, Math.max(2, pl.r*view.scale*0.7*prog), 0, 0, TAU); ctx.fill();
+  });
+  // CHAIN LIGHTNING — jagged purple-white arcs
+  lightnings.forEach(function(lg){
+    var a2 = clamp(lg.life / lg.max, 0, 1);
+    ctx.lineJoin = 'round';
+    ctx.strokeStyle = 'rgba(199,146,234,' + (0.55*a2) + ')'; ctx.lineWidth = 6;
+    ctx.beginPath();
+    lg.pts.forEach(function(pt2, ix){ var sp3 = w2s(pt2[0], pt2[1]); if(ix===0) ctx.moveTo(sp3.x, sp3.y-8); else ctx.lineTo(sp3.x, sp3.y-8); });
+    ctx.stroke();
+    ctx.strokeStyle = 'rgba(255,255,255,' + (0.9*a2) + ')'; ctx.lineWidth = 2;
+    ctx.beginPath();
+    lg.pts.forEach(function(pt2, ix){ var sp3 = w2s(pt2[0], pt2[1]); if(ix===0) ctx.moveTo(sp3.x, sp3.y-8); else ctx.lineTo(sp3.x, sp3.y-8); });
+    ctx.stroke(); ctx.lineJoin = 'miter';
+  });
+  // FLAMETHROWER / ICE BREATH cones
+  if(player && player.alive && player.flameTime > 0) wedge(player.x, player.y, player.face, 198, 0.62, 'rgba(224,120,40,.28)');
+  if(player && player.alive && player.iceTime > 0) wedge(player.x, player.y, player.face, 182, 0.68, 'rgba(94,200,216,.26)');
+  // BOSS BEAM — charge orb, then a layered blue-white blast down the facing line
+  if(player && player.alive && (player.beamCharge > 0 || player.beamTime > 0)){
+    var bfx = Math.cos(player.beamDir), bfy = Math.sin(player.beamDir); // drawn along the tracked direction
+    var hand = w2s(player.x + bfx * 26, player.y + bfy * 26);
+    if(player.beamCharge > 0){
+      var cr = 5 + (0.7 - player.beamCharge) / 0.7 * 13 + Math.sin(G.time * 30) * 1.5;
+      ctx.fillStyle = 'rgba(94,200,216,.35)';
+      ctx.beginPath(); ctx.arc(hand.x, hand.y - 10, cr + 7, 0, TAU); ctx.fill();
+      ctx.fillStyle = '#eaf7ff';
+      ctx.beginPath(); ctx.arc(hand.x, hand.y - 10, cr, 0, TAU); ctx.fill();
+    }
+    if(player.beamTime > 0){
+      var bend = w2s(player.x + bfx * 470, player.y + bfy * 470);
+      var flick = 0.85 + Math.sin(G.time * 47) * 0.15;
+      ctx.lineCap = 'round';
+      ctx.strokeStyle = 'rgba(94,200,216,.38)'; ctx.lineWidth = 46 * flick;
+      ctx.beginPath(); ctx.moveTo(hand.x, hand.y - 10); ctx.lineTo(bend.x, bend.y - 10); ctx.stroke();
+      ctx.strokeStyle = 'rgba(140,220,245,.75)'; ctx.lineWidth = 26 * flick;
+      ctx.beginPath(); ctx.moveTo(hand.x, hand.y - 10); ctx.lineTo(bend.x, bend.y - 10); ctx.stroke();
+      ctx.strokeStyle = 'rgba(255,255,255,.95)'; ctx.lineWidth = 11 * flick;
+      ctx.beginPath(); ctx.moveTo(hand.x, hand.y - 10); ctx.lineTo(bend.x, bend.y - 10); ctx.stroke();
+      ctx.fillStyle = 'rgba(234,247,255,.9)';
+      ctx.beginPath(); ctx.arc(hand.x, hand.y - 10, 15 * flick, 0, TAU); ctx.fill();
+      ctx.lineCap = 'butt';
+    }
+  }
+  // projectiles — arrows draw as shafts with heads; old bolts (none in the kit now) as orbs
+  projectiles.forEach(function(pr){
+    var pp = w2s(pr.x, pr.y);
+    if(pr.kind === 'arrow'){
+      var va = Math.atan2(pr.vy, pr.vx);
+      var sp1 = w2s(pr.x - Math.cos(va) * 15, pr.y - Math.sin(va) * 15);
+      ctx.strokeStyle = '#b08d4f'; ctx.lineWidth = 2.6;
+      ctx.beginPath(); ctx.moveTo(sp1.x, sp1.y - 8); ctx.lineTo(pp.x, pp.y - 8); ctx.stroke();
+      ctx.fillStyle = '#e8e4d8';
+      ctx.beginPath();
+      ctx.moveTo(pp.x + Math.cos(va) * 6, pp.y - 8 + Math.sin(va) * 3);
+      ctx.lineTo(pp.x - Math.cos(va) * 2 - Math.sin(va) * 3.4, pp.y - 8 - Math.sin(va) * 2 + Math.cos(va) * 3.4);
+      ctx.lineTo(pp.x - Math.cos(va) * 2 + Math.sin(va) * 3.4, pp.y - 8 - Math.sin(va) * 2 - Math.cos(va) * 3.4);
+      ctx.closePath(); ctx.fill();
+      ctx.strokeStyle = 'rgba(233,226,207,.6)'; ctx.lineWidth = 1.6; // fletching
+      ctx.beginPath(); ctx.moveTo(sp1.x, sp1.y - 8); ctx.lineTo(sp1.x - 4, sp1.y - 12); ctx.moveTo(sp1.x, sp1.y - 8); ctx.lineTo(sp1.x - 4, sp1.y - 4); ctx.stroke();
+      return;
+    }
+    ctx.fillStyle = '#5ec8d8';
+    ctx.beginPath(); ctx.arc(pp.x, pp.y-8, 6.5, 0, TAU); ctx.fill();
+    ctx.fillStyle = 'rgba(94,200,216,.3)';
+    ctx.beginPath(); ctx.arc(pp.x, pp.y-8, 11, 0, TAU); ctx.fill();
+  });
+  // thrown swords — spinning in flight, stuck in the ground waiting for their owner
+  thrownSwords.forEach(function(sw){
+    var sp2 = w2s(sw.x, sw.y);
+    ctx.save(); ctx.translate(sp2.x, sp2.y - (sw.state === 'fly' ? 10 : 2));
+    if(sw.state === 'fly') ctx.rotate(sw.spin); else ctx.rotate(0.9);
+    ctx.strokeStyle = '#8a6d2f'; ctx.lineWidth = 3;
+    ctx.beginPath(); ctx.moveTo(-4, 0); ctx.lineTo(2, 0); ctx.stroke();
+    ctx.strokeStyle = '#d7dde6'; ctx.lineWidth = 3;
+    ctx.beginPath(); ctx.moveTo(2, 0); ctx.lineTo(16, 0); ctx.stroke();
+    ctx.restore();
+    if(sw.state === 'ground'){
+      ctx.strokeStyle = 'rgba(242,193,78,.5)'; ctx.lineWidth = 1.4;
+      ctx.beginPath(); ctx.arc(sp2.x, sp2.y, 9, 0, TAU); ctx.stroke();
+    }
+  });
+  // particles (drawn in screen space approx via w2s)
+  particles.forEach(function(pt){
+    var pp = w2s(pt.x, pt.y);
+    ctx.globalAlpha = clamp(pt.life/pt.max, 0, 1);
+    ctx.fillStyle = pt.color;
+    ctx.fillRect(pp.x - pt.size/2, pp.y - 10 - pt.size/2, pt.size, pt.size);
+  });
+  ctx.globalAlpha = 1;
+  // floaters
+  ctx.font = '700 13px ui-sans-system, sans-serif'; ctx.textAlign = 'center';
+  floaters.forEach(function(f){
+    var pp = w2s(f.x, f.y);
+    ctx.globalAlpha = clamp(f.life, 0, 1);
+    ctx.fillStyle = f.color;
+    ctx.fillText(f.text, pp.x, pp.y - 14);
+  });
+  ctx.globalAlpha = 1;
+  ctx.restore();
+  // SOLAR FLASH — a full-screen burst of light that decays over ~half a second
+  if(G.flash > 0){
+    ctx.fillStyle = 'rgba(255,250,220,' + clamp(G.flash, 0, 1) * 0.92 + ')';
+    ctx.fillRect(0, 0, r.width, r.height);
+  }
+  // hurt vignette
+  if(player && player.hurtFlash > 0){
+    ctx.fillStyle = 'rgba(180,30,30,' + (player.hurtFlash*0.55) + ')';
+    ctx.fillRect(0,0,r.width,26); ctx.fillRect(0,r.height-26,r.width,26);
+    ctx.fillRect(0,0,26,r.height); ctx.fillRect(r.width-26,0,26,r.height);
+  }
+}
+
+/* ---------- flow ---------- */
+function hideAllPanels(){
+  document.getElementById('overlay').classList.add('hidden');
+  document.getElementById('beat').classList.add('hidden');
+  document.getElementById('shop').classList.add('hidden');
+  document.getElementById('savepanel').classList.add('hidden');
+  document.getElementById('moves').classList.add('hidden');
+}
+/* ----- Pause · Moves panel: the full move list lives HERE, not on the arena ----- */
+function anyPanelOpen(){
+  return ['overlay','beat','shop','savepanel'].some(function(id){ return !document.getElementById(id).classList.contains('hidden'); });
+}
+function panelOpen(id){ return !document.getElementById(id).classList.contains('hidden'); }
+function openMoves(){
+  // Already open? Do NOTHING. The old version re-saved G.wasPaused = G.paused here —
+  // open the panel twice and it snapshot "paused" as the state to restore, so every
+  // close "restored" paused=true and the game could never unpause. That was the bug.
+  if(!G.running || G.over || anyPanelOpen() || panelOpen('moves')) return;
+  G.paused = true;
+  document.getElementById('moves').classList.remove('hidden');
+}
+function closeMoves(){
+  document.getElementById('moves').classList.add('hidden');
+  // Paused is DERIVED from what is actually on screen, never restored from a snapshot:
+  // another modal (story beat, shop, save panel) still open keeps the fight frozen —
+  // otherwise we are unpaused. Every close path lands in the same correct state.
+  G.paused = anyPanelOpen();
+}
+function toggleMoves(){
+  if(panelOpen('moves')) closeMoves(); else openMoves();
+}
+document.getElementById('moves-close').addEventListener('click', function(){ closeMoves(); this.blur(); }); // blur: a still-focused button would eat your next Space (jump) as a click
+function resetRunState(){
+  G.wave = 0; G.generation = 1; G.genePool = []; G.lastAverages = null; G.logLines = [];
+  G.over = false; G.paused = false; G.running = true; G.time = 0;
+  G.bones = 0; G.totalBones = 0; G.duel = false; G.pendingGenes = null;
+  skels = []; projectiles = []; particles = []; floaters = []; shockwaves = []; thrownSwords = []; pillars = []; lightnings = [];
+  document.getElementById('evo-log').textContent = '';
+  document.getElementById('evo-traits').innerHTML = '<span>Awaiting first wave…</span>';
+  document.getElementById('pause-btn').textContent = '❚❚ Pause · Moves';
+}
+function startRun(mode){
+  hideAllPanels();
+  player = newPlayer();
+  resetRunState();
+  G.mode = mode;
+  if(mode === 'story'){
+    // Story: you arrive with a sword and nothing else. The kit is EARNED, bone by bone.
+    player.unlocks.spell = false; player.unlocks.shock = false; player.unlocks.beam = false; player.unlocks.flash = false;
+    player.unlocks.heal = false; player.unlocks.dash = false;
+    G.state = 'between'; G.betweenTimer = 99999; // held by the intro beat
+    updateHUD();
+    showBeat('The Grave World', [
+      'A world of graves, where the skeletons hang out. They keep pubs. They sweep their little homes, do their chores, dance badly at parties — and they are all in a daze, because none of them knows what they are FOR.',
+      'They love fighting most of all. They don’t know why.',
+      'Then you fall out of the sky: a final boss who can think. Who can LEARN. And the Master — the first Skeleton Sword — rises from his grave, taps his blade twice, and challenges you to a duel.'
+    ], 'Face the Master', function(){ spawnMaster(); });
+  } else {
+    spawnWave();
+  }
+  updateHUD();
+}
+function startGame(){ startRun(G.mode || 'survival'); }
+
+function spawnMaster(){
+  var g = baseGenes();
+  g.speed = 1.12; g.size = 1.55; g.attackRange = 1.1; g.attackSpeed = 1.05; g.parryWindow = 1.2;
+  g.reaction = 0.5; g.dodge = 0.3; g.parry = 0.32; g.riposte = 0.55; g.dash = 0.25; g.feint = 0.2; g.aggression = 0.6; g.strafe = 0.5; g.nerve = 0.7; g.throwSkill = 0.4;
+  g.name = 'MASTER'; g.swordLen = 1.5; g.eyeGlow = 0.85; // the first Skeleton Sword carries a long blade
+  var m = makeSkel(g, WORLD/2, WORLD*0.2);
+  m.hp = m.maxHp = 300; m.isMaster = true; m.r = Math.max(5, 15*1.55);
+  skels = [m];
+  G.duel = true; G.state = 'fight'; G.paused = false;
+  banner('THE MASTER — SKELETON SWORD', 'He has been waiting a long time for someone who can learn.');
+  updateHUD();
+}
+
+/* ----- story beats (intro / master / pub / finale) ----- */
+var beatCallback = null;
+function showBeat(title, lines, btnLabel, cb){
+  document.getElementById('beat-title').innerHTML = title;
+  document.getElementById('beat-lines').innerHTML = lines.map(function(l){ return '<p class="beat-line">' + l + '</p>'; }).join('');
+  document.getElementById('beat-btn').textContent = btnLabel;
+  beatCallback = cb || null;
+  document.getElementById('beat').classList.remove('hidden');
+  G.paused = true;
+}
+document.getElementById('beat-btn').addEventListener('click', function(){
+  document.getElementById('beat').classList.add('hidden');
+  var cb = beatCallback; beatCallback = null;
+  if(cb) cb(); // shop beats keep the game paused inside openShop()
+  else G.paused = false;
+});
+
+/* ----- bone shop: four hidden skill trees ----- */
+var TREES = [
+  { id:'fire', name:'🔥 FIRE', color:'#e07840', tiers:[
+    { id:'spell', name:'Arrows',    cost:30, desc:'Unlock the bow — K / ARROW. Free to shoot, no mana: tap for one arrow (7 dmg), hold and release for a 3- or 5-arrow spread. Also unlocks Chain Lightning in magic mode (SHIFT).' },
+    { id:'shock', name:'Shockwave',     cost:60, desc:'Unlock U / SHOCK — a wide control ring: modest damage, real shove. Your sword still kills; this clears space. Also unlocks Flamethrower in magic mode.' },
+    { id:'fire3', name:'Ember Heart',   cost:90, desc:'Arrows hit a little harder (9), Shockwave hits harder and reaches wider (268) — still softer than a good sword combo, by design. Also unlocks Fire Pillar and the Might buff in magic mode.' },
+    { id:'beam', name:'Boss Beam',      cost:120, desc:'Unlock F / BEAM — 55 MP. A full Kame-style beam: 0.7s of rooted, breakable charge, then 1.1s of blast that TRACKS your lock target (or the nearest skeleton). Gotta have beams. Also unlocks SOLAR FLASH (G) — a full-screen blind.' } ]},
+  { id:'ice', name:'❄ ICE', color:'#5ec8d8', tiers:[
+    { id:'ice1', name:'Frostbite',      cost:30, desc:'Every hit chills: skeletons move 30% slower for 2 seconds. Also unlocks Ice Breath in magic mode — chill stacks there build to a full freeze.' },
+    { id:'ice2', name:'Frost Aegis',    cost:60, desc:'Your shield now blocks 100% of blade damage while it holds.' },
+    { id:'ice3', name:'Permafrost',     cost:90, desc:'Chill deepens — 55% slower, and it lingers longer.' } ]},
+  { id:'shield', name:'🛡 SHIELDING', color:'#d9a441', tiers:[
+    { id:'heal',  name:'Mend',          cost:40, desc:'Unlock H / HEAL — quick cast, works while moving, combat only.' },
+    { id:'aegis', name:'Aegis Form',    cost:70, desc:'Move at 80% speed while shielding, and blocking drains far less mana. Also unlocks the Armor buff in magic mode.' },
+    { id:'heart', name:'Boss Heart',    cost:100, desc:'Fully restores your HP on the spot. Your max stays 206 — one bone for every bone there is, no more, no less.' } ]},
+  { id:'mobility', name:'💨 MOBILITY', color:'#7bc47f', tiers:[
+    { id:'dash',  name:'Dash',          cost:30, desc:'Unlock B / DASH — the first answer to a surround.' },
+    { id:'mob2',  name:'Swift Boots',   cost:60, desc:'+18% movement speed, always on. Also unlocks the Swift buff in magic mode.' },
+    { id:'mob3',  name:'Phantom Step',  cost:90, desc:'Dash recharges twice as fast. Be elsewhere, twice as often.' } ]}
+];
+function renderShop(){
+  document.getElementById('shop-bones').textContent = G.bones;
+  document.getElementById('shop-form').textContent = player ? ('Your form: ' + BONE_STAGES[player.boneStage].name + ' · ' + G.totalBones + ' bones gathered all-time') : '';
+  var html = '';
+  TREES.forEach(function(tree){
+    html += '<div class="tree"><h4 style="color:' + tree.color + '">' + tree.name + '</h4>';
+    tree.tiers.forEach(function(tier, idx){
+      var owned = player.unlocks[tier.id];
+      var prevOwned = idx === 0 || player.unlocks[tree.tiers[idx-1].id];
+      if(!prevOwned && !owned){
+        html += '<div class="tier locked"><div class="t-name">· · · · ·</div><div class="t-desc">Hidden in the dark of this tree. Buy the tier above to reveal what grows here.</div></div>';
+      } else {
+        html += '<div class="tier"><div class="t-name">' + tier.name + '</div><div class="t-desc">' + tier.desc + '</div>';
+        if(owned) html += '<span class="t-owned">✓ YOURS</span>';
+        else html += '<button class="t-buy" data-tree="' + tree.id + '" data-tier="' + tier.id + '"' + (G.bones < tier.cost ? ' disabled' : '') + '>Buy — 🦴 ' + tier.cost + '</button>';
+        html += '</div>';
+      }
+    });
+    html += '</div>';
+  });
+  document.getElementById('shop-trees').innerHTML = html;
+  var btns = document.querySelectorAll('#shop-trees .t-buy');
+  for(var i=0;i<btns.length;i++){
+    btns[i].addEventListener('click', function(){
+      buyTier(this.getAttribute('data-tree'), this.getAttribute('data-tier'));
+    });
+  }
+}
+function buyTier(treeId, tierId){
+  var tree = null, tier = null;
+  TREES.forEach(function(t){ if(t.id === treeId) t.tiers.forEach(function(x){ if(x.id === tierId){ tree = t; tier = x; } }); });
+  if(!tier || player.unlocks[tierId] || G.bones < tier.cost) return;
+  G.bones -= tier.cost;
+  player.unlocks[tierId] = true;
+  if(tierId === 'heart'){ player.hp = player.maxHp; } // full restore — max HP is 206 and stays 206
+  if(tierId === 'beam'){ player.unlocks.flash = true; } // the Beam tier also teaches Solar Flash (G)
+  beep(880, 0.14, 'sine', 0.06); beep(1174, 0.18, 'sine', 0.05);
+  logLine('Bone shop: ' + tier.name + ' unlocked (' + tree.name.replace(/[^A-Z ]/g,'').trim() + ' tree).');
+  renderShop(); updateHUD();
+}
+function openShop(){
+  renderShop();
+  document.getElementById('shop').classList.remove('hidden');
+  G.paused = true;
+}
+document.getElementById('shop-close').addEventListener('click', function(){
+  document.getElementById('shop').classList.add('hidden');
+  G.paused = false;
+  if(G.state === 'between') G.betweenTimer = 0.05; // next wave, right now
+  updateHUD();
+});
+
+/* ----- SAVE STATES — the shareable core of the game -----
+   A save is the horde itself: every living skeleton's full gene set,
+   plus wave, generation, mode, and (Story) bones + unlocked kit.
+   Encoded as text so it can be copied, pasted, or sent as a file. */
+function currentGeneSet(){
+  if(skels && skels.length) return skels.map(function(s){ return s.genes; });
+  if(G.genePool && G.genePool.length) return G.genePool;
+  return [];
+}
+function makeSaveObject(){
+  return {
+    v:1, app:'skeleton-sword',
+    mode: G.mode, wave: Math.max(1, G.wave), generation: G.generation,
+    genes: currentGeneSet(),
+    hp: player ? Math.ceil(player.hp) : 206,
+    bones: G.bones || 0, totalBones: G.totalBones || 0,
+    unlocks: player ? player.unlocks : null,
+    savedAt: new Date().toISOString()
+  };
+}
+function makeSaveCode(){
+  return 'SS1.' + btoa(unescape(encodeURIComponent(JSON.stringify(makeSaveObject()))));
+}
+function parseSaveCode(txt){
+  txt = (txt || '').trim();
+  if(txt.indexOf('SS1.') === 0) txt = txt.slice(4);
+  var obj = JSON.parse(decodeURIComponent(escape(atob(txt))));
+  if(!obj || !Array.isArray(obj.genes) || !obj.genes.length) throw new Error('no horde in save');
+  if(typeof obj.genes[0].speed !== 'number') throw new Error('bad genes');
+  obj.wave = clamp(parseInt(obj.wave, 10) || 1, 1, 100000);
+  obj.generation = clamp(parseInt(obj.generation, 10) || 1, 1, 100000);
+  obj.mode = obj.mode === 'story' ? 'story' : 'survival';
+  return obj;
+}
+function loadSaveObject(obj){
+  hideAllPanels();
+  player = newPlayer();
+  resetRunState();
+  G.mode = obj.mode;
+  if(obj.unlocks){
+    Object.keys(player.unlocks).forEach(function(k){
+      if(typeof obj.unlocks[k] === 'boolean') player.unlocks[k] = obj.unlocks[k];
+    });
+    // Boss Heart no longer raises max HP on load either — 206 is 206, at all times.
+  }
+  if(G.mode === 'survival'){ player.unlocks.spell = true; player.unlocks.shock = true; player.unlocks.beam = true; player.unlocks.flash = true; player.unlocks.heal = true; player.unlocks.dash = true; }
+  player.hp = clamp(obj.hp || player.maxHp, 30, player.maxHp);
+  G.bones = obj.bones || 0; G.totalBones = obj.totalBones || 0;
+  player.boneStage = boneStageFor(G.totalBones);
+  // Land exactly on the saved wave & generation with the saved horde intact.
+  G.wave = obj.wave - 1;
+  G.generation = obj.wave > 1 ? obj.generation - 1 : obj.generation;
+  G.pendingGenes = obj.genes;
+  spawnWave();
+  banner('Save state loaded', (obj.mode === 'story' ? 'Story' : 'Survival') + ' · Wave ' + obj.wave + ' · Generation ' + obj.generation + ' — the exact horde someone saved. It remembers everything.');
+  logLine('Save state loaded: wave ' + obj.wave + ', generation ' + obj.generation + ', ' + obj.genes.length + ' saved gene sets.');
+  updateHUD();
+}
+function tryLoadFromText(txt, statusEl){
+  try{
+    var obj = parseSaveCode(txt);
+    loadSaveObject(obj);
+    return true;
+  }catch(e){
+    if(statusEl){ statusEl.textContent = 'That doesn’t look like a Skeleton Sword save code. Paste the whole thing, starting with SS1.'; statusEl.className = 'status-line err'; }
+    return false;
+  }
+}
+function copyText(txt, statusEl, okMsg){
+  function done(){ if(statusEl){ statusEl.textContent = okMsg; statusEl.className = 'status-line'; } }
+  if(navigator.clipboard && navigator.clipboard.writeText){
+    navigator.clipboard.writeText(txt).then(done, function(){ fallback(); });
+  } else fallback();
+  function fallback(){
+    var ta = document.getElementById('save-code');
+    if(ta){ ta.removeAttribute('readonly'); ta.select(); try{ document.execCommand('copy'); }catch(e){} ta.setAttribute('readonly',''); }
+    done();
+  }
+}
+/* save panel */
+function openSavePanel(){
+  if(!G.running){ showMenu(); return; }
+  G.paused = true;
+  var obj = makeSaveObject();
+  document.getElementById('save-summary').innerHTML =
+    '<b>' + (obj.mode === 'story' ? 'Story' : 'Survival') + '</b> · Wave <b>' + obj.wave + '</b> · Generation <b>' + obj.generation + '</b> · ' +
+    obj.genes.length + ' gene sets captured' + (obj.mode === 'story' ? ' · 🦴 ' + obj.bones + ' bones · form: ' + BONE_STAGES[boneStageFor(obj.totalBones)].name : '');
+  document.getElementById('save-code').value = makeSaveCode();
+  document.getElementById('save-status').textContent = '';
+  document.getElementById('load-status').textContent = '';
+  document.getElementById('savepanel').classList.remove('hidden');
+}
+function closeSavePanel(){
+  document.getElementById('savepanel').classList.add('hidden');
+  G.paused = anyPanelOpen() || panelOpen('moves'); // derived from the screen, not restored — same unstick rule as the Moves panel
+}
+document.getElementById('save-btn').addEventListener('click', function(){ openSavePanel(); this.blur(); });
+document.getElementById('save-close').addEventListener('click', function(){ closeSavePanel(); this.blur(); });
+document.getElementById('save-copy').addEventListener('click', function(){
+  copyText(document.getElementById('save-code').value, document.getElementById('save-status'), '✓ Copied. Send it to anyone — they load it from the front menu and face your horde.');
+});
+document.getElementById('save-download').addEventListener('click', function(){
+  var code = document.getElementById('save-code').value;
+  var blob = new Blob([code], { type:'text/plain' });
+  var a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = 'skeleton-sword-save-wave' + Math.max(1, G.wave) + '-gen' + G.generation + '.txt';
+  document.body.appendChild(a); a.click();
+  setTimeout(function(){ URL.revokeObjectURL(a.href); a.remove(); }, 400);
+  var st = document.getElementById('save-status'); st.textContent = '✓ Downloaded. The file is just the save code as text.'; st.className = 'status-line';
+});
+document.getElementById('load-btn').addEventListener('click', function(){
+  if(tryLoadFromText(document.getElementById('load-code').value, document.getElementById('load-status'))){
+    document.getElementById('savepanel').classList.add('hidden');
+  }
+});
+document.getElementById('load-file').addEventListener('change', function(){
+  var f = this.files && this.files[0]; if(!f) return;
+  var rd = new FileReader();
+  rd.onload = function(){
+    document.getElementById('load-code').value = String(rd.result || '');
+    if(tryLoadFromText(String(rd.result || ''), document.getElementById('load-status'))){
+      document.getElementById('savepanel').classList.add('hidden');
+    }
+  };
+  rd.readAsText(f);
+  this.value = '';
+});
+
+/* ----- front menu ----- */
+var MENU_HTML =
+  '<div class="menu-title">SKELETON <span class="gold">SWORD</span></div>' +
+  '<p class="menu-sub">Every skeleton with a sword you ever cut down as fodder is back — and between waves, they breed. You are the final boss. They are the ones who learn.</p>' +
+  '<div class="mode-grid">' +
+    '<button class="mode-btn" id="menu-story" type="button"><span class="m-name">📖 Story Mode</span><span class="m-desc">Start with a sword and nothing else. Duel the Master, earn bones from the fallen, and spend them down four hidden skill trees — Fire, Ice, Shielding, Mobility — until you style like Dante… while the horde learns to style back. Pub breaks every 10 waves. The slower road, and the one that explains everything.</span></button>' +
+    '<button class="mode-btn" id="menu-survival" type="button"><span class="m-name">⚔ Survival Mode</span><span class="m-desc">The main mode. Full kit from the first second — sword &amp; spin, spell, shockwave, shield, heal, dash. Eight skeletons a wave, no healing between waves, constant evolution. How many generations can the boss survive?</span></button>' +
+  '</div>' +
+  '<div class="menu-sec"><h3>💾 LOAD A SAVE STATE</h3>' +
+  '<p>Someone send you a horde? Paste their save code here and face the exact evolution they saved — wave, generation, genes and all.</p>' +
+  '<textarea class="savebox" id="menu-load-code" placeholder="Paste a save code (starts with SS1.)…"></textarea>' +
+  '<div class="btn-row"><button class="ui-btn primary" id="menu-load-btn" type="button">Load this save</button>' +
+  '<label class="ui-btn" for="menu-load-file" style="text-align:center; padding:9px 10px;">Load from file…</label>' +
+  '<input type="file" id="menu-load-file" accept=".txt,.json,text/plain" style="display:none" /></div>' +
+  '<div class="status-line" id="menu-load-status"></div></div>' +
+  '<div class="menu-sec"><h3>HOW IT PLAYS</h3>' +
+  '<p>The arena stays clean while you fight — the full move list &amp; controls live under <b style="color:var(--bone)">❚❚ Pause · Moves</b> (top bar, or Esc / P) whenever you want them. Melee is your real damage. <b style="color:var(--bone)">SHIFT</b> now toggles a full magic mode — chain lightning, flamethrower, fire pillar, ice breath, and four mana-paid self-buffs — and dash moved to <b style="color:var(--bone)">B</b>. The skeletons can parry all of it. In-game, <b style="color:var(--bone)">💾 Save state</b> (top bar) captures your horde at any moment — wave 5 or wave 500 — to copy or download and send to another player.</p></div>';
+function renderMenu(){
+  var card = document.getElementById('overlay-card');
+  card.innerHTML = MENU_HTML;
+  document.getElementById('overlay').classList.remove('hidden');
+  document.getElementById('menu-story').addEventListener('click', function(){ startRun('story'); });
+  document.getElementById('menu-survival').addEventListener('click', function(){ startRun('survival'); });
+  document.getElementById('menu-load-btn').addEventListener('click', function(){
+    tryLoadFromText(document.getElementById('menu-load-code').value, document.getElementById('menu-load-status'));
+  });
+  document.getElementById('menu-load-file').addEventListener('change', function(){
+    var f = this.files && this.files[0]; if(!f) return;
+    var rd = new FileReader();
+    rd.onload = function(){
+      if(!tryLoadFromText(String(rd.result || ''), document.getElementById('menu-load-status'))){
+        document.getElementById('menu-load-code').value = String(rd.result || '');
+      }
+    };
+    rd.readAsText(f);
+    this.value = '';
+  });
+}
+function showMenu(){
+  G.running = false; G.paused = false; G.state = 'menu'; G.duel = false;
+  hideAllPanels();
+  renderMenu();
+}
+document.getElementById('menu-btn').addEventListener('click', showMenu);
+
+function gameOver(){
+  G.over = true; G.state = 'over';
+  selectAndBreedSafe();
+  var card = document.getElementById('overlay-card');
+  card.innerHTML =
+    '<h1>The fodder <span class="gold">got you</span>.</h1>' +
+    '<p>You fell on <b>wave ' + G.wave + '</b>, generation ' + G.generation + ' (' + (G.mode === 'story' ? 'Story' : 'Survival') + '). No stat was buffed. No sword was upgraded. They just… learned you — the rolls, the parries, the feints your own games taught a thousand skeletons to fear, turned back on the boss.</p>' +
+    (G.mode === 'story' ? '<p>You gathered <b>🦴 ' + G.totalBones + ' bones</b> all-time and ended as <b>' + BONE_STAGES[player.boneStage].name + '</b>.</p>' : '') +
+    '<p class="dim" id="final-evo"></p>' +
+    '<p>Before you go — this horde is one of a kind. Save it and send it to someone. Let them meet what killed you.</p>' +
+    '<div class="btn-row"><button class="ui-btn primary" id="go-save-btn" type="button">💾 Copy this horde’s save code</button></div>' +
+    '<div class="status-line" id="go-save-status"></div>' +
+    '<button class="start-btn" id="start-btn-2" type="button">Face a fresh horde</button>' +
+    '<button class="start-btn" id="go-menu-btn" type="button" style="background:var(--panel2); color:var(--bone); border:1px solid var(--line); margin-top:8px;">Back to the front menu</button>';
+  document.getElementById('overlay').classList.remove('hidden');
+  var la = G.lastAverages;
+  if(la) document.getElementById('final-evo').textContent =
+    'Final horde averages — Dodge ' + Math.round(la.dodge*100) + '% · Parry ' + Math.round(la.parry*100) +
+    '% · Riposte ' + Math.round((la.riposte||0)*100) + '% · Dash ' + Math.round(la.dash*100) + '% · Feint ' + Math.round(la.feint*100) + '% · Shimmy ' + Math.round(la.strafe*100) + '%';
+  document.getElementById('start-btn-2').addEventListener('click', startGame);
+  document.getElementById('go-menu-btn').addEventListener('click', showMenu);
+  document.getElementById('go-save-btn').addEventListener('click', function(){
+    var code = makeSaveCode();
+    var st = document.getElementById('go-save-status');
+    if(navigator.clipboard && navigator.clipboard.writeText){
+      navigator.clipboard.writeText(code).then(function(){ st.textContent = '✓ Copied — wave ' + Math.max(1,G.wave) + ', generation ' + G.generation + '. Anyone can load it from the front menu.'; st.className = 'status-line'; },
+        function(){ st.textContent = 'Copy was blocked — open 💾 Save state in the top bar instead; it holds the same code.'; st.className = 'status-line err'; });
+    } else { st.textContent = 'Open 💾 Save state in the top bar — it holds this horde’s code, ready to copy.'; st.className = 'status-line'; }
+  });
+}
+function selectAndBreedSafe(){ try{ G.allWaveSkels = skels.slice(); selectAndBreed(); }catch(e){} }
+
+document.getElementById('restart-btn').addEventListener('click', function(){ startGame(); });
+document.getElementById('pause-btn').addEventListener('click', function(){ toggleMoves(); this.blur(); }); // the button TOGGLES: clicking it while paused is an unpause
+
+/* ---------- main loop ---------- */
+var lastT = 0;
+function loop(t){
+  requestAnimationFrame(loop);
+  var dt = Math.min((t - lastT)/1000 || 0, 0.05); lastT = t;
+  fitCanvas();
+  if(G.running && !G.paused) update(dt);
+  draw();
+}
+window.addEventListener('resize', fitCanvas);
+if(window.matchMedia && window.matchMedia('(pointer: coarse)').matches) document.body.classList.add('coarse');
+player = newPlayer(); // so HUD/draw have something before start
+renderMenu(); // the front menu is the first thing a player sees
+updateHUD();
+fitCanvas();
+requestAnimationFrame(loop);
+</script>
+</body>
+</html>
