@@ -218,18 +218,20 @@
   .tune-row .tune-val{flex:0 0 54px; text-align:right; color:var(--cyan); font-variant-numeric:tabular-nums; font-weight:700;}
   @media (max-width:640px){ .tune-row label{flex-basis:116px;} }
   #wave-stats{
-    position:absolute; right:10px; top:10px; z-index:4; pointer-events:none;
-    background:rgba(23,23,28,.88); border:1px solid var(--line); border-radius:10px;
-    padding:10px 12px; font-size:12px; line-height:1.5; color:var(--bone);
-    min-width:212px; display:none; font-variant-numeric:tabular-nums;
+    position:absolute; left:50%; top:50%; transform:translate(-50%,-50%); z-index:4; pointer-events:none;
+    background:rgba(23,23,28,.94); border:1px solid var(--line); border-radius:10px;
+    padding:14px 16px 12px; font-size:12.5px; line-height:1.55; color:var(--bone);
+    min-width:248px; max-width:min(92vw,340px); display:none; font-variant-numeric:tabular-nums;
+    box-shadow:0 10px 36px rgba(0,0,0,.6);
   }
-  #wave-stats.show{display:block;}
+  #wave-stats.show{display:block; pointer-events:auto; cursor:pointer;}
   #wave-stats h5{margin:0 0 5px; font-size:11px; letter-spacing:.12em; color:var(--gold);}
   #wave-stats .ws-row{display:flex; justify-content:space-between; gap:14px;}
   #wave-stats .ws-row span:first-child{color:var(--muted);}
   #wave-stats .ws-row b{color:var(--gold-bright); font-weight:700;}
   #wave-stats .ws-sec{margin-top:6px; padding-top:5px; border-top:1px dashed rgba(255,255,255,.12); font-size:11px; letter-spacing:.1em; color:#e05252;}
-  @media (max-width:760px){ #wave-stats{top:auto; bottom:170px; right:8px; min-width:186px; font-size:11px;} }
+  #wave-stats .ws-hint{margin-top:9px; padding-top:7px; border-top:1px solid rgba(255,255,255,.1); font-size:11.5px; text-align:center; color:var(--gold-bright); letter-spacing:.04em;}
+  @media (max-width:760px){ #wave-stats{min-width:216px; font-size:11.5px; padding:12px 13px 10px;} }
   /* ---------- Ability cooldown bar ---------- */
   #ability-bar{
     position:absolute; left:50%; transform:translateX(-50%); bottom:10px;
@@ -1212,8 +1214,22 @@ function showWaveStats(){
     row('Damage healed', Math.round(st.healed || 0)) + row('Parries', st.parries || 0) + row('Ripostes landed', st.ripostes || 0) +
     '<div class="ws-sec">THE HORDE</div>' +
     row('Damage dealt to you', Math.round(st.skelDmg || 0)) + row('Sword throws landed', st.swordHits || 0) +
-    row('Skel-tosses landed', st.tossHits || 0) + row('Their parries', st.skelParries || 0);
+    row('Skel-tosses landed', st.tossHits || 0) + row('Their parries', st.skelParries || 0) +
+    '<div class="ws-hint">Click or press SPACE for next wave →</div>';
   el.className = 'show';
+}
+function skipWaveStats(){
+  // Jump straight to the next wave from the tape — click / tap / Space.
+  // Only a normal, timed intermission is skippable: held breaks (story beats,
+  // the Bone Shop — betweenTimer parked at 99999) advance through their own
+  // buttons, and a paused game stays paused.
+  if(!G.running || G.paused || G.over) return false;
+  if(G.state !== 'between') return false;
+  if(G.betweenTimer > 60) return false;
+  var el = document.getElementById('wave-stats');
+  if(!el || el.className !== 'show') return false;
+  G.betweenTimer = 0; // the update loop spawns the next wave on its next tick
+  return true;
 }
 function selectAndBreed(){
   var all = G.allWaveSkels || [];
@@ -1408,7 +1424,7 @@ window.addEventListener('keydown', function(e){
   if(e.repeat) return;
   var magic = player && player.magicMode;
   if(e.code === 'KeyP'){ if(panelOpen('tuningpanel')) closeTuning(); else if(panelOpen('moves')) closeMoves(); else if(panelOpen('savepanel')) closeSavePanel(); else togglePause(); return; }
-  if(e.code === 'Space'){ if(player && player.airT > 0) tryGroundPound(); else tryJump(); }
+  if(e.code === 'Space'){ if(skipWaveStats()) return; if(player && player.airT > 0) tryGroundPound(); else tryJump(); }
   if(e.code === 'ShiftLeft' || e.code === 'ShiftRight') toggleMagic(); // SHIFT = magic toggle now. It is NOT dash anymore.
   if(e.code === 'KeyB') tryDash(); // dash lives on B now — ground or air
   if(e.code === 'KeyV') tryBlink(); // BLINK — short-range teleport
@@ -1446,6 +1462,7 @@ canvas.addEventListener('pointermove', function(e){
   var r = canvas.getBoundingClientRect(); mouse.x = e.clientX - r.left; mouse.y = e.clientY - r.top; mouse.seen = true;
 });
 canvas.addEventListener('pointerdown', function(e){
+  if(skipWaveStats()) return; // during the tape, a click / tap anywhere on the arena jumps to the next wave
   if(e.pointerType === 'touch') return;
   mouse.seen = true;
   var r = canvas.getBoundingClientRect(); mouse.x = e.clientX - r.left; mouse.y = e.clientY - r.top;
@@ -1453,6 +1470,7 @@ canvas.addEventListener('pointerdown', function(e){
   if(e.button === 2) trySpell();
 });
 canvas.addEventListener('contextmenu', function(e){ e.preventDefault(); });
+document.getElementById('wave-stats').addEventListener('click', function(){ skipWaveStats(); });
 
 /* touch joystick */
 (function(){
