@@ -330,7 +330,7 @@
     <div class="ab ready" id="ab-regen" data-mode="magic" style="display:none"><div class="ab-fill"></div><span class="ab-key">H</span><span class="ab-name">Regen Buff · 20 MP</span><span class="ab-cd">READY</span></div>
     <div class="ab ready" id="ab-might" data-mode="magic" style="display:none"><div class="ab-fill"></div><span class="ab-key">M</span><span class="ab-name">Might Buff · 24 MP</span><span class="ab-cd">READY</span></div>
     <div class="ab ready" id="ab-siphon" data-mode="magic" style="display:none"><div class="ab-fill"></div><span class="ab-key">N</span><span class="ab-name">Siphon · 45 MP</span><span class="ab-cd">READY</span></div>
-    <div class="ab ready" id="ab-drain" data-mode="magic" style="display:none"><div class="ab-fill"></div><span class="ab-key">T</span><span class="ab-name">Soul Drain · drains MP</span><span class="ab-cd">READY</span></div>
+    <div class="ab ready" id="ab-drain" data-mode="magic" style="display:none"><div class="ab-fill"></div><span class="ab-key">T</span><span class="ab-name">Soul Drain · restores MP</span><span class="ab-cd">READY</span></div>
     <div class="ab ready" id="ab-great1" data-mode="magic" style="display:none"><div class="ab-fill"></div><span class="ab-key">1</span><span class="ab-name">🔥 GREAT FLAME · ALL MP</span><span class="ab-cd">READY</span></div>
     <div class="ab ready" id="ab-great2" data-mode="magic" style="display:none"><div class="ab-fill"></div><span class="ab-key">2</span><span class="ab-name">❄ GREAT ICE · ALL MP</span><span class="ab-cd">READY</span></div>
     <div class="ab ready" id="ab-great3" data-mode="magic" style="display:none"><div class="ab-fill"></div><span class="ab-key">3</span><span class="ab-name">⚡ GREAT THUNDER · ALL MP</span><span class="ab-cd">READY</span></div>
@@ -475,7 +475,7 @@
           <div class="move-row"><span class="mk">O (magic)</span><span class="md">Fire Pillar — <b>46</b> in a huge circle at your lock target (or 175 ahead) after a 0.4s telegraph — then the pillar <b>STAYS UP ~3s as a burning hitbox</b>, searing anything standing in it (6 a tick) · 42 MP</span></div>
           <div class="move-row"><span class="mk">I / U / H / M (magic)</span><span class="md">Self-buffs, 9s each — every buff now takes a <b>0.6s CAST</b> first: get hit mid-cast and it fizzles (mana unspent), so retreating to buff is a real decision, not a freebie — <b>I</b> Armor −55% damage taken · 24 MP · <b>U</b> Swift +35% speed · 18 MP · <b>H</b> Regen +5 HP/s · 20 MP · <b>M</b> Might +40% damage · 24 MP</span></div>
           <div class="move-row"><span class="mk">N (magic)</span><span class="md">SIPHON — 45 MP, 8s. <b>22% of all damage you deal returns as HP</b> — healing that can't be interrupted, because it's already in your sword. The trade: you take <b>+25% damage</b> while it burns and your mana does not regenerate. For swarms, not for comfort</span></div>
-          <div class="move-row"><span class="mk">T (magic)</span><span class="md">SOUL DRAIN — lock onto the nearest skeleton (or your Q target) and <b>PARALYZE</b> it: it cannot move, swing, or guard while you drink its soul for damage over time. The price: <b>you are rooted too</b>, and the channel burns <b>9 MP/s</b> until the target dies, slips out of range, you take a hit, or you press T again to let go</span></div>
+          <div class="move-row"><span class="mk">T (magic)</span><span class="md">SOUL DRAIN — lock onto the nearest skeleton (or your Q target) and <b>PARALYZE</b> it: it cannot move, swing, or guard while you drink its soul for damage over time. The price: <b>you are rooted too</b> — locking onto one skeleton and rooting each other is the whole cost. It costs <b>no MP</b>; instead the soul feeds you, <b>restoring 15 MP/s</b> while the channel holds, until the target dies, slips out of range, you take a hit, or you press T again to let go</span></div>
           <div class="move-row"><span class="mk">1 (magic)</span><span class="md">🔥 GREAT FLAME — <b>costs ALL your mana</b> (needs 50+ banked). The biggest damage you own: a triple spiral of fire uncoils out of you for ~2.4s, hitbox after hitbox, and everything it touches keeps <b>burning</b>. You are <b>rooted</b> for the cast — and it cannot be interrupted</span></div>
           <div class="move-row"><span class="mk">2 (magic)</span><span class="md">❄ GREAT ICE STORM — <b>ALL mana</b>. A storm rages around you for ~3.5s, ticking damage and stacking cold on everything near. Three storm-hits <b>FREEZE</b> a skeleton solid for 2.2s — and you are free to move and attack the whole time</span></div>
           <div class="move-row"><span class="mk">3 (magic)</span><span class="md">⚡ GREAT THUNDER — <b>ALL mana</b>. A dense lightning storm follows you for ~4.2s — bolts every ~0.09s, bigger than before, and a landed bolt <b>stuns for 1.6s</b> — while you keep running and fighting under your own weather</span></div>
@@ -1413,7 +1413,7 @@ window.addEventListener('keydown', function(e){
   if(e.code === 'KeyB') tryDash(); // dash lives on B now — ground or air
   if(e.code === 'KeyV') tryBlink(); // BLINK — short-range teleport
   if(e.code === 'KeyN'){ if(magic) castBuff('siphon'); } // SIPHON — the costly lifesteal buff (magic mode)
-  if(e.code === 'KeyT'){ if(magic) trySoulDrain(); } // SOUL DRAIN — paralyze one skel, root yourself, bleed mana (magic mode). T again lets go.
+  if(e.code === 'KeyT'){ if(magic) trySoulDrain(); } // SOUL DRAIN — paralyze one skel, root yourself, restore mana (magic mode). T again lets go.
   if(e.code === 'Digit1'){ if(magic) tryGreat('flame'); } // THE GREAT SPELLS — all your mana, uninterruptible (magic mode)
   if(e.code === 'Digit2'){ if(magic) tryGreat('ice'); }
   if(e.code === 'Digit3'){ if(magic) tryGreat('thunder'); }
@@ -2119,10 +2119,11 @@ function pillarBurnTick(pl){
    Target one skeleton — your lock target if you have one, else the nearest
    in reach — and PARALYZE it: while the channel holds it cannot move, swing,
    dodge, or guard, and its soul leaks away as steady damage. The price is
-   symmetry: YOU are rooted too, and the channel burns 9 MP/s. It ends when
-   the target dies, slips beyond 430, your mana runs dry, you take a hit
-   (see damagePlayer), you act, or you press T again to let go. A duel
-   frozen in place, in a game that never stops moving. */
+   symmetry: YOU are rooted too, locked onto that one skeleton — that is
+   the whole cost. It costs NO mana; instead the soul feeds you, restoring
+   15 MP/s while the channel holds. It ends when the target dies, slips
+   beyond 430, you take a hit (see damagePlayer), you act, or you press T
+   again to let go. A duel frozen in place, in a game that never stops moving. */
 function trySoulDrain(){
   if(!G.running || G.paused || G.over || !player || player.stagger > 0) return;
   if((player.hitStunT || 0) > 0) return;
@@ -2149,7 +2150,7 @@ function updateSoulDrain(dt){
     floater(player.x, player.y - 48, tgt.dead ? 'SOUL CONSUMED' : 'DRAIN BROKEN — OUT OF RANGE', '#c792ea');
     return;
   }
-  player.mp = Math.max(0, player.mp - 9 * dt); // the slow drain — the channel eats the bar, not a lump sum
+  player.mp = clamp(player.mp + 15 * dt, 0, player.maxMp); // Soul Drain RESTORES mana — no cost; the soul you drink feeds the bar (passive regen is paused in the main loop while draining, so this is the gain, not a double-up)
   tgt.stunT = Math.max(tgt.stunT || 0, 0.14); // PARALYZED — refreshed every frame; it cannot act while the tether holds
   tgt.parryTime = 0; tgt.parryActive = false; tgt.parryIntentT = -1; // no guard forms inside a drain
   player.drainTickT -= dt;
@@ -2163,7 +2164,6 @@ function updateSoulDrain(dt){
     var tt = Math.random();
     spawnParticles(player.x + (tgt.x - player.x) * tt + rand(-6, 6), player.y + (tgt.y - player.y) * tt + rand(-6, 6), '#b26ae0', 1, 40);
   }
-  if(player.mp <= 0){ player.drainTarget = null; floater(player.x, player.y - 48, 'SOUL DRAIN — MANA SPENT', '#c792ea'); }
 }
 /* ================= THE GREAT SPELLS — 1/2/3/4 (magic mode) =================
    The all-in tier: each costs ALL your mana (and needs at least 50 banked —
@@ -3844,7 +3844,7 @@ function update(dt){
     }
     if(G.reactQueue.length > 260) G.reactQueue.splice(0, G.reactQueue.length - 260); // a spammy second can't flood the queue
   }
-  updateSoulDrain(dt);   // the drain channel: paralyzed target, rooted boss, mana bleeding
+  updateSoulDrain(dt);   // the drain channel: paralyzed target, rooted boss, mana restoring
   updateChain(dt);       // chain lightning's timed links walk the pack, one strike every ~0.08s
   updateGreatFlame(dt);  // the rooted spiral cast
   updateQuakeSlam(dt);   // the earthquake leap-slam and the frozen beat after it
@@ -4008,7 +4008,7 @@ function update(dt){
     emitPlayerAction('shield');
     if(player.parryCd <= 0){ player.parryT = 0.28; player.parryCd = 0.9; } // PARRY: only a FRESH raise opens the window — holding the shield is just blocking
   }
-  player.mp = clamp(player.mp + ((player.flameTime > 0 || player.iceTime > 0 || player.buffSiphonT > 0 || player.drainTarget) ? 0 : (player.shielding ? 2 : 9)) * dt, 0, player.maxMp); // no regen while a channel is drinking the bar — flame, ice, the soul drain — or while Siphon burns (part of its cost)
+  player.mp = clamp(player.mp + ((player.flameTime > 0 || player.iceTime > 0 || player.buffSiphonT > 0 || player.drainTarget) ? 0 : (player.shielding ? 2 : 9)) * dt, 0, player.maxMp); // no passive regen while a channel is drinking the bar (flame, ice) or while Siphon burns (part of its cost); Soul Drain pauses passive regen too, but only because updateSoulDrain restores MP itself — draining a soul should only ever push the bar up
 
   /* BUFF CAST: the 0.6s channel completes here — buff applies, mana is spent.
      A hit during the channel already fizzled it in damagePlayer. */
