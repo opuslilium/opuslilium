@@ -145,7 +145,12 @@
   /* ---------- Menu / beats / shop / save ---------- */
   .menu-title{font-family:Georgia,serif; font-size:34px; letter-spacing:.06em; text-align:center; color:var(--bone); margin:2px 0 2px;}
   .menu-title .gold{color:var(--gold);}
+  .menu-version{text-align:center; color:var(--muted); font-size:11px; letter-spacing:.14em; text-transform:uppercase; margin:0 0 6px;}
   .menu-sub{text-align:center; color:var(--muted); font-size:13px; margin:0 0 16px; line-height:1.5;}
+  .mode-btn.under-construction{cursor:not-allowed; opacity:.82; position:relative; overflow:hidden;}
+  .mode-btn.under-construction:hover{border-color:var(--line);}
+  .construction-sign{display:inline-block; background:var(--gold); color:#191204; font-size:11px; font-weight:800; letter-spacing:.14em; text-transform:uppercase; padding:5px 9px; border-radius:5px; margin:2px 0 7px; border:1px solid #191204; box-shadow:0 1px 0 #191204;}
+  .mode-btn.under-construction .m-name{color:var(--muted);}
   .mode-grid{display:grid; grid-template-columns:1fr 1fr; gap:12px;}
   .mode-btn{
     text-align:left; background:var(--panel2); border:1px solid var(--line); border-radius:12px;
@@ -212,6 +217,19 @@
   .tune-row input[type=range]{flex:1; accent-color:var(--gold); min-width:70px;}
   .tune-row .tune-val{flex:0 0 54px; text-align:right; color:var(--cyan); font-variant-numeric:tabular-nums; font-weight:700;}
   @media (max-width:640px){ .tune-row label{flex-basis:116px;} }
+  #wave-stats{
+    position:absolute; right:10px; top:10px; z-index:4; pointer-events:none;
+    background:rgba(23,23,28,.88); border:1px solid var(--line); border-radius:10px;
+    padding:10px 12px; font-size:12px; line-height:1.5; color:var(--bone);
+    min-width:212px; display:none; font-variant-numeric:tabular-nums;
+  }
+  #wave-stats.show{display:block;}
+  #wave-stats h5{margin:0 0 5px; font-size:11px; letter-spacing:.12em; color:var(--gold);}
+  #wave-stats .ws-row{display:flex; justify-content:space-between; gap:14px;}
+  #wave-stats .ws-row span:first-child{color:var(--muted);}
+  #wave-stats .ws-row b{color:var(--gold-bright); font-weight:700;}
+  #wave-stats .ws-sec{margin-top:6px; padding-top:5px; border-top:1px dashed rgba(255,255,255,.12); font-size:11px; letter-spacing:.1em; color:#e05252;}
+  @media (max-width:760px){ #wave-stats{top:auto; bottom:170px; right:8px; min-width:186px; font-size:11px;} }
   /* ---------- Ability cooldown bar ---------- */
   #ability-bar{
     position:absolute; left:50%; transform:translateX(-50%); bottom:10px;
@@ -288,6 +306,7 @@
   <div id="buff-tag"></div>
 
   <div id="banner"><div class="big" id="banner-big"></div><div class="small" id="banner-small"></div></div>
+  <div id="wave-stats"></div>
 
   <div id="ability-bar">
     <div class="ab ready" id="ab-atk" data-mode="phys"><div class="ab-fill"></div><span class="ab-key">J</span><span class="ab-name">Horizontal</span><span class="ab-cd">READY</span></div>
@@ -420,11 +439,11 @@
       <div class="moves-grid">
         <div class="moves-sec melee">
           <h4>⚔ MELEE — HITS HARDEST</h4>
-          <div class="move-row"><span class="mk">J / K — REKKAS</span><span class="md"><b>J = horizontal, K = vertical</b>, mixed freely over 3 steps — JJJ, JJK, JKK, KKK, any order. Step 1: swipe <b>24</b> / vertical slice <b>31</b> (harder, narrower). Step 2: WIDE swipe <b>27</b> / <b>LUNGE cut 30</b> — the lunge's travel is short now (68, deliberately <b>less than the dash</b>): it engages, it doesn't relocate you; the dash (B, ~129) is the movement tool again, and it reaches a touch further than it used to. Step 3: <b>SPIN 40</b> all around / <b>LAUNCHER 34</b> — pops skels UP into the air and a short distance back: helpless stun-CC for the whole flight (~1.1s) plus a <b>0.6s landing stun</b>. Every step carries you forward</span></div>
-          <div class="move-row"><span class="mk">Press mid-swing</span><span class="md"><b>Steps 1–2 CANCEL.</b> Any J/K press during a step-1/2 attack kills it instantly — even before its hit lands — and starts the next step that same frame. Fast KK is a lunge NOW; fast KKK skips straight to the launcher. <b>Step 3 does NOT cancel into more melee.</b> The finisher ignores J/K presses mid-swing and ends in <b>recovery lag — 0.42s after the spin, 0.48s after the launcher</b> — no next move, no dash, no blink, no walking out of it. Two escapes only: the <b>SPIN can be canceled by CASTING ANY SPELL</b> — the cast throws the swing/recovery away and fires (spin → magic, the stylish route) — and the launcher jump-cancels (next row). You committed; the horde gets its beat</span></div>
+          <div class="move-row"><span class="mk">J / K — REKKAS</span><span class="md"><b>J = horizontal, K = vertical</b>, mixed freely over 3 steps — JJJ, JJK, JKK, KKK, any order. Step 1: swipe <b>24</b> / vertical slice <b>34</b> (harder, much thinner). Step 2: WIDE swipe <b>27</b> / <b>LUNGE cut 36</b> — the verticals and the lunge are thin blades now: less arc to hide in, more damage when they land — the lunge's travel is short now (68, deliberately <b>less than the dash</b>): it engages, it doesn't relocate you; the dash (B, ~129) is the movement tool again, and it reaches a touch further than it used to. Step 3: <b>SPIN 40</b> all around / <b>LAUNCHER 42</b> — pops skels UP into the air and a short distance back: helpless stun-CC for the whole flight (~1.1s) plus a <b>0.6s landing stun</b>. Every step carries you forward</span></div>
+          <div class="move-row"><span class="mk">Press mid-swing</span><span class="md"><b>Steps 1–2 CANCEL.</b> Any J/K press during a step-1/2 attack kills it instantly — even before its hit lands — and starts the next step that same frame. Fast KK is a lunge NOW; fast KKK skips straight to the launcher. <b>Step 3 does NOT cancel into more melee.</b> The finisher ignores J/K presses mid-swing and ends in <b>recovery lag — 0.42s after the spin, 0.48s after the launcher</b> — no next move, no dash, no blink — but you CAN slow-move through it at ~38% speed, so a decision can still be made while you recover. Two escapes only: the <b>SPIN can be canceled by CASTING ANY SPELL</b> — the cast throws the swing/recovery away and fires (spin → magic, the stylish route) — and the launcher jump-cancels (next row). You committed; the horde gets its beat</span></div>
           <div class="move-row"><span class="mk">SPACE after a launcher</span><span class="md"><b>JUMP CANCEL — the finisher's one escape, and only the launcher has it.</b> During the launcher's swing OR its recovery, SPACE cancels straight into a jump so you can chase what you launched. The spin finisher has no such out — its recovery runs in full</span></div>
           <div class="move-row"><span class="mk">Hold J (standstill)</span><span class="md"><b>CHARGED SPIN</b> — hold J from neutral to charge (you move a little slower while charging); release past ~0.55s for a full <b>SPIN</b> — bigger than ever, 150 reach all around — with the finisher's recovery (spell-cancelable, like any spin). Release early and it's just a normal step-1 swipe</span></div>
-          <div class="move-row"><span class="mk">Hold K (standstill)</span><span class="md"><b>CHARGED VERTICAL</b> — hold K to charge; release past ~0.5s for a heavy slice (<b>54</b>) that looses a <b>WIND SLICE</b>: a piercing crescent that flies straight to the edge of the arena, cutting every skel in its path for <b>30</b> — once each, it does not stop. Release early for a normal step-1 slice</span></div>
+          <div class="move-row"><span class="mk">Hold K (standstill)</span><span class="md"><b>CHARGED VERTICAL</b> — hold K to charge; release past ~0.5s for a heavy thin slice (<b>62</b>) that looses a <b>WIND SLICE</b>: a piercing crescent that flies straight to the edge of the arena, cutting every skel in its path for <b>30</b> — once each, it does not stop. Release early for a normal step-1 slice</span></div>
           <div class="move-row"><span class="mk">K in air</span><span class="md">AIR SLASH — <b>28</b>, and <b>40 + a re-pop</b> against LAUNCHED skels (juggle — the slash restores their upward velocity and keeps them up with you!). The launcher follow-up: launch with step-3 K, SPACE to jump-cancel after it, and meet them up there. More air game can grow from this later</span></div>
           <div class="move-row"><span class="mk">Tap L</span><span class="md">PARRY — raise the shield at the last instant (a 0.28s window on a <b>fresh</b> raise): the blow deals nothing and the attacker staggers. Just holding the shield only blocks — timing is the parry. Works on anything that hits you, thrown swords included</span></div>
           <div class="move-row"><span class="mk">J after a parry</span><span class="md">RIPOSTE — inside the ~1s window, J becomes a lunging riposte for <b>60</b>. Entirely optional: the window is also a free second to run, blink, or reposition. And yes, they can parry your riposte</span></div>
@@ -450,7 +469,7 @@
         <div class="moves-sec">
           <h4>✦ MAGIC MODE — SHIFT TOGGLES (DASH IS ON B NOW)</h4>
           <div class="move-row"><span class="mk">Shift</span><span class="md"><b>Toggle magic mode.</b> Your right hand stops swinging and starts casting; the ability bar swaps. Shift again to go back to the sword. Magic hits hard and its AoEs are big — and it is COSTLY</span></div>
-          <div class="move-row"><span class="mk">J (magic)</span><span class="md">Chain Lightning — <b>30</b> plus a <b>0.35s stun</b> on every hop, up to 5 targets, weaker each hop · 34 MP. A parry grounds out that one skeleton's share — <b>the chain jumps on through the group anyway</b></span></div>
+          <div class="move-row"><span class="mk">J (magic)</span><span class="md">Chain Lightning — <b>26</b> on the first skel, then it LINKS every ~0.08s to the nearest unhit skel within 230 of the last — damage and stun RAMP with every link (+5 dmg, +0.13s stun), no skel hit twice · 34 MP. It FEEDS on grouping: a tight pack chains far, a dispersed horde starves it — watch them learn to spread out. A parry grounds out that one skeleton's share — <b>the chain jumps on through the group anyway</b></span></div>
           <div class="move-row"><span class="mk">K (magic)</span><span class="md">Flamethrower — <b>10</b> a tick in a big, longer cone · <b>HOLD K: no cooldown</b>, it burns until you release or your mana runs dry (drains 30 MP/s). You shuffle at 40% speed while it roars. And like every fire skill now, what it scorches keeps <b>BURNING</b> — a slow damage-over-time after the flames pass</span></div>
           <div class="move-row"><span class="mk">L (magic)</span><span class="md">Ice Breath — <b>5</b> a tick + chill stacks · <b>HOLD L: no cooldown</b>, drains 26 MP/s until released or empty. Each stack slows them; at 5 stacks they <b>FREEZE solid for 1.7s</b></span></div>
           <div class="move-row"><span class="mk">O (magic)</span><span class="md">Fire Pillar — <b>46</b> in a huge circle at your lock target (or 175 ahead) after a 0.4s telegraph — then the pillar <b>STAYS UP ~3s as a burning hitbox</b>, searing anything standing in it (6 a tick) · 42 MP</span></div>
@@ -459,8 +478,8 @@
           <div class="move-row"><span class="mk">T (magic)</span><span class="md">SOUL DRAIN — lock onto the nearest skeleton (or your Q target) and <b>PARALYZE</b> it: it cannot move, swing, or guard while you drink its soul for damage over time. The price: <b>you are rooted too</b>, and the channel burns <b>9 MP/s</b> until the target dies, slips out of range, you take a hit, or you press T again to let go</span></div>
           <div class="move-row"><span class="mk">1 (magic)</span><span class="md">🔥 GREAT FLAME — <b>costs ALL your mana</b> (needs 50+ banked). The biggest damage you own: a triple spiral of fire uncoils out of you for ~2.4s, hitbox after hitbox, and everything it touches keeps <b>burning</b>. You are <b>rooted</b> for the cast — and it cannot be interrupted</span></div>
           <div class="move-row"><span class="mk">2 (magic)</span><span class="md">❄ GREAT ICE STORM — <b>ALL mana</b>. A storm rages around you for ~3.5s, ticking damage and stacking cold on everything near. Three storm-hits <b>FREEZE</b> a skeleton solid for 2.2s — and you are free to move and attack the whole time</span></div>
-          <div class="move-row"><span class="mk">3 (magic)</span><span class="md">⚡ GREAT THUNDER — <b>ALL mana</b>. A lightning storm follows you for ~3.5s, bolts striking at random around you. A bolt that lands <b>stuns</b> — and you keep running and fighting under your own weather</span></div>
-          <div class="move-row"><span class="mk">4 (magic)</span><span class="md">🌋 GREAT EARTHQUAKE — <b>ALL mana</b>. The ground erupts around you for ~3s in random patches: damage plus a real <b>knock-UP</b> — launched skels are helpless until they land. You fight on through it</span></div>
+          <div class="move-row"><span class="mk">3 (magic)</span><span class="md">⚡ GREAT THUNDER — <b>ALL mana</b>. A dense lightning storm follows you for ~4.2s — bolts every ~0.09s, bigger than before, and a landed bolt <b>stuns for 1.6s</b> — while you keep running and fighting under your own weather</span></div>
+          <div class="move-row"><span class="mk">4 (magic)</span><span class="md">🌋 GREAT EARTHQUAKE — <b>ALL mana</b>. No more dodgeable patches: you LEAP and slam down in one fast motion, and <b>every skel in the circle (350) launches at once</b> — higher than the launcher throws (~225 up) and helpless for longer (1.7s) — while you stand <b>frozen in the crater for 0.55s</b>, watching them fly</span></div>
           <div class="move-row"><span class="mk">Hitstun</span><span class="md">Physical hits now <b>STUN</b> — theirs and yours. A clean skeleton hit locks you for ~0.25s; a coordinated gang can stunlock you to death. Your escapes are the <b>UNINTERRUPTIBLES</b>: Shockwave (U), any GREAT spell, and the insta-casts — Solar Flash (G) and Blink (V). Everything else waits for the stun to end</span></div>
           <div class="move-row"><span class="mk">Touch (magic)</span><span class="md">MAGIC button toggles · SPELL=Chain · BEAM=Flame · SHOCK=Pillar · HEAL=Ice Breath · BUFF button cycles the four buffs. ATK always stays the sword</span></div>
         </div>
@@ -732,6 +751,9 @@ function baseGenes(){
     dash:       rand(0.0, 0.08),
     runDrive:   rand(0.05, 0.3),   // RUNNING: willingness to break into a RUN to close distance — especially when the boss is kiting with arrows / lightning / beams. Running is fast (near the boss's own buffed speed) but burns a limited stamina pool.
     runStamina: rand(0.7, 1.1),    // RUNNING: stamina pool multiplier — how long the run lasts before the skel is winded and must walk it off. Evolves alongside runDrive.
+    chargeDrive: rand(0.04, 0.22), // CHARGED MELEE: willingness to wind up a heavy, hitstunning blow when close — RNG-bred like everything else, never scripted
+    diveDrive:  rand(0.04, 0.22),  // DIVE: willingness to turn a jump into a diving attack on the way down — variation from RNG, direction from selection
+    patience:   rand(0.1, 0.4),    // ENERGY DISCIPLINE: how much stamina a skel refuses to spend early — patient lineages keep gas for the late fight instead of blowing it all in the first charge
     tossDrive:  rand(0.04, 0.2),   // SKEL TOSS: willingness to pick up a nearby partner and THROW them at the boss — teamwork as a ranged engagement tool. Pays off only with coordination, so the two genes travel together.
     feint:      rand(0.0, 0.04),
     strafe:     rand(0.15, 0.4),   // lateral / shimmy tendency
@@ -749,7 +771,7 @@ function baseGenes(){
 function breed(a, b){
   var g = {}, keys = Object.keys(a);
   // identity + newer tactical fields ride along even if one parent predates them
-  ['name','boneHue','boneSat','boneLight','bladeHue','eyeGlow','swordLen','lunge','parryTiming','bait','coordination','counter','flank','rangeSense','boneSense','spacing','runDrive','runStamina','tossDrive','reactMs','rwDodge','rwLateral','rwParry','rwRun','rwAttack','rwThrow','rwRetreat'].forEach(function(k){ if(keys.indexOf(k) < 0) keys.push(k); });
+  ['name','boneHue','boneSat','boneLight','bladeHue','eyeGlow','swordLen','lunge','parryTiming','bait','coordination','counter','flank','rangeSense','boneSense','spacing','runDrive','runStamina','tossDrive','chargeDrive','diveDrive','patience','reactMs','rwDodge','rwLateral','rwParry','rwRun','rwAttack','rwThrow','rwRetreat'].forEach(function(k){ if(keys.indexOf(k) < 0) keys.push(k); });
   for(var i=0;i<keys.length;i++){
     var k = keys[i];
     var v = Math.random()<0.5 ? a[k] : b[k];
@@ -774,7 +796,7 @@ function breed(a, b){
       v = capStat(k, (typeof v === 'number' ? v : 1) * mut);
     } else if(k === 'runStamina'){
       v = clamp((typeof v === 'number' ? v : 0.9) * rand(0.9, 1.12), 0.5, 1.9); // stamina grows slowly, bounded — a minion's lungs, not a marathoner's
-    } else if(k === 'parryTiming' || k === 'bait' || k === 'coordination' || k === 'counter' || k === 'flank' || k === 'rangeSense' || k === 'boneSense' || k === 'runDrive' || k === 'tossDrive'){
+    } else if(k === 'parryTiming' || k === 'bait' || k === 'coordination' || k === 'counter' || k === 'flank' || k === 'rangeSense' || k === 'boneSense' || k === 'runDrive' || k === 'tossDrive' || k === 'chargeDrive' || k === 'diveDrive' || k === 'patience'){
       // TACTICAL genes: the real inheritance. Small steps, wide ceiling —
       // timing, baiting and teamwork are what natural selection can keep improving.
       v = (typeof v === 'number' ? v : 0.1) + rand(-TUNING.mutTactical, TUNING.mutTactical * 1.15);
@@ -816,6 +838,7 @@ function weakGenes(t){
   ['rwDodge','rwLateral','rwParry','rwRun','rwAttack','rwThrow','rwRetreat'].forEach(function(k){ g[k] = (g[k] || 0.8) * (0.55 + 0.45 * t); }); // their reaction dice are as shaky as everything else about them
   g.runDrive = (g.runDrive || 0.1) * t * 0.3; g.runStamina = 0.6 + 0.3 * t; // fresh graves can barely jog — running is learned later
   g.tossDrive = (g.tossDrive || 0.1) * t * 0.3; // fresh graves don't throw each other either — teamwork is learned
+  g.chargeDrive = (g.chargeDrive || 0.1) * t * 0.3; g.diveDrive = (g.diveDrive || 0.1) * t * 0.3; g.patience = (g.patience || 0.2) * (0.4 + 0.6 * t);
   g.swordLen = 0.8 + 0.25 * t;
   g.lunge = 0.8 + 0.25 * t;
   g.eyeGlow = 0;
@@ -823,12 +846,13 @@ function weakGenes(t){
 }
 function dampenGenes(g, f){ // scale the combat genes of an existing set toward feeble
   ['speed','vitality','attackSpeed','reaction','aggression'].forEach(function(k){ if(typeof g[k] === 'number') g[k] *= f; });
-  ['parry','riposte','dodge','dash','feint','throwSkill','parryTiming','bait','coordination','counter','flank','rangeSense','boneSense','runDrive','tossDrive'].forEach(function(k){ if(typeof g[k] === 'number') g[k] *= f * f; });
+  ['parry','riposte','dodge','dash','feint','throwSkill','parryTiming','bait','coordination','counter','flank','rangeSense','boneSense','runDrive','tossDrive','chargeDrive','diveDrive','patience'].forEach(function(k){ if(typeof g[k] === 'number') g[k] *= f * f; });
   return g;
 }
 /* --- Reaction system: ANY player input can trigger a RANDOM response --- */
 var REACTION_CHOICES = ['dodge','parry','dashIn','run','lateral','feint','jump','stab','swipe','retreat','hold','throwSword'];
 function emitPlayerAction(type){
+  if(G.waveStats && G.state === 'fight') G.waveStats.actions = (G.waveStats.actions || 0) + 1; // APM counts real inputs, not frames
   if(!player || G.state!=='fight') return;
   // KITING TRACKER: arrows, bolts, beams, chains — ranged pressure the horde can
   // learn to answer by RUNNING. Skels check this timestamp when deciding to run.
@@ -866,6 +890,32 @@ function pickWeightedReaction(s, type){
             retreat:(g.rwRetreat||0.7), hold:0.55, throwSword:(g.rwThrow||0.7) };
   var fav = REACTION_FAVORED[type];
   if(fav && W[fav] !== undefined) W[fav] += (g.counter || 0) * 3.2; // the counter gene leans the dice toward the right answer — it never picks for you
+  /* --- OBSERVATION — the dice read the field before they roll ---
+     Nothing below picks an answer; each observation only bends weights,
+     scaled by the genes that own it (coordination for ally-reads, counter
+     for player-reads, flank for position). Variation stays RNG; selection
+     shapes which bends pay. */
+  var od = Math.hypot(player.x - s.x, player.y - s.y);
+  var behind = Math.cos(Math.atan2(s.y - player.y, s.x - player.x) - player.face); // >0 = in front of your facing, <0 = behind you
+  if(od > 300){ W.run += 0.9; W.dashIn += 0.4; W.retreat = Math.max(0.05, W.retreat - 0.3); } // far: closing answers make sense
+  if(od < 95){ W.parry += 0.5; W.swipe += 0.4; W.run = Math.max(0.05, W.run - 0.5); } // point blank: guard and swing, don't sprint
+  if(behind < -0.35){ W.stab += 0.8 * (0.4 + (g.flank || 0)); W.swipe += 0.3; } // behind the boss: the backstab is right there
+  var alliesNear = 0, allyWinding = 0, allyCharging = 0;
+  for(var oi = 0; oi < skels.length; oi++){
+    var al = skels[oi]; if(al === s || al.dead) continue;
+    var ad = Math.hypot(al.x - s.x, al.y - s.y);
+    if(ad < 70) alliesNear++;
+    if(ad < 260 && (al.state.indexOf('Windup') !== -1)) allyWinding++;
+    if(ad < 260 && al.state === 'chargeWindup') allyCharging++;
+  }
+  if(alliesNear >= 2){ W.lateral += 0.7 * (0.4 + (g.coordination || 0)); W.retreat += 0.25; } // crowded: spread out — bunching is chain-lightning food
+  else if(alliesNear === 0 && od > 130){ W.run += 0.35; W.dashIn += 0.3; } // alone and far: get there
+  if(allyWinding > 0){ W.stab += 0.55 * (0.4 + (g.coordination || 0)); W.swipe += 0.35 * (0.4 + (g.coordination || 0)); } // a partner is winding up: strike WITH them (tandem timing starts as an observation)
+  if(allyCharging > 0){ W.stab += 0.3; } // a partner commits to the heavy one: pile on, don't duplicate
+  if((player.rekkaRecoveryT || 0) > 0){ W.stab += 0.9 * (0.4 + (g.counter || 0)); W.dashIn += 0.5; W.parry = Math.max(0.05, W.parry - 0.3); } // you're in finisher recovery: punish window, plainly visible
+  if(player.charging || player.arrowCharging){ W.dodge += 0.5; W.lateral += 0.4; } // you're winding something up: don't stand in the line
+  if(player.drainTarget || (player.greatFlameT || 0) > 0){ W.throwSword += 0.7; W.retreat += 0.3; } // you're rooted in a channel: a thrown sword answers it from range
+  if((player.hitStunT || 0) > 0){ W.stab += 0.6; W.swipe += 0.4; } // you're stunned: press, now
   if(type === 'move'){ W.lateral += 0.35; W.retreat += 0.3; W.hold += 0.2; } // ambient: a skel steps back because you did
   if(type === 'spell' || type === 'chain'){ W.dodge += (g.counter||0) * 0.8; }
   var total = 0, keys = Object.keys(W);
@@ -950,7 +1000,7 @@ function newPlayer(){
     earthCd:0, buffCastT:0, buffCastKind:'', chargeKind:'', // EARTH PUSH cooldown · BUFF CAST (0.6s channel, interruptible) · which melee key is being CHARGE-held ('' | 'H' | 'V')
     hitStunT:0, // HITSTUN — a clean physical hit locks the boss briefly; gangs can stunlock. Escapes are the UNINTERRUPTIBLES only (shockwave, great spells, insta-casts)
     drainTarget:null, drainTickT:0, // SOUL DRAIN channel: the skel being drained (paralyzed) — the boss is rooted while it lasts
-    greatCds:{ flame:0, ice:0, thunder:0, quake:0 }, greatFlameT:0, greatFlameBase:0, greatFlameTickT:0, // GREAT SPELLS: per-spell cooldowns · the Great Flame channel (rooted, uninterruptible)
+    greatCds:{ flame:0, ice:0, thunder:0, quake:0 }, quakeSlamT:0, quakeFreezeT:0, greatFlameT:0, greatFlameBase:0, greatFlameTickT:0, // GREAT SPELLS: per-spell cooldowns · the Great Flame channel (rooted, uninterruptible)
     buffArmorT:0, buffHasteT:0, buffPowerT:0, buffRegenT:0, buffSiphonT:0, buffCd:0, buffCycle:0,
     charging:false, charge:0, spinAnim:0, spinDidHit:false,
     airT:0, airDur:0.55, jumpH:0, airDashUsed:false, pounding:false,
@@ -1008,6 +1058,9 @@ function makeSkel(genes, x, y){
   if(typeof genes.runDrive !== 'number') genes.runDrive = rand(0.05, 0.3);
   if(typeof genes.runStamina !== 'number') genes.runStamina = rand(0.7, 1.1);
   if(typeof genes.tossDrive !== 'number') genes.tossDrive = rand(0.04, 0.2);
+  if(typeof genes.chargeDrive !== 'number') genes.chargeDrive = rand(0.04, 0.22);
+  if(typeof genes.diveDrive !== 'number') genes.diveDrive = rand(0.04, 0.22);
+  if(typeof genes.patience !== 'number') genes.patience = rand(0.1, 0.4);
   if(typeof genes.reactMs !== 'number') genes.reactMs = rand(170, 300); // pre-reaction-time saves seed mid-range; clamped into the tuned human band
   genes.reactMs = clamp(genes.reactMs, reactRange()[0], reactRange()[1]);
   ['rwDodge','rwLateral','rwParry','rwRun','rwAttack','rwThrow','rwRetreat'].forEach(function(k){ if(typeof genes[k] !== 'number') genes[k] = rand(0.3, 1.2); });
@@ -1036,7 +1089,7 @@ function makeSkel(genes, x, y){
     parryTime:0, parryActive:false, parryCd:0, parryIntentT:-1, parryWhiffT:0, parryReadCd:0,
     timedParries:0, baitWins:0, baitChecked:false, coordHits:0, guardHits:0, counterHits:0, runHits:0, tossHits:0, flankSlot: rand(0, TAU), lungeDist:0,
     hazardCd:0, tossCd: rand(1.5, 4), tossT:0, tossDur:0, tossH:0, tossFromX:0, tossFromY:0, tossToX:0, tossToY:0, tossHitDone:false, tossById:null,
-    runEnergy: 100, running:false, runMode:'chase', runAng:0, runTx:0, runTy:0, windedT:0, runLungeT:0, launchT:0, launchH:0, launchVx:0, launchVy:0, launchVz:0, fetchRun:false, lungeBoost:1,
+    chargeHits:0, diveHits:0, diveDone:false, runEnergy: 100, running:false, runMode:'chase', runAng:0, runTx:0, runTy:0, windedT:0, runLungeT:0, launchT:0, launchH:0, launchVx:0, launchVy:0, launchVz:0, fetchRun:false, lungeBoost:1,
     burnT:0, burnTickT:0, baitWindowT:0, baitRange:0, iceHits:0, iceHitT:0,
     strafeDir: Math.random()<0.5?-1:1, strafeT: rand(1,2.5),
     reactionCd:0, reactions:0, moveAng: rand(0,TAU), moveT: rand(0.2,0.9),
@@ -1089,6 +1142,8 @@ function spawnWave(){
     }
   }
   skels = []; thrownSwords = [];
+  G.waveStats = { t0: G.time, actions:0, dmgDealt:0, healed:0, parries:0, ripostes:0, skelDmg:0, swordHits:0, tossHits:0, skelParries:0, kills:0 };
+  var wsEl = document.getElementById('wave-stats'); if(wsEl) wsEl.className = '';
   var cx0 = player ? player.x : WORLD/2, cy0 = player ? player.y : WORLD/2;
   var spawnDist = Math.max(350, 430 - G.wave * 2); // STEEPER RAMP: later waves rise closer — pressure arrives sooner
   for(var k=0;k<n;k++){
@@ -1146,6 +1201,20 @@ function logLine(t){
   document.getElementById('evo-log').textContent = G.logLines[G.logLines.length-1] || '';
 }
 
+function showWaveStats(){
+  var st = G.waveStats; if(!st) return;
+  var el = document.getElementById('wave-stats'); if(!el) return;
+  var dur = Math.max(1, G.time - (st.t0 || G.time));
+  var apm = Math.round((st.actions || 0) / (dur / 60));
+  function row(l, v){ return '<div class="ws-row"><span>' + l + '</span><b>' + v + '</b></div>'; }
+  el.innerHTML = '<h5>WAVE ' + G.wave + ' — THE TAPE</h5>' +
+    row('APM', apm) + row('Damage dealt', Math.round(st.dmgDealt || 0)) + row('Kills', st.kills || 0) +
+    row('Damage healed', Math.round(st.healed || 0)) + row('Parries', st.parries || 0) + row('Ripostes landed', st.ripostes || 0) +
+    '<div class="ws-sec">THE HORDE</div>' +
+    row('Damage dealt to you', Math.round(st.skelDmg || 0)) + row('Sword throws landed', st.swordHits || 0) +
+    row('Skel-tosses landed', st.tossHits || 0) + row('Their parries', st.skelParries || 0);
+  el.className = 'show';
+}
 function selectAndBreed(){
   var all = G.allWaveSkels || [];
   if(!all.length){ G.genePool = []; return; }
@@ -1156,7 +1225,7 @@ function selectAndBreed(){
     // raw damage, because they are the behaviours worth inheriting. Nothing is
     // forced: the roulette below still decides, this only tilts the wheel.
     var engagement = s.dmgDealt*TUNING.fitDmg + s.hits*TUNING.fitHit + s.parries*TUNING.fitParry + (s.timedParries||0)*TUNING.fitTimedParry + (s.ripostes||0)*TUNING.fitRiposte +
-      s.dodges*TUNING.fitDodge + (s.reactions||0)*TUNING.fitReact + (s.baitWins||0)*TUNING.fitBait + (s.coordHits||0)*TUNING.fitTandem + (s.guardHits||0)*TUNING.fitGuard + (s.counterHits||0)*TUNING.fitCounter + (s.runHits||0)*TUNING.fitRun + (s.tossHits||0)*TUNING.fitToss; // a hit landed by RUNNING the boss down — or by being THROWN at them — pays like a tandem hit: teamwork is what selection rewards. ALL weights live in TUNING (Pause → Evolution Tuning).
+      s.dodges*TUNING.fitDodge + (s.reactions||0)*TUNING.fitReact + (s.baitWins||0)*TUNING.fitBait + (s.coordHits||0)*TUNING.fitTandem + (s.guardHits||0)*TUNING.fitGuard + (s.counterHits||0)*TUNING.fitCounter + (s.runHits||0)*TUNING.fitRun + (s.tossHits||0)*TUNING.fitToss + (s.chargeHits||0)*7 + (s.diveHits||0)*7; // a hit landed by RUNNING the boss down — or by being THROWN at them — pays like a tandem hit: teamwork is what selection rewards. ALL weights live in TUNING (Pause → Evolution Tuning).
     // REACTION SPEED: faster is simply better (as in life) — a small bonus scaled
     // by where the skel's reactMs sits inside the human range, so over generations
     // selection visibly shaves the horde's lag toward the floor.
@@ -1243,7 +1312,7 @@ function refreshAbilityBar(){
     setAB(id, 1, 'READY', 'ready');
   }
   if((player.rekkaRecoveryT || 0) > 0){
-    var rcTxt = player.rekkaKind === 'V' ? 'RECOVERING ' + player.rekkaRecoveryT.toFixed(1) + 's — SPACE = JUMP CANCEL!' : 'RECOVERING ' + player.rekkaRecoveryT.toFixed(1) + 's — CAST A SPELL TO CANCEL!';
+    var rcTxt = player.rekkaKind === 'V' ? 'RECOVERING ' + player.rekkaRecoveryT.toFixed(1) + 's — SPACE = JUMP CANCEL!' : 'RECOVERING ' + player.rekkaRecoveryT.toFixed(1) + 's — SLOW-MOVE OK · CAST TO CANCEL!';
     var rcFrac = player.rekkaRecoveryDur > 0 ? 1 - player.rekkaRecoveryT / player.rekkaRecoveryDur : 1;
     setAB('ab-atk', rcFrac, rcTxt, 'cd'); setAB('ab-vert', rcFrac, rcTxt, 'cd');
   }
@@ -1497,8 +1566,8 @@ function doChargedSpin(){
   startRekkaStep(3, 'H'); // the finisher itself, bought with charge time instead of two chain steps
 }
 function doChargedVertical(){
-  player.atkAnim = 0.3; player.atkCd = 0.55; player.swingStep = 4; player.swingDmg = 54; player.atkDidHit = true;
-  var range = 114, arc = 1.0;
+  player.atkAnim = 0.3; player.atkCd = 0.55; player.swingStep = 4; player.swingDmg = 62; player.atkDidHit = true;
+  var range = 112, arc = 0.68;
   skels.forEach(function(s){
     if(s.dead) return;
     var d = Math.sqrt(dist2(player.x, player.y, s.x, s.y));
@@ -1507,9 +1576,9 @@ function doChargedVertical(){
     var diff = Math.abs(((ang - player.face) % TAU + TAU * 1.5) % TAU - Math.PI);
     if(diff > arc) return;
     if(parryCheck(s, 'sword')){ player.stagger = Math.max(player.stagger, 0.45); return; }
-    if(s.dodgeTime > 0) return;
+    if(canEvade(s)) return;
     applyChill(s);
-    damageSkel(s, 54, ang, 22);
+    damageSkel(s, 62, ang, 22);
   });
   meleeWallCheck(range, arc, false);
   projectiles.push({ x: player.x + Math.cos(player.face) * 30, y: player.y + Math.sin(player.face) * 30,
@@ -1557,15 +1626,16 @@ function cancelSpinForCast(){
    point (active or recovery) so you can chase what you launched. */
 var REKKA = {
   1:{ H:{dmg:24, range:98,  arc:1.25, fwd:30,  moveT:0.16, dur:0.30, rec:0, label:'H-SWIPE'},
-      V:{dmg:31, range:94,  arc:0.82, fwd:26,  moveT:0.16, dur:0.32, rec:0, label:'V-SLICE'} },
+      V:{dmg:34, range:92,  arc:0.56, fwd:26,  moveT:0.16, dur:0.32, rec:0, label:'V-SLICE'} },
   2:{ H:{dmg:27, range:116, arc:1.65, fwd:38,  moveT:0.17, dur:0.32, rec:0, label:'WIDE H-SWIPE'},
-      V:{dmg:30, range:102, arc:0.92, fwd:68, moveT:0.20, dur:0.36, rec:0, label:'LUNGE CUT'} },
+      V:{dmg:36, range:100, arc:0.60, fwd:68, moveT:0.20, dur:0.36, rec:0, label:'LUNGE CUT'} },
   3:{ H:{dmg:40, range:150, arc:Math.PI, fwd:14, moveT:0.14, dur:0.44, rec:0.42, label:'SPIN FINISHER'},
-      V:{dmg:34, range:106, arc:1.05, fwd:34,  moveT:0.16, dur:0.40, rec:0.48, label:'LAUNCHER'} }
+      V:{dmg:42, range:104, arc:0.70, fwd:34,  moveT:0.16, dur:0.40, rec:0.48, label:'LAUNCHER'} }
 };
 function meleePress(kind){
   if(!G.running || G.paused || G.over || !player || player.stagger > 0) return;
   if((player.hitStunT || 0) > 0) return; // hitstun: the sword arm waits — only the uninterruptibles (shockwave / greats / flash / blink) answer from inside a stun
+  if((player.quakeFreezeT || 0) > 0) return; // frozen in the earthquake's crater — the pose holds, the sword waits
   if(player.drainTarget) player.drainTarget = null; // swinging ends the soul drain — the channel demands stillness
   if(player.healCast > 0 || player.beamCharge > 0 || player.beamTime > 0 || player.diagTime > 0 || player.recoverT > 0) return;
   // FINISHER COMMITMENT: the step-3 hit is NOT cancelable into more moves.
@@ -1635,7 +1705,7 @@ function resolveRekkaHit(){
       if(!spin && !(step === 3)){ player.stagger = Math.max(player.stagger, 0.42); }
       hitAny = true; return;
     }
-    if(s.dodgeTime > 0) return;
+    if(canEvade(s)) return;
     applyChill(s);
     damageSkel(s, def.dmg, ang, step === 3 ? 22 : 14);
     hitAny = true;
@@ -1695,10 +1765,10 @@ function tryAirSlash(){
     if(d > 108 + s.r) return;
     var ang = Math.atan2(s.y - player.y, s.x - player.x);
     var diff = Math.abs(((ang - player.face) % TAU + TAU * 1.5) % TAU - Math.PI);
-    if(diff > 1.2) return;
+    if(diff > 0.85) return;
     if((s.launchT || 0) <= 0 && (s.launchH || 0) <= 10 && s.jumpH <= 12 && player.jumpH < 26) return; // air attacks trade with AIRBORNE targets (or from real height)
     if(parryCheck(s, 'sword')){ player.stagger = 0.4; hitAny = true; return; }
-    if(s.dodgeTime > 0) return;
+    if(canEvade(s)) return;
     var juggled = (s.launchT || 0) > 0 || (s.launchH || 0) > 10;
     damageSkel(s, juggled ? 40 : 28, ang, 10);
     if(juggled && !s.dead){ // JUGGLE: a real re-pop — upward velocity restored, helpless time refreshed, so it stays UP with you
@@ -1841,7 +1911,7 @@ function beamTick(){
     if(along < 0 || along > len + s.r) return;
     var perp = Math.abs(rx * (-fy) + ry * fx);
     if(perp > halfW + s.r * 0.5) return;
-    if(s.dodgeTime > 0) return;           // rolled out of the beam — no damage
+    if(canEvade(s)) return;           // rolled out of the beam — no damage
     if(s.parryTime > 0) return;           // holding a parry against the beam: anime-correct, no damage
     if(rollParry(s, 0.5)){ resolveParry(s, 'beam'); return; } // snaps into a parry mid-beam — and may riposte if you're close
     applyChill(s);
@@ -1883,33 +1953,47 @@ function tryChain(){
   if(!cur){ floater(player.x, player.y-44, 'CHAIN — no target in reach', '#a79f8a'); return; }
   cancelSpinForCast();
   player.chainCd = 1.6; player.mp -= 34;
-  var dmg = 30, hops = 0;
-  while(cur && hops < 5){
-    var pts = [[cx, cy]];
-    var seg = 5;
-    for(var si = 1; si < seg; si++){ var tt = si/seg; pts.push([cx + (cur.x-cx)*tt + rand(-13,13), cy + (cur.y-cy)*tt + rand(-13,13)]); }
-    pts.push([cur.x, cur.y]);
-    lightnings.push({ pts: pts, life: 0.22, max: 0.22 });
-    hitSet.push(cur);
-    // A parry grounds out THIS skeleton's share of the bolt — it does NOT stop the chain.
-    // Lightning keeps hopping through the whole group in range, parries or not.
-    var parriedThis = false;
-    if(cur.parryTime <= 0 && rollParry(cur, 0.85)){ resolveParry(cur, 'chain'); parriedThis = true; }
-    else if(cur.parryTime > 0){ resolveParry(cur, 'chain'); parriedThis = true; }
-    if(parriedThis) floater(cur.x, cur.y-44, 'PARRIED — chain jumps on!', '#5ec8d8');
-    else if(cur.dodgeTime <= 0){
-      damageSkel(cur, Math.round(dmg), Math.atan2(cur.y-cy, cur.x-cx), 9);
-      if(!cur.dead && cur.freezeT <= 0){ cur.stunT = Math.max(cur.stunT || 0, 0.35); floater(cur.x, cur.y-36, '⚡ STUNNED', '#c792ea'); } // every hop carries a slight stun now — chain lightning is crowd control, not just reach
-    }
-    else floater(cur.x, cur.y-22, 'dodged!', '#a79f8a');
-    cx = cur.x; cy = cur.y; dmg *= 0.82; hops++;
-    var nxt = null, nd = 155;
-    skels.forEach(function(sk){ if(sk.dead || hitSet.indexOf(sk) >= 0) return; var dd = Math.hypot(sk.x-cx, sk.y-cy); if(dd < nd){ nd = dd; nxt = sk; } });
-    cur = nxt;
-  }
+  // THE CHAIN IS TIMED NOW: it strikes the first skel instantly, then LINKS —
+  // visibly, every ~0.08s — to the nearest UNHIT skel within 230 of the last
+  // one struck. Grouping is exactly what feeds it: a tight pack chains far,
+  // a dispersed horde starves it. Damage and stun RAMP with every link
+  // (26 + 5/link, 0.35s + 0.13s/link), and no skel is ever hit twice.
+  G.chainState = { cx: player.x, cy: player.y, first: cur, hitIds: [], hops: 0, t: 0 };
+  G.lastChainT = G.time;
   spawnParticles(player.x, player.y, '#c792ea', 10, 150);
   beep(1180, 0.08, 'sawtooth', 0.05); beep(700, 0.12, 'sawtooth', 0.04);
   emitPlayerAction('chain'); updateHUD();
+}
+function updateChain(dt){
+  var cs = G.chainState; if(!cs) return;
+  cs.t -= dt; if(cs.t > 0) return;
+  cs.t = 0.08; // the visible link interval — short, but you can watch it walk the pack
+  var cur = null;
+  if(cs.hops === 0) cur = cs.first;
+  else {
+    var nd = 230;
+    skels.forEach(function(sk){ if(sk.dead || cs.hitIds.indexOf(sk.id) >= 0) return; var dd = Math.hypot(sk.x - cs.cx, sk.y - cs.cy); if(dd < nd){ nd = dd; cur = sk; } });
+  }
+  if(!cur || cur.dead || cs.hops >= 10){ G.chainState = null; return; }
+  var pts = [[cs.cx, cs.cy]];
+  var seg = 5;
+  for(var si = 1; si < seg; si++){ var tt = si/seg; pts.push([cs.cx + (cur.x-cs.cx)*tt + rand(-13,13), cs.cy + (cur.y-cs.cy)*tt + rand(-13,13)]); }
+  pts.push([cur.x, cur.y]);
+  lightnings.push({ pts: pts, life: 0.22, max: 0.22 });
+  cs.hitIds.push(cur.id);
+  var dmg = 26 + cs.hops * 5, stun = 0.35 + cs.hops * 0.13; // the ramp: every link hits harder and holds longer
+  var parriedThis = false;
+  if(cur.parryTime <= 0 && rollParry(cur, 0.85)){ resolveParry(cur, 'chain'); parriedThis = true; }
+  else if(cur.parryTime > 0){ resolveParry(cur, 'chain'); parriedThis = true; }
+  if(parriedThis) floater(cur.x, cur.y-44, 'PARRIED — chain jumps on!', '#5ec8d8');
+  else if(!canEvade(cur)){
+    damageSkel(cur, dmg, Math.atan2(cur.y-cs.cy, cur.x-cs.cx), 9);
+    if(!cur.dead && cur.freezeT <= 0){ cur.stunT = Math.max(cur.stunT || 0, stun); floater(cur.x, cur.y-36, '⚡ LINK ' + (cs.hops+1) + ' — ' + stun.toFixed(2) + 's', '#c792ea'); }
+  }
+  else floater(cur.x, cur.y-22, 'dodged!', '#a79f8a');
+  cs.cx = cur.x; cs.cy = cur.y; cs.hops++;
+  G.lastChainT = G.time;
+  beep(1180 - cs.hops * 60, 0.07, 'sawtooth', 0.045);
 }
 function tryFlame(){
   // HELD CHANNEL: no cooldown, no upfront cost. Hold K (magic) and it burns,
@@ -1935,7 +2019,7 @@ function flameTick(){
     if(diff > arc) return;
     if(sk.parryTime > 0) return; // holding the parry against the flames — the blade glows, nothing burns
     if(rollParry(sk, 0.3)){ resolveParry(sk, 'flame'); return; }
-    if(sk.dodgeTime > 0) return;
+    if(canEvade(sk)) return;
     damageSkel(sk, 10, ang, 4); // ~95 total across a full channel, if they just stand in it
     applyBurn(sk); // and what the flame touches keeps burning after it passes
   });
@@ -1967,7 +2051,7 @@ function iceTick(){
     if(diff > arc) return;
     if(sk.parryTime > 0) return; // parrying the cold — frost rimes the blade, not the bones
     if(rollParry(sk, 0.3)){ resolveParry(sk, 'ice'); return; }
-    if(sk.dodgeTime > 0) return;
+    if(canEvade(sk)) return;
     damageSkel(sk, 5, ang, 4);
     sk.chillStacks = Math.min(6, (sk.chillStacks || 0) + 1); sk.chillT = 2.4; // stacks: slower… slower… FROZEN
     if(sk.chillStacks >= 5){
@@ -2025,7 +2109,7 @@ function pillarBurnTick(pl){
     if(sk.dead) return;
     var d = Math.sqrt(dist2(pl.x, pl.y, sk.x, sk.y));
     if(d > pl.r + sk.r) return;
-    if(sk.dodgeTime > 0) return;
+    if(canEvade(sk)) return;
     if(sk.parryTime > 0) return; // holding a stance in the fire — the blade takes the burn, not the bones
     damageSkel(sk, 6, Math.atan2(sk.y - pl.y, sk.x - pl.x), 2); // searing ticks, ~20/s while they stand in it
     applyBurn(sk); // and they carry the fire out with them when they escape
@@ -2120,17 +2204,51 @@ function tryGreat(kind){
     floater(player.x, player.y - 60, '❄ GREAT ICE STORM!', '#5ec8d8');
     beep(1100, 0.3, 'sine', 0.05); beep(700, 0.4, 'sine', 0.04);
   } else if(kind === 'thunder'){
-    spellZones.push({ kind:'thunderstorm', t:3.5, boltT:0.1 });
+    spellZones.push({ kind:'thunderstorm', t:4.2, boltT:0.05 });
     floater(player.x, player.y - 60, '⚡ GREAT THUNDER!', '#ffe9a8');
     beep(1500, 0.2, 'sawtooth', 0.06); beep(90, 0.4, 'sine', 0.08);
   } else if(kind === 'quake'){
-    spellZones.push({ kind:'quake', t:3.0, patchT:0.1 });
+    // THE SLAM: no more random patches to dodge. You leap — FAST — and come
+    // down on the whole circle at once (see updateQuakeSlam): everyone inside
+    // it launches, immediately, higher than the launcher ever throws them,
+    // while you stand frozen in the crater for a beat, watching them fly.
+    player.quakeSlamT = 0.20;
     floater(player.x, player.y - 60, '🌋 GREAT EARTHQUAKE!', '#e0a458');
-    beep(45, 0.5, 'sine', 0.1);
+    beep(300, 0.12, 'sawtooth', 0.05);
   }
   G.shake = Math.max(G.shake, 6);
   emitPlayerAction('great');
   updateHUD();
+}
+function updateQuakeSlam(dt){
+  if((player.quakeFreezeT || 0) > 0){ player.quakeFreezeT -= dt; return; }
+  if((player.quakeSlamT || 0) <= 0) return;
+  player.quakeSlamT -= dt;
+  var prog = 1 - Math.max(0, player.quakeSlamT) / 0.20;
+  player.jumpH = Math.sin(Math.min(1, prog) * Math.PI) * 78; // the leap: up fast, down FASTER — the draw rides jumpH
+  if(player.quakeSlamT > 0) return;
+  player.jumpH = 0;
+  player.quakeFreezeT = 0.55; // frozen in the crater while they fly — the pose is the point
+  shockwaves.push({ x: player.x, y: player.y, r: 24, maxR: 350, life: 0.5, max: 0.5, speed: 700 });
+  skels.forEach(function(s){
+    if(s.dead) return;
+    var d = Math.hypot(s.x - player.x, s.y - player.y);
+    if(d > 350 + s.r) return; // EVERYONE in the circle, right off the bat — no patches, no luck
+    if(parryCheck(s, 'great')) return;
+    var ang = Math.atan2(s.y - player.y, s.x - player.x);
+    damageSkel(s, 24, ang, 10);
+    if(!s.dead && s.freezeT <= 0 && s.state !== 'tossed'){
+      if((s.launchH || 0) <= 1) s.launchH = 0;
+      s.launchT = Math.max(s.launchT || 0, 1.7); // launched LONGER than anything else in the game
+      s.launchVz = 545; // peak ≈ 545²/(2·660) ≈ 225 units — far above the launcher's ~109
+      s.launchVx = Math.cos(ang) * 130; s.launchVy = Math.sin(ang) * 130;
+      s.kbVx = 0; s.kbVy = 0; s.stunT = 0; s.dodgeTime = 0; s.running = false;
+      floater(s.x, s.y - 42, '🌋 SLAMMED SKYWARD!', '#e0a458');
+    }
+  });
+  spawnParticles(player.x, player.y, '#b09a72', 34, 300);
+  beep(42, 0.5, 'sine', 0.11); beep(80, 0.3, 'triangle', 0.07);
+  G.shake = Math.max(G.shake, 11);
 }
 function updateGreatFlame(dt){
   if((player.greatFlameT || 0) <= 0) return;
@@ -2155,7 +2273,7 @@ function zoneHit(z){
     var d = Math.hypot(s.x - z.x, s.y - z.y);
     if(d > z.r + s.r) return;
     z.hitIds.push(s.id);
-    if(s.dodgeTime > 0) return;
+    if(canEvade(s)) return;
     if(parryCheck(s, 'great')) return; // yes — a read stance can turn aside even a great spell's burst. The sword is a concept.
     var ang = Math.atan2(s.y - z.y, s.x - z.x);
     damageSkel(s, z.dmg, ang, z.quake ? 20 : 10);
@@ -2183,7 +2301,7 @@ function iceStormTick(){
     if(s.dead) return;
     var d = Math.hypot(s.x - player.x, s.y - player.y);
     if(d > 300 + s.r) return;
-    if(s.dodgeTime > 0) return;
+    if(canEvade(s)) return;
     if(s.parryTime > 0) return; // holding a stance against the storm — rime, not damage
     damageSkel(s, 8, Math.atan2(s.y - player.y, s.x - player.x), 3);
     s.iceHits = (s.iceHits || 0) + 1; s.iceHitT = 2.5;
@@ -2210,10 +2328,10 @@ function updateSpellZones(dt){
     } else if(z.kind === 'thunderstorm'){
       z.t -= dt; z.boltT -= dt;
       if(z.boltT <= 0){
-        z.boltT = 0.2;
-        var ba = rand(0, TAU), bd = rand(30, 320);
+        z.boltT = 0.09; // MANY more bolts — the storm is dense now, not a sprinkle
+        var ba = rand(0, TAU), bd = rand(20, 380);
         var bp = clampArena(player.x + Math.cos(ba) * bd, player.y + Math.sin(ba) * bd, 24);
-        spellZones.push({ kind:'burst', bolt:true, x: bp.x, y: bp.y, r:56, t:0.42, dmg:19, stun:0.9, hitIds:[] }); // telegraphed ~0.33s, then the sky answers
+        spellZones.push({ kind:'burst', bolt:true, x: bp.x, y: bp.y, r:72, t:0.42, dmg:21, stun:1.6, hitIds:[] }); // bigger bolts, LONG stun — and you run and fight freely the whole storm
       }
       if(z.t <= 0) spellZones.splice(zi, 1);
     } else if(z.kind === 'quake'){
@@ -2541,7 +2659,7 @@ function doDiveLanding(){
     if(s.dead) return;
     var d = Math.sqrt(dist2(player.x,player.y,s.x,s.y));
     if(d > 52 + s.r) return;
-    if(s.dodgeTime > 0) return;
+    if(canEvade(s)) return;
     if(parryCheck(s, 'dive')) return;
     damageSkel(s, 16, Math.atan2(s.y-player.y, s.x-player.x), 20);
   });
@@ -2563,7 +2681,7 @@ function diagHits(){
     if(parryCheck(s, 'dive')){
       player.stagger = 0.5; player.diagDidHit = true; return;
     }
-    if(s.dodgeTime > 0) return;
+    if(canEvade(s)) return;
     applyChill(s);
     damageSkel(s, 68, ang, 30); // FINISHER damage — the hardest single hit in the kit, well past the spin's 48
     player.diagDidHit = true;
@@ -2665,6 +2783,7 @@ function updateTossed(s, dt){
       skels.forEach(function(o){ if(o.id === s.tossById) thrower = o; });
       if(thrower && !thrower.dead){ thrower.hits++; thrower.dmgDealt += (player.shielding ? 14 * 0.12 : 14); thrower.tossHits = (thrower.tossHits || 0) + 1; noteTandemHit(thrower); }
       s.hits++; s.tossHits = (s.tossHits || 0) + 1;
+      if(G.waveStats) G.waveStats.tossHits = (G.waveStats.tossHits || 0) + 1;
       damagePlayer(14, ha, 16, true); // a whole skeleton landing on you is as physical as it gets — hitstun included
       floater(s.x, s.y - 48, 'SKEL-TOSS HIT!', '#e05252');
       spawnParticles(s.x, s.y, '#e9e2cf', 12, 170);
@@ -2739,6 +2858,7 @@ function rollParry(s, scale){
 }
 function resolveParry(s, kind){
   s.parries++;
+  if(G.waveStats) G.waveStats.skelParries = (G.waveStats.skelParries || 0) + 1;
   s.timedParries = (s.timedParries||0) + 1; // every stance parry is a TIMED parry by construction — the guard was up when it mattered
   s.parryTime = 0; s.parryActive = false;   // the stance is spent
   s.parryCd = Math.max(s.parryCd||0, rand(0.75, 1.05) - (s.genes.parryTiming||0) * 0.3); // and it cannot instantly re-guard
@@ -2822,7 +2942,7 @@ function playerAttackHits(){
       G.shake = Math.max(G.shake, 3);
       return;
     }
-    if(s.dodgeTime > 0) return; // mid-roll: whiff
+    if(canEvade(s)) return; // mid-roll: whiff
     applyChill(s);
     damageSkel(s, player.swingDmg || 19, ang);
     player.atkDidHit = true;
@@ -2852,9 +2972,10 @@ function doRiposte(){
     var diff = Math.abs(((ang - player.face) % TAU + TAU * 1.5) % TAU - Math.PI);
     if(diff > 1.25) return;
     if(parryCheck(s, 'riposte')){ player.stagger = 0.5; return; }
-    if(s.dodgeTime > 0) return;
+    if(canEvade(s)) return;
     applyChill(s);
     damageSkel(s, 60, ang, 22);
+    if(G.waveStats) G.waveStats.ripostes = (G.waveStats.ripostes || 0) + 1;
   });
   meleeWallCheck(118, 1.25, false);
   floater(player.x, player.y - 50, 'RIPOSTE!', '#5ec8d8');
@@ -2879,7 +3000,7 @@ function spinAttackHits(){
     var d = Math.sqrt(dist2(player.x,player.y,s.x,s.y));
     if(d > 150 + s.r) return;
     if(parryCheck(s, 'spin')){ hitAny = true; return; }
-    if(s.dodgeTime > 0) return;
+    if(canEvade(s)) return;
     applyChill(s);
     damageSkel(s, 48, Math.atan2(s.y-player.y, s.x-player.x), 20); // legacy full-spin hit — reach grew with the rekka spin (150)
     hitAny = true;
@@ -2897,15 +3018,21 @@ function applyChill(s){
    they scorch keeps burning for ~3s (3 dmg per 0.5s tick, processed in
    updateSkel), refreshed by any new fire hit. Fire is area denial with a tail. */
 function applyBurn(s){ if(s && !s.dead) s.burnT = Math.max(s.burnT || 0, 3); }
+/* A roll only evades while the skel is actually free to roll. CC owns the body:
+   launched, frozen, stunned or paralyzed skels take hits — a dodge timer left
+   running under CC used to make them randomly invulnerable. */
+function canEvade(s){ return s.dodgeTime > 0 && s.freezeT <= 0 && (s.launchT||0) <= 0 && (s.launchH||0) <= 4 && (s.stunT||0) <= 0 && s.state !== 'tossed'; }
 function damageSkel(s, dmg, ang, kb){
   if(kb === undefined) kb = 14; // EVERY attack shoves now — hits should feel like hits
   if(player && player.buffPowerT > 0) dmg = Math.round(dmg * 1.4); // Might buff: +40% damage
   if(!s.hasSword) dmg = Math.round(dmg * 1.5); // unarmed (sword thrown, not yet fetched) = VULNERABLE
   if((s.parryWhiffT||0) > 0) dmg = Math.round(dmg * 1.35); // caught in parry-whiff recovery = PUNISHED — the stance has a cost
   s.hp -= dmg; s.hurtFlash = 0.18;
+  if(G.waveStats) G.waveStats.dmgDealt = (G.waveStats.dmgDealt || 0) + dmg;
   if(player && player.buffSiphonT > 0 && player.alive){ // SIPHON lifesteal: your damage feeds you — a heal the swarm can't interrupt, because it's already in the sword
     var steal = dmg * 0.22;
     if(steal > 0 && player.hp < player.maxHp){
+      if(G.waveStats) G.waveStats.healed = (G.waveStats.healed || 0) + steal;
       player.hp = Math.min(player.maxHp, player.hp + steal);
       if(dmg >= 14) floater(player.x, player.y - 30, '+' + Math.round(steal) + ' 🩸', '#e05252');
     }
@@ -2923,6 +3050,7 @@ function damageSkel(s, dmg, ang, kb){
   beep(140, 0.07, 'sawtooth', 0.05); G.shake = Math.max(G.shake, 2);
   if(s.hp <= 0 && !s.dead){
     s.dead = true; s.diedAt = G.time;
+    if(G.waveStats) G.waveStats.kills = (G.waveStats.kills || 0) + 1;
     if(s.swordRef){ s.swordRef.state = 'gone'; s.swordRef = null; }
     spawnParticles(s.x, s.y, '#e9e2cf', 22, 220);
     floater(s.x, s.y-30, '☠', '#e9e2cf');
@@ -2940,6 +3068,7 @@ function damagePlayer(dmg, fromAng, kb, melee){
   if(player.dashTime > 0){ floater(player.x, player.y-34, 'DODGED', '#7bc47f'); return; }
   if(player.parryT > 0){ // PLAYER PARRY — a fresh shield-raise timed to the blow: nothing lands, the attacker reels, and a riposte window opens
     player.parryT = 0; player.riposteT = 1.1;
+    if(G.waveStats) G.waveStats.parries = (G.waveStats.parries || 0) + 1;
     floater(player.x, player.y-42, 'PARRIED! — J TO RIPOSTE', '#5ec8d8');
     spawnParticles(player.x + Math.cos(fromAng)*22, player.y + Math.sin(fromAng)*22, '#5ec8d8', 10, 170);
     beep(990, 0.07, 'square', 0.05); G.shake = Math.max(G.shake, 2);
@@ -2958,6 +3087,7 @@ function damagePlayer(dmg, fromAng, kb, melee){
     beep(520, 0.06, 'square', 0.04);
   }
   player.hp -= dmg; player.hurtFlash = 0.2;
+  if(G.waveStats) G.waveStats.skelDmg = (G.waveStats.skelDmg || 0) + dmg;
   player.x += Math.cos(fromAng) * kb; player.y += Math.sin(fromAng) * kb; clampToField(player);
   // HITSTUN — a clean PHYSICAL hit locks the boss for a beat (~0.25s; a shielded
   // hit barely nudges). This is what makes a surround lethal: three skels
@@ -3061,6 +3191,7 @@ function updateSkel(s, dt){
   // decays hard (×(1−3.2dt)/frame) so the flight goes UP and only a SHORT
   // distance back (~65 units total), exactly the brief's shape.
   if((s.launchT||0) > 0 || (s.launchH||0) > 0){
+    s.dodgeTime = 0; // launched = helpless: no roll protection rides along
     if(s.launchVz === undefined) s.launchVz = 300; // a save from before vertical velocity existed still pops
     s.launchT = Math.max(0, (s.launchT || 0) - dt);
     s.launchVz -= 660 * dt;
@@ -3082,9 +3213,9 @@ function updateSkel(s, dt){
   if(s.runLungeT > 0) s.runLungeT -= dt;
   if(s.windedT > 0) s.windedT -= dt;
   // FROZEN solid by ice breath: no moves, no parries, just ice and regret
-  if(s.freezeT > 0){ s.freezeT -= dt; if(s.freezeT <= 0){ s.chillStacks = 0; floater(s.x, s.y-30, 'thawed!', '#5ec8d8'); } clampToField(s); return; }
+  if(s.freezeT > 0){ s.dodgeTime = 0; s.freezeT -= dt; if(s.freezeT <= 0){ s.chillStacks = 0; floater(s.x, s.y-30, 'thawed!', '#5ec8d8'); } clampToField(s); return; }
   // hitstun: a real hit interrupts whatever they were doing
-  if(s.stunT > 0){ s.stunT -= dt; clampToField(s); return; }
+  if(s.stunT > 0){ s.dodgeTime = 0; s.stunT -= dt; clampToField(s); return; }
   if(s.chillT > 0){ s.chillT -= dt; if(s.chillT <= 0) s.chillStacks = 0; }
   var dx = player.x - s.x, dy = player.y - s.y;
   var d = Math.hypot(dx,dy) || 1;
@@ -3268,6 +3399,7 @@ function updateSkel(s, dt){
         }
       }
       var wantDist = (62 + (1-g.nerve)*26) * (g.attackRange||1) * (g.size||1) * (g.spacing||1); // spacing gene: crowd or hover, per-skel
+      if(G.lastChainT && G.time - G.lastChainT < 4) wantDist *= 1.45; // CHAIN MEMORY: lightning just punished a bunch-up — the horde spreads wider for a while. Dispersion, learned in the moment and bred over generations.
       // RNG movement: periodically re-roll a direction — forward, lateral, diagonal,
       // even backwards or a fully random heading. Direction itself is a dice roll.
       s.moveT -= dt;
@@ -3390,7 +3522,8 @@ function updateSkel(s, dt){
       var runMax = 100 * (g.runStamina || 0.9);
       if(s.runEnergy === undefined || s.runEnergy > runMax) s.runEnergy = Math.min(s.runEnergy === undefined ? runMax : s.runEnergy, runMax);
       var kiting = (G.lastRangedT !== undefined && (G.time - G.lastRangedT) < 4);
-      if(!s.running && (s.windedT||0) <= 0 && s.runEnergy > runMax * 0.3 && d > 185){
+      var reserve = runMax * (0.08 + (g.patience||0.2) * 0.5); // PATIENCE: a disciplined skel refuses to spend its last stamina early — the tank is not a toy for the first charge
+      if(!s.running && (s.windedT||0) <= 0 && s.runEnergy > Math.max(runMax * 0.3, reserve + 24) && d > 185){
         var runChance = (g.runDrive || 0) * (kiting ? 2.6 : 1) * dt * 1.6;
         if(Math.random() < runChance){
           s.running = true;
@@ -3420,6 +3553,8 @@ function updateSkel(s, dt){
         if(s.runEnergy <= 0){
           s.runEnergy = 0; s.running = false; s.windedT = 1.7;
           floater(s.x, s.y-22, 'winded…', '#a79f8a');
+        } else if(s.runEnergy <= reserve && (g.patience||0) > 0.22 && s.runMode === 'chase' && d > wantDist + 60){
+          s.running = false; // patient runners break off with gas still in the tank — they'll spend it when it matters, not all in the first rush
         } else if(s.runMode === 'chase' && d < wantDist + 24){
           s.running = false; // arrived — the run did its job
         } else {
@@ -3468,7 +3603,8 @@ function updateSkel(s, dt){
         s.face = toPlayer;
         var aspd = g.attackSpeed||1;
         var lw = lenWindup(g); // long blade = longer windup; short blade = snappier (on top of attackSpeed)
-        if(Math.random() < g.feint * 0.8 + (g.bait||0) * 0.55){ s.state = 'feint'; s.stateT = 0.3/aspd; s.baitChecked = false; } // the bait gene throws fake swings to draw YOUR guard early
+        if(Math.random() < (g.chargeDrive||0) * 0.85){ s.atkType='charged'; s.state='chargeWindup'; s.stateT=0.55*lw/aspd; s.windupHitDone=false; floater(s.x, s.y-34, 'CHARGING…', '#ff6b6b'); } // the heavy one: a visible wind-up, then a blow that hits harder AND stuns longer — gang up with two of these and the boss feels it
+        else if(Math.random() < g.feint * 0.8 + (g.bait||0) * 0.55){ s.state = 'feint'; s.stateT = 0.3/aspd; s.baitChecked = false; } // the bait gene throws fake swings to draw YOUR guard early
         else {
           // RANGE SENSE (axis 2): pick the attack that fits THIS distance —
           // leap/stab from far, stab mid, swipe close — instead of rolling blind.
@@ -3496,6 +3632,30 @@ function updateSkel(s, dt){
         s.state = 'approach'; s.atkCd = rand(0.25, 0.6) * (1.2 - g.aggression*0.5);
       }
       break;
+    case 'chargeWindup':
+      s.face = angleLerp(s.face, toPlayer, 0.14);
+      if(Math.random() < dt * 9) spawnParticles(s.x, s.y - 10, '#ff6b6b', 1, 60); // the charge GATHERS — sparks crawl up the blade
+      if(s.stateT <= 0){ s.state = 'chargeStrike'; s.stateT = 0.15; }
+      break;
+    case 'chargeStrike': {
+      if(!s.windupHitDone){
+        s.windupHitDone = true;
+        var crange = 82 * (s.genes.attackRange||1) * (s.genes.swordLen||1), carc = 1.0;
+        if(d < crange + player.r){
+          var cang = Math.atan2(player.y-s.y, player.x-s.x);
+          var cdiff = Math.abs(((cang - s.face)%TAU + TAU*1.5)%TAU - Math.PI);
+          if(cdiff < carc && !blindMiss(s)){
+            s.hits++; s.chargeHits = (s.chargeHits||0) + 1; var cmdg = 19; noteTandemHit(s); s.dmgDealt += (player.shielding ? cmdg*0.12 : cmdg);
+            damagePlayer(cmdg, cang, 20, true);
+            player.hitStunT = Math.max(player.hitStunT || 0, 0.5); // CHARGED = longer hitstun — this is the gang-up punish
+            floater(s.x, s.y-34, 'CHARGED HIT!', '#ff6b6b');
+          }
+        }
+        beep(120, 0.07, 'sawtooth', 0.05); G.shake = Math.max(G.shake, 2);
+      }
+      if(s.stateT <= 0){ s.state = 'recover'; s.stateT = rand(0.6, 0.95) * (1.25 - g.aggression*0.55); }
+      break;
+    }
     case 'windup':
       s.face = angleLerp(s.face, toPlayer, 0.1);
       if(s.stateT <= 0){ s.state = 'strike'; s.stateT = 0.14; }
@@ -3508,7 +3668,7 @@ function updateSkel(s, dt){
           var ang = Math.atan2(player.y-s.y, player.x-s.x);
           var diff = Math.abs(((ang - s.face)%TAU + TAU*1.5)%TAU - Math.PI);
           if(diff < arc && !blindMiss(s)){
-            s.hits++; var dmg = 8; noteTandemHit(s); s.dmgDealt += (player.shielding ? dmg*0.12 : dmg);
+            s.hits++; var dmg = 9; noteTandemHit(s); s.dmgDealt += (player.shielding ? dmg*0.12 : dmg);
             damagePlayer(dmg, ang, undefined, true); // physical — carries hitstun
           }
         }
@@ -3549,7 +3709,7 @@ function updateSkel(s, dt){
         if(jDist > jMax){ jtx = s.x + (jtx - s.x)/jDist * jMax; jty = s.y + (jty - s.y)/jDist * jMax; }
         var jtp = clampArena(jtx, jty, 28);
         s.jumpToX = jtp.x; s.jumpToY = jtp.y;
-        s.windupHitDone=false;
+        s.windupHitDone=false; s.diveDone = false; // every leap re-rolls the dive in the air (diveDrive gene)
       }
       break;
     case 'jumpAir': {
@@ -3559,6 +3719,15 @@ function updateSkel(s, dt){
       s.y = s.jumpFromY + (s.jumpToY - s.jumpFromY)*jp;
       s.jumpH = Math.sin(jp*Math.PI)*44;
       s.face = toPlayer;
+      // THE DIVE — out of the jump, like yours: mid-flight, close to you, a
+      // diveDrive-weighted dice roll turns the leap into a diving slash on
+      // the way down. It hits HARDER than any standing swing (21) — a whole
+      // skeleton falling on you, blade first.
+      if(!s.diveDone && jp > 0.4 && jp < 0.85 && d < 86 && Math.random() < 0.3 + (g.diveDrive||0)){
+        s.diveDone = true;
+        if(!blindMiss(s)){ s.hits++; s.diveHits = (s.diveHits||0) + 1; var ddm = 21; noteTandemHit(s); s.dmgDealt += (player.shielding ? ddm*0.12 : ddm); damagePlayer(ddm, toPlayer, undefined, true); floater(s.x, s.y-36, 'DIVE ATTACK!', '#e05252'); }
+        spawnParticles(s.x, s.y, '#e9e2cf', 8, 150); beep(240, 0.07, 'sawtooth', 0.04);
+      }
       if(jp >= 1){
         s.jumpH = 0; s.state='recover'; s.stateT=0.62;
         // landing slash — MORE damage than basic (15 vs 8)
@@ -3676,7 +3845,9 @@ function update(dt){
     if(G.reactQueue.length > 260) G.reactQueue.splice(0, G.reactQueue.length - 260); // a spammy second can't flood the queue
   }
   updateSoulDrain(dt);   // the drain channel: paralyzed target, rooted boss, mana bleeding
+  updateChain(dt);       // chain lightning's timed links walk the pack, one strike every ~0.08s
   updateGreatFlame(dt);  // the rooted spiral cast
+  updateQuakeSlam(dt);   // the earthquake leap-slam and the frozen beat after it
   updateSpellZones(dt);  // great-spell zones: bursts, ice storm, thunder storm, quake
   if(player.comboT > 0){ player.comboT -= dt; if(player.comboT <= 0) player.combo = 0; }
   /* REKKA chain timers: the pending hit lands a beat after the press (a press
@@ -3721,7 +3892,7 @@ function update(dt){
     if(player.flurryHitT <= 0){
       player.flurryHitT = 0.07;
       skels.forEach(function(s){
-        if(s.dead || s.dodgeTime > 0) return;
+        if(s.dead || canEvade(s)) return;
         if(Math.sqrt(dist2(player.x, player.y, s.x, s.y)) > 102 + s.r) return;
         var fang = Math.atan2(s.y - player.y, s.x - player.x);
         var fdiff = Math.abs(((fang - player.face) % TAU + TAU * 1.5) % TAU - Math.PI);
@@ -3861,6 +4032,7 @@ function update(dt){
   if(player.healCast > 0){
     player.healCast -= dt;
     if(player.healCast <= 0){
+      if(G.waveStats) G.waveStats.healed = (G.waveStats.healed || 0) + Math.min(46, player.maxHp - player.hp);
       player.hp = Math.min(player.maxHp, player.hp + 46);
       player.mp -= 32; player.healCd = 4.5;
       floater(player.x, player.y-38, '+46', '#7bc47f');
@@ -3874,11 +4046,11 @@ function update(dt){
     player.dashTime -= dt;
     player.x += player.dashDx * 680 * dt; player.y += player.dashDy * 680 * dt;
     player.face = Math.atan2(player.dashDy, player.dashDx);
-  } else if(mv && player.stagger <= 0 && player.diagTime <= 0 && player.recoverT <= 0 && (player.rekkaRecoveryT || 0) <= 0 && player.beamCharge <= 0 && player.beamTime <= 0 && (player.hitStunT || 0) <= 0 && !player.drainTarget && (player.greatFlameT || 0) <= 0){
+  } else if(mv && player.stagger <= 0 && player.diagTime <= 0 && player.recoverT <= 0 && player.beamCharge <= 0 && player.beamTime <= 0 && (player.hitStunT || 0) <= 0 && !player.drainTarget && (player.greatFlameT || 0) <= 0 && (player.quakeSlamT || 0) <= 0 && (player.quakeFreezeT || 0) <= 0){
     // …and no moving in hitstun, while soul-draining (rooted by the channel), or while Great Flame uncoils (rooted by the cast)
     // No steering mid-dive, no moving during landing recovery OR a finisher's end recovery, and feet stay planted for the beam — all commitments. (Jump-canceling the launcher clears rekkaRecoveryT first, so air movement after the chase-jump is free.)
     // Heal-while-moving: healCast no longer roots you (Skyrim-style)
-    var sp = player.speed * (player.unlocks.mob2 ? 1.18 : 1) * (player.buffHasteT > 0 ? 1.35 : 1) * ((player.flameTime > 0 || player.iceTime > 0) ? 0.4 : 1) * (player.shockWindup > 0 ? 0.3 : 1) * (player.arrowCharging ? 0.55 : 1) * (player.shielding ? (player.unlocks.aegis ? 0.8 : 0.45) : (player.charging ? 0.72 : 1)); // charging a melee attack slows the stride a little — power has a posture
+    var sp = player.speed * (player.unlocks.mob2 ? 1.18 : 1) * (player.buffHasteT > 0 ? 1.35 : 1) * ((player.flameTime > 0 || player.iceTime > 0) ? 0.4 : 1) * (player.shockWindup > 0 ? 0.3 : 1) * ((player.rekkaRecoveryT || 0) > 0 ? 0.38 : 1) * (player.arrowCharging ? 0.55 : 1) // FINISHER RECOVERY no longer roots you: you move at ~38% through it — decisions still get made, just slowly * (player.shielding ? (player.unlocks.aegis ? 0.8 : 0.45) : (player.charging ? 0.72 : 1)); // charging a melee attack slows the stride a little — power has a posture
     G.moveReactT = (G.moveReactT||0) - dt;
     if(G.moveReactT <= 0){ G.moveReactT = 0.65; emitPlayerAction('move'); }
     player.x += mv.x * sp * dt; player.y += mv.y * sp * dt;
@@ -3921,6 +4093,7 @@ function update(dt){
   if(player.lockTarget && player.lockTarget.dead){ floater(player.lockTarget.x, player.lockTarget.y - 40, 'lock lost', '#a79f8a'); player.lockTarget = null; }
   if(!anyAlive && G.state === 'fight'){
     G.allWaveSkels = skels.slice();
+    showWaveStats();
     selectAndBreed();
     if(G.mode === 'story'){
       if(G.duel){
@@ -3966,7 +4139,7 @@ function update(dt){
       updateHUD();
       return;
     }
-    G.state = 'between'; G.betweenTimer = Math.max(0.6, 1.35 - G.wave * 0.03); // STEEPER RAMP: the breather between waves SHRINKS as waves climb — late waves give you almost no air
+    G.state = 'between'; G.betweenTimer = 4.4; // a real breather now: long enough to read the wave-stats card before the next horde rises
     // NO heal between waves in Survival Mode. HP only comes back via the in-combat Heal spell.
     banner('Wave ' + G.wave + ' cleared', 'The fallen are judged. The best return — changed. No breather. Next wave incoming…');
     updateHUD();
@@ -3984,6 +4157,7 @@ function update(dt){
       sw.state = 'ground';
       var gp1 = clampArena(player.x - sw.vx * 0.03, player.y - sw.vy * 0.03, 16); sw.x = gp1.x; sw.y = gp1.y;
       var ow = sw.owner;
+      if(G.waveStats) G.waveStats.swordHits = (G.waveStats.swordHits || 0) + 1;
       if(ow && !ow.dead){ ow.hits++; noteTandemHit(ow); ow.dmgDealt += (player.shielding ? 11 * 0.12 : 11); }
       damagePlayer(11, Math.atan2(sw.vy, sw.vx), undefined, true);
       floater(player.x, player.y - 40, 'THROWN SWORD HIT — blade down!', '#e05252');
@@ -4193,6 +4367,7 @@ function drawSkel(s){
   if(s.state === 'windup' || s.state === 'jumpWindup' || s.state === 'swipeWindup' || s.state === 'riposteWindup') swordAng = -2.2;
   if(s.state === 'strike' || s.state === 'swipeStrike' || s.state === 'riposteStrike') swordAng = 0.75;
   if(s.state === 'jumpAir') swordAng = -2.6;
+  if(s.state === 'chargeWindup') swordAng = -2.45; // winding up the heavy one — blade high, shaking
   if(s.state === 'stabWindup') swordAng = -0.2;
   if(s.state === 'stabDash') swordAng = 0;
   if(s.parryTime > 0) swordAng = -1.5;
@@ -4232,6 +4407,8 @@ function drawSkel(s){
   if(s.state === 'swipeStrike') wedge(s.x, s.y, s.face, 84 * reach, 1.75, 'rgba(190,82,224,.42)');
   if(s.state === 'stabWindup') wedge(s.x, s.y, s.face, 118 * reach, 0.38, 'rgba(224,200,60,.20)');
   if(s.state === 'stabDash') wedge(s.x, s.y, s.face, 70, 0.38, 'rgba(224,200,60,.45)');
+  if(s.state === 'chargeWindup') wedge(s.x, s.y, s.face, 82 * reach, 1.0, 'rgba(255,60,60,.30)');
+  if(s.state === 'chargeStrike') wedge(s.x, s.y, s.face, 82 * reach, 1.0, 'rgba(255,60,60,.55)');
   if(s.state === 'riposteWindup') wedge(s.x, s.y, s.face, 88 * reach, 1.2, 'rgba(94,200,216,.28)');
   if(s.state === 'riposteStrike') wedge(s.x, s.y, s.face, 88 * reach, 1.2, 'rgba(94,200,216,.50)');
   // hp bar
@@ -5284,9 +5461,10 @@ document.getElementById('load-file').addEventListener('change', function(){
 /* ----- front menu ----- */
 var MENU_HTML =
   '<div class="menu-title">SKELETON <span class="gold">SWORD</span></div>' +
+  '<div class="menu-version">Version 18 &middot; Alpha</div>' +
   '<p class="menu-sub">Every skeleton with a sword you ever cut down as fodder is back — and between waves, they breed. You are the final boss. They are the ones who learn.</p>' +
   '<div class="mode-grid">' +
-    '<button class="mode-btn" id="menu-story" type="button"><span class="m-name">📖 Story Mode</span><span class="m-desc">Start with a sword and nothing else. Duel the Master, earn bones from the fallen, and spend them down four hidden skill trees — Fire, Ice, Shielding, Mobility — until you style like Dante… while the horde learns to style back. Pub breaks every 10 waves. The slower road, and the one that explains everything.</span></button>' +
+    '<button class="mode-btn under-construction" id="menu-story" type="button" disabled aria-disabled="true"><span class="m-name">📖 Story Mode</span><span class="construction-sign">Under Construction</span><span class="m-desc">This mode is still being built and isn&rsquo;t playable yet. Survival Mode is open below &mdash; jump in there.</span></button>' +
     '<button class="mode-btn" id="menu-survival" type="button"><span class="m-name">⚔ Survival Mode</span><span class="m-desc">The main mode. Full kit from the first second — rekka sword combos, bow, shockwave, shield, heal, dash. Twelve skeletons a wave, no healing between waves, constant evolution — and the ramp is steeper now: tighter selection, closer spawns, and skels that learn to RUN. How many generations can the boss survive?</span></button>' +
   '</div>' +
   '<div class="menu-sec" id="menu-quick-sec" style="display:none"><h3>↩ RESUME QUICK SAVE</h3>' +
