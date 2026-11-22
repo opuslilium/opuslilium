@@ -320,6 +320,7 @@
     <div class="ab ready" id="ab-flash" data-mode="phys"><div class="ab-fill"></div><span class="ab-key">G</span><span class="ab-name">Flash · 40 MP</span><span class="ab-cd">READY</span></div>
     <div class="ab ready" id="ab-heal" data-mode="phys"><div class="ab-fill"></div><span class="ab-key">H</span><span class="ab-name">Heal · 32 MP</span><span class="ab-cd">READY</span></div>
     <div class="ab ready" id="ab-dash"><div class="ab-fill"></div><span class="ab-key">B</span><span class="ab-name">Dash</span><span class="ab-cd">READY</span></div>
+    <div class="ab ready" id="ab-roll"><div class="ab-fill"></div><span class="ab-key">C</span><span class="ab-name">Roll</span><span class="ab-cd">READY</span></div>
     <div class="ab ready" id="ab-blink"><div class="ab-fill"></div><span class="ab-key">V</span><span class="ab-name">Blink · 15 MP</span><span class="ab-cd">READY</span></div>
     <div class="ab ready" id="ab-parry" data-mode="phys"><div class="ab-fill"></div><span class="ab-key">L tap</span><span class="ab-name">Parry</span><span class="ab-cd">READY</span></div>
     <div class="ab ready" id="ab-chain" data-mode="magic" style="display:none"><div class="ab-fill"></div><span class="ab-key">J</span><span class="ab-name">Chain ⚡ · 34 MP</span><span class="ab-cd">READY</span></div>
@@ -350,6 +351,7 @@
         <div class="tbtn small" id="tb-flash">FLASH</div>
         <div class="tbtn small" id="tb-heal">HEAL</div>
         <div class="tbtn small" id="tb-dash">DASH</div>
+        <div class="tbtn small" id="tb-roll">ROLL</div>
         <div class="tbtn small" id="tb-blink">BLINK</div>
         <div class="tbtn small" id="tb-jump">JUMP</div>
       </div>
@@ -376,7 +378,7 @@
       <p>At first you will feel untouchable. That's the point. Watch what they learn.</p>
       <div class="kit">
         <div><b>Rekka combos</b> <span>— J = horizontal, K = vertical, mixed freely over 3 steps (JJJ, JJK, KKK…): every step lunges you forward, step-3 J spins, step-3 K LAUNCHES skels up into the air and a short way back — stunned until they land, and stunned a beat more. Steps 1–2 CANCEL — press the next input mid-swing and the next step starts instantly. The step-3 FINISHER does not cancel into more melee: it ends in real recovery lag — but the SPIN can be canceled by CASTING ANY SPELL, and the launcher escapes by SPACE jump-cancel so you can chase what you popped up. HOLD J or K from a standstill to CHARGE instead: J charges a spin, K charges a heavy slice that throws a WIND SLICE the whole way across the arena. Charging slows your stride a little</span></div>
-        <div><b>Arrows</b> <span>— R: free bow shots, no mana · tap = 1 arrow, hold &amp; release = 3–5 arrow spread · Q locks a target for precision fire</span></div>
+        <div><b>Arrows</b> <span>— R: free bow shots, no mana · tap = 1 arrow, hold &amp; release = 3–15 arrow spreads the longer you hold · hold ~2s = ITANO CIRCUS, 20 tracking arrows in all directions · Q locks a target for precision fire</span></div>
         <div><b>Solar Flash</b> <span>— G: full-screen light, blinds &amp; dazes the whole horde</span></div>
         <div><b>Shockwave</b> <span>— U key. Modest AoE damage, real shove, and a small knock-UP now — skels pop into the air, helpless until they land</span></div>
         <div><b>Earth Push</b> <span>— E key. A wave that starts at your feet and rolls forward, shoving as it goes — then rises into a destructible wall where it stops</span></div>
@@ -460,9 +462,9 @@
         </div>
         <div class="moves-sec">
           <h4>✦ SPELLS &amp; SUPPORT — LIGHTER BY DESIGN</h4>
-          <div class="move-row"><span class="mk">R</span><span class="md">Arrows — <b>7</b> each · <b>FREE, no mana</b>. Tap = 1 arrow; HOLD R briefly and release = a spread of <b>3, then 5</b> arrows. Reach and chip — your sword is still the killer. Parry-able, like everything. (K belongs to the vertical rekka now.) But beware: sustained arrow / lightning pressure is exactly what teaches the horde to <b>RUN</b></span></div>
+          <div class="move-row"><span class="mk">R</span><span class="md">Arrows — <b>7</b> each · <b>FREE, no mana</b>. Tap = 1 arrow; HOLD R and release = a spread of <b>3, then 5</b> arrows — and keep holding for <b>7, 10, then 15</b>. Hold it all the way (~2s) and you get the <b>ITANO CIRCUS</b>: 20 TRACKING arrows in all directions. Reach and chip — your sword is still the killer. Parry-able, like everything. (K belongs to the vertical rekka now.) But beware: sustained arrow / lightning pressure is exactly what teaches the horde to <b>RUN</b></span></div>
           <div class="move-row"><span class="mk">U</span><span class="md">Shockwave — <b>14</b> · 30 MP · a WIDE ring (218) with a huge radial shove that now <b>POPS SKELS INTO THE AIR</b> too — a small launch (about half the launcher's height): helpless in flight, stunned again on landing, juggle them if you're quick. The “get off me” move, with air time. It has <b>0.32s of startup</b> — and it is <b>UNINTERRUPTIBLE</b>: cast it from inside a hitstun and the ring still fires. It is one of your stunlock escapes. <b>U only.</b></span></div>
-          <div class="move-row"><span class="mk">E</span><span class="md">Earth Push — <b>10</b> · 26 MP · 5s cooldown · a WIDE forward arc that now rolls out as a <b>WAVE</b>: it starts at your feet and spreads forward slowly, hurling each skel backward with a <b>0.5s stun</b> only when the front reaches it — then, as the wave spends itself, an <b>EARTH WALL</b> rises ~150 ahead: a barrier that blocks movement for you and them alike until it takes <b>3 hits</b> (your sword or theirs — skels will hack at it to get through, and you can break your own if it traps you). Max 2 walls standing</span></div>
+          <div class="move-row"><span class="mk">E</span><span class="md">Earth Push — <b>10</b> · 26 MP · 5s cooldown · a WIDE forward arc that now rolls out as a <b>WAVE</b>: it starts at your feet and spreads forward slowly, hurling each skel backward with a <b>0.5s stun</b> only when the front reaches it — then, as the wave spends itself, an <b>EARTH WALL</b> rises ~195 ahead — BIGGER now, 250 wide: a barrier that blocks movement for you and them alike until it takes <b>4 hits</b> (your sword or theirs — skels will hack at it to get through, and you can break your own if it traps you). Max 2 walls standing</span></div>
           <div class="move-row"><span class="mk">G</span><span class="md">Solar Flash — 40 MP · 7s cooldown · <b>full-screen light</b>. No damage: every skeleton is DAZED (0.6s stun) then <b>BLIND for 3.6s</b> — they wander with no sense of where you are and ~65% of their swings whiff. Works in either mode</span></div>
           <div class="move-row"><span class="mk">F</span><span class="md">Boss Beam — <b>8</b> a tick while they stand in it · 55 MP · 0.7s charge (rooted — a hit breaks it), then a 1.1s Kame-style blast that <b>TRACKS</b>: it bends toward your lock target (Q), or the nearest skeleton if you never locked one — while charging and while firing. Re-tuned: <b>wider, and long enough to cross the whole arena</b>. Your sword still out-damages it up close</span></div>
           <div class="move-row"><span class="mk">Hold L</span><span class="md">Shield — block their blades</span></div>
@@ -472,23 +474,24 @@
           <h4>✦ MAGIC MODE — SHIFT TOGGLES (DASH IS ON B NOW)</h4>
           <div class="move-row"><span class="mk">Shift</span><span class="md"><b>Toggle magic mode.</b> Your right hand stops swinging and starts casting; the ability bar swaps. Shift again to go back to the sword. Magic hits hard and its AoEs are big — and it is COSTLY</span></div>
           <div class="move-row"><span class="mk">J (magic)</span><span class="md">Chain Lightning — <b>26</b> on the first skel, then it LINKS every ~0.08s to the nearest unhit skel within 230 of the last — damage and stun RAMP with every link (+5 dmg, +0.13s stun), no skel hit twice · 34 MP. It FEEDS on grouping: a tight pack chains far, a dispersed horde starves it — watch them learn to spread out. A parry grounds out that one skeleton's share — <b>the chain jumps on through the group anyway</b></span></div>
-          <div class="move-row"><span class="mk">K (magic)</span><span class="md">Flamethrower — <b>10</b> a tick in a big, longer cone · <b>HOLD K: no cooldown</b>, it burns until you release or your mana runs dry (drains 30 MP/s). You shuffle at 40% speed while it roars. And like every fire skill now, what it scorches keeps <b>BURNING</b> — a slow damage-over-time after the flames pass</span></div>
+          <div class="move-row"><span class="mk">K (magic)</span><span class="md">Flamethrower — <b>15</b> a tick (buffed) in a big, longer cone · <b>HOLD K: no cooldown</b>, it burns until you release or your mana runs dry (drains 30 MP/s). You shuffle at 40% speed while it roars. And like every fire skill now, what it scorches keeps <b>BURNING</b> — a slow damage-over-time after the flames pass</span></div>
           <div class="move-row"><span class="mk">L (magic)</span><span class="md">Ice Breath — <b>5</b> a tick + chill stacks · <b>HOLD L: no cooldown</b>, drains 26 MP/s until released or empty. Each stack slows them; at 5 stacks they <b>FREEZE solid for 1.7s</b></span></div>
           <div class="move-row"><span class="mk">O (magic)</span><span class="md">Fire Pillar — <b>46</b> in a huge circle at your lock target (or 175 ahead) after a 0.4s telegraph — then the pillar <b>STAYS UP ~3s as a burning hitbox</b>, searing anything standing in it (6 a tick) · 42 MP</span></div>
           <div class="move-row"><span class="mk">I / U / H / M (magic)</span><span class="md">Self-buffs, 9s each — every buff now takes a <b>0.6s CAST</b> first: get hit mid-cast and it fizzles (mana unspent), so retreating to buff is a real decision, not a freebie — <b>I</b> Armor −55% damage taken · 24 MP · <b>U</b> Swift +35% speed · 18 MP · <b>H</b> Regen +5 HP/s · 20 MP · <b>M</b> Might +40% damage · 24 MP</span></div>
           <div class="move-row"><span class="mk">N (magic)</span><span class="md">SIPHON — 45 MP, 8s. <b>22% of all damage you deal returns as HP</b> — healing that can't be interrupted, because it's already in your sword. The trade: you take <b>+25% damage</b> while it burns and your mana does not regenerate. For swarms, not for comfort</span></div>
-          <div class="move-row"><span class="mk">T (magic)</span><span class="md">SOUL DRAIN — lock onto the nearest skeleton (or your Q target) and <b>PARALYZE</b> it: it cannot move, swing, or guard while you drink its soul for damage over time. The price: <b>you are rooted too</b> — locking onto one skeleton and rooting each other is the whole cost. It costs <b>no MP</b>; instead the soul feeds you, <b>restoring 15 MP/s</b> while the channel holds, until the target dies, slips out of range, you take a hit, or you press T again to let go</span></div>
+          <div class="move-row"><span class="mk">T (magic)</span><span class="md">SOUL DRAIN — lock onto the nearest skeleton (or your Q target) and <b>PARALYZE</b> it: it cannot move, swing, or guard while you drink its soul for damage over time. The price: <b>you are rooted too</b> — locking onto one skeleton and rooting each other is the whole cost. It costs <b>no MP</b>; instead the soul feeds you, <b>restoring 15 MP/s</b> while the channel holds, until the target dies, slips out of range, you take a hit, or you press T again to let go. While it holds you can do <b>NOTHING else</b> — no dash, no roll, no spells — and it will not start (and will break) during a <b>Great Ice Storm</b>; Great Thunder is fine</span></div>
           <div class="move-row"><span class="mk">1 (magic)</span><span class="md">🔥 GREAT FLAME — <b>costs ALL your mana</b> (needs 50+ banked). The biggest damage you own: a triple spiral of fire uncoils out of you for ~2.4s, hitbox after hitbox, and everything it touches keeps <b>burning</b>. You are <b>rooted</b> for the cast — and it cannot be interrupted</span></div>
           <div class="move-row"><span class="mk">2 (magic)</span><span class="md">❄ GREAT ICE STORM — <b>ALL mana</b>. A storm rages around you for ~3.5s, ticking damage and stacking cold on everything near. Three storm-hits <b>FREEZE</b> a skeleton solid for 2.2s — and you are free to move and attack the whole time</span></div>
           <div class="move-row"><span class="mk">3 (magic)</span><span class="md">⚡ GREAT THUNDER — <b>ALL mana</b>. A dense lightning storm follows you for ~4.2s — bolts every ~0.09s, bigger than before, and a landed bolt <b>stuns for 1.6s</b> — while you keep running and fighting under your own weather</span></div>
-          <div class="move-row"><span class="mk">4 (magic)</span><span class="md">🌋 GREAT EARTHQUAKE — <b>ALL mana</b>. No more dodgeable patches: you LEAP and slam down in one fast motion, and <b>every skel in the circle (350) launches at once</b> — higher than the launcher throws (~225 up) and helpless for longer (1.7s) — while you stand <b>frozen in the crater for 0.55s</b>, watching them fly</span></div>
+          <div class="move-row"><span class="mk">4 (magic)</span><span class="md">🌋 GREAT EARTHQUAKE — <b>ALL mana</b>. No more dodgeable patches: you LEAP and slam down in one fast motion, and <b>every skel in the circle (520 — much bigger than the other greats) launches at once</b> — higher than the launcher throws (~225 up) and helpless for longer (1.7s) — while you stand <b>frozen in the crater for 0.55s</b>, watching them fly</span></div>
           <div class="move-row"><span class="mk">Hitstun</span><span class="md">Physical hits now <b>STUN</b> — theirs and yours. A clean skeleton hit locks you for ~0.25s; a coordinated gang can stunlock you to death. Your escapes are the <b>UNINTERRUPTIBLES</b>: Shockwave (U), any GREAT spell, and the insta-casts — Solar Flash (G) and Blink (V). Everything else waits for the stun to end</span></div>
           <div class="move-row"><span class="mk">Touch (magic)</span><span class="md">MAGIC button toggles · SPELL=Chain · BEAM=Flame · SHOCK=Pillar · HEAL=Ice Breath · BUFF button cycles the four buffs. ATK always stays the sword</span></div>
         </div>
         <div class="moves-sec">
           <h4>🎯 MOVE &amp; TARGET</h4>
           <div class="move-row"><span class="mk">WASD / stick</span><span class="md">Move AND aim — attacks fly toward your last move direction; the cursor is ignored</span></div>
-          <div class="move-row"><span class="mk">B</span><span class="md">Dash (ground or air, once per jump in air)</span></div>
+          <div class="move-row"><span class="mk">B</span><span class="md">Dash (ground or air, once per jump in air) — but NOT during a GREAT spell, and NOT while Soul Draining</span></div>
+          <div class="move-row"><span class="mk">C (ground) / ROLL</span><span class="md">DODGE ROLL — the skeletons&rsquo; own roll, now yours too: a 0.38s tumble that passes through hits, then a brief <b>OPEN</b> window where hits on you land harder. Their roll ends in the same window now, and neither of you can roll out of a committed move anymore. Skels also have a free short <b>DASH</b> of their own, in any direction, tuned by their genes</span></div>
           <div class="move-row"><span class="mk">V</span><span class="md">BLINK — a short teleport (250) in your move/facing direction · 15 MP · 2.5s cooldown. Through the swarm, out of the corner, gone</span></div>
           <div class="move-row"><span class="mk">Camera</span><span class="md">The arena is a wide circle now and the camera tracks you across it — dashes and blinks actually travel somewhere</span></div>
           <div class="move-row"><span class="mk">Shift</span><span class="md">Toggle MAGIC MODE (see the magic section) — no longer dash</span></div>
@@ -638,8 +641,8 @@ function beep(freq, dur, type, vol){
    turn them live from Pause → 🧬 Evolution Tuning. The defaults ARE the
    shipped balance; Reset restores them. They ride inside save codes. */
 var TUNING_DEFAULTS = {
-  fitDmg:1.6, fitHit:6, fitParry:4, fitTimedParry:9, fitRiposte:7, fitDodge:3, fitReact:1.2,
-  fitBait:8, fitTandem:9, fitGuard:7, fitCounter:5, fitRun:9, fitToss:9, fitSurvival:0.25, fitReactSpeed:3,
+  fitDmg:4, fitHit:3, fitParry:2, fitTimedParry:3, fitRiposte:3, fitDodge:1, fitReact:0.5,
+  fitBait:3, fitTandem:3, fitGuard:2, fitCounter:2, fitRun:3, fitToss:3, fitSurvival:0.1, fitReactSpeed:1,
   mutTactical:0.07, mutGeneric:0.09, mutPhys:0.10, keepBase:0.60, keepFloor:0.38,
   reactFloor:150, reactCeil:300, runSpeed:380, hordeSize:12
 };
@@ -647,7 +650,7 @@ var TUNING = {};
 Object.keys(TUNING_DEFAULTS).forEach(function(k){ TUNING[k] = TUNING_DEFAULTS[k]; });
 function reactRange(){ var lo = Math.min(TUNING.reactFloor, TUNING.reactCeil), hi = Math.max(TUNING.reactFloor, TUNING.reactCeil); return [lo, Math.max(hi, lo + 20)]; }
 var TUNING_DEFS = [
-  { group:'FITNESS — WHAT SELECTION REWARDS', help:'At wave clear, each skeleton scores: (its deeds × these weights) + survival. A fitness-weighted roulette then picks the breeders — fitter is favoured, never guaranteed. Tactical deeds (timed parries, true baits, tandem hits) outweigh raw damage by default: selection is for decision-making, not stats.', items:[
+  { group:'FITNESS — WHAT SELECTION REWARDS', help:'At wave clear, each skeleton scores: (its deeds × these weights) + survival. A fitness-weighted roulette then picks the breeders — fitter is favoured, never guaranteed. Damage dealt to the boss is the strongest single reward by default — pure natural selection, especially in the early waves: no single deed out-earns hurting the boss.', items:[
     { k:'fitDmg', label:'Damage dealt', min:0, max:5, step:0.1 },
     { k:'fitHit', label:'Per hit landed', min:0, max:15, step:0.5 },
     { k:'fitParry', label:'Per parry', min:0, max:12, step:0.5 },
@@ -712,11 +715,12 @@ function driftHue(h, amt){ return ((h + rand(-amt, amt)) % 360 + 360) % 360; }
    teleport across the arena. What separates wave 1000 from wave 1 is mostly
    BEHAVIOUR — timing, baiting, spacing, coordination — selected, never forced. */
 var CAPS = {
-  speed:[0.55,1.45], size:[0.72,1.6], vitality:[0.5,2.0], attackRange:[0.7,1.32],
+  speed:[0.70,1.45], size:[0.72,1.6], vitality:[0.5,2.0], attackRange:[0.7,1.32],
   attackSpeed:[0.65,1.45], parryWindow:[0.7,1.4], swordLen:[0.65,1.9], lunge:[0.7,1.45]
 };
 var MAX_LUNGE_DIST = 175; // world units — the longest single committed lunge, before the lunge gene
-function capStat(k, v){ var c = CAPS[k]; return c ? clamp(v, c[0], c[1]) : v; }
+function isHelter(){ return typeof G !== 'undefined' && !!G && G.mode === 'helter'; }
+function capStat(k, v){ if(isHelter()) return v; var c = CAPS[k]; return c ? clamp(v, c[0], c[1]) : v; } // HELTER SKELTER: caps lifted — boneless skels mutate past every limit, sword length and move speed included
 function swordLenOf(g){ return capStat('swordLen', (g && typeof g.swordLen === 'number') ? g.swordLen : 1); }
 function lungeOf(g){ return capStat('lunge', (g && typeof g.lunge === 'number') ? g.lunge : 1); }
 function baseGenes(){
@@ -797,17 +801,17 @@ function breed(a, b){
       var mut = (Math.random()<0.10) ? rand(0.78, 1.3) : rand(1 - TUNING.mutPhys * 0.8, 1 + TUNING.mutPhys);
       v = capStat(k, (typeof v === 'number' ? v : 1) * mut);
     } else if(k === 'runStamina'){
-      v = clamp((typeof v === 'number' ? v : 0.9) * rand(0.9, 1.12), 0.5, 1.9); // stamina grows slowly, bounded — a minion's lungs, not a marathoner's
+      v = clamp((typeof v === 'number' ? v : 0.9) * rand(0.9, 1.12), 0.5, isHelter() ? 3.5 : 1.9); // stamina grows slowly, bounded — a minion's lungs, not a marathoner's (unbounded-ish in Helter)
     } else if(k === 'parryTiming' || k === 'bait' || k === 'coordination' || k === 'counter' || k === 'flank' || k === 'rangeSense' || k === 'boneSense' || k === 'runDrive' || k === 'tossDrive' || k === 'chargeDrive' || k === 'diveDrive' || k === 'patience'){
       // TACTICAL genes: the real inheritance. Small steps, wide ceiling —
       // timing, baiting and teamwork are what natural selection can keep improving.
       v = (typeof v === 'number' ? v : 0.1) + rand(-TUNING.mutTactical, TUNING.mutTactical * 1.15);
       if(Math.random()<0.07) v += rand(-0.1, 0.16); // occasional insight
-      v = clamp(v, 0, 0.92);
+      v = clamp(v, 0, isHelter() ? 1.6 : 0.92);
     } else {
       v = (typeof v === 'number' ? v : 0) + rand(-TUNING.mutGeneric, TUNING.mutGeneric);
       if(Math.random()<0.08) v += rand(-0.15, 0.22); // occasional wild swing
-      v = clamp(v, 0, 0.92);
+      v = clamp(v, 0, isHelter() ? 1.6 : 0.92);
     }
     g[k] = v;
   }
@@ -817,7 +821,7 @@ function breed(a, b){
    Effective attack speed already lives in attackSpeed; length bends it further. */
 function lenWindup(g){ var L = swordLenOf(g); return 0.55 + 0.5 * L; } // blade length bends the swing: short blades snap out, long blades labour — reach is paid for in windup
 function lenCycle(g){ var L = swordLenOf(g); return 0.7 + 0.35 * L; } // the re-attack cadence follows the same trade — a long sword is slower to swing AGAIN, too
-function sizeSpeed(g){ return clamp(1 + (1 - (g.size || 1)) * 0.7, 0.55, 1.3); } // SIZE IS A TRADEOFF: small skels skitter, big ones lumber — and HP scales the other way (see makeSkel)
+function sizeSpeed(g){ return 1; } // SIZE AND SPEED ARE SEPARATE NOW: body size no longer bends stride at all — the speed gene alone decides how fast a skel moves, and its floor was raised in CAPS so the slowest are a bit less slow. HP still scales with size (see makeSkel).
 /* --- STORY: the horde after the Master starts from fresh graves ---
    The Master's genes do NOT pass on (see the duel branch in update()).
    Wave 1 is deliberately feeble — t=0 is a skeleton barely holding its
@@ -866,7 +870,7 @@ function emitPlayerAction(type){
   skels.forEach(function(s){
     if(s.dead) return;
     var d = Math.hypot(player.x-s.x, player.y-s.y);
-    if(d>340) return;
+    if(d>340 && type !== 'great') return; // a GREAT spell is felt by the whole arena — every skel gets to answer it
     G.reactQueue.push({ at: G.time + ((s.genes.reactMs || 225) / 1000) * rand(0.85, 1.25), s: s, type: type });
   });
 }
@@ -881,12 +885,27 @@ function emitPlayerAction(type){
    5-arrow spread gets five different answers. Ambient stimuli ('move') lean
    slightly lateral / retreat / hold: skels mirror, drift, step back when you
    step back. Pure freshness, selected for like everything else. */
-var REACTION_FAVORED = { heal:'stab', beamCharge:'lateral', shockwaveWindup:'lateral', flash:'dodge',
+var REACTION_FAVORED = { heal:'stab', beamCharge:'lateral', beam:'lateral', shockwaveWindup:'lateral', shockwave:'dodge', flash:'dodge',
   dash:'swipe', blink:'swipe', buff:'throwSword', magicToggle:'dashIn',
   jump:'retreat', diagStrike:'dodge', pound:'dodge', chain:'run', flame:'run', ice:'retreat', pillar:'dodge',
-  spell:'run', great:'dodge', soulDrain:'stab' };
+  spell:'run', arrowDraw:'dodge', earthPush:'dodge', great:'dodge', soulDrain:'stab', riposte:'parry', target:'lateral' };
 function pickWeightedReaction(s, type){
   var g = s.genes;
+  /* EARLY WAVES ARE NEUTRAL (waves 1–9): no favoured answer, no observation
+     leans, no counter bonus — every option starts near-equal and only the
+     skel's own bred reaction weights tilt it, slightly. Pure natural
+     selection: the strongest pressure is the fitness rule (damage to the
+     boss pays most), not a designer's thumb on the dice. */
+  if((G.wave || 1) <= 9){
+    var EW = { dodge:0.6+(g.rwDodge||0.8)*0.4, parry:0.6+(g.rwParry||0.7)*0.4, dashIn:0.8, run:0.6+(g.rwRun||0.8)*0.4, lateral:0.6+(g.rwLateral||0.8)*0.4,
+               feint:0.8, jump:0.6+(g.rwAttack||0.8)*0.4, stab:0.6+(g.rwAttack||0.8)*0.4, swipe:0.6+(g.rwAttack||0.8)*0.4,
+               retreat:0.6+(g.rwRetreat||0.7)*0.4, hold:0.8, throwSword:0.6+(g.rwThrow||0.7)*0.4 };
+    var etotal = 0, ekeys = Object.keys(EW);
+    ekeys.forEach(function(k){ etotal += EW[k]; });
+    var eroll = Math.random() * etotal, epick = 'hold';
+    for(var ei2 = 0; ei2 < ekeys.length; ei2++){ eroll -= EW[ekeys[ei2]]; if(eroll <= 0){ epick = ekeys[ei2]; break; } }
+    return epick;
+  }
   var W = { dodge:(g.rwDodge||0.8), parry:(g.rwParry||0.7)*0.8, dashIn:0.55, run:(g.rwRun||0.8), lateral:(g.rwLateral||0.8),
             feint:0.45, jump:(g.rwAttack||0.8)*0.45, stab:(g.rwAttack||0.8), swipe:(g.rwAttack||0.8)*0.9,
             retreat:(g.rwRetreat||0.7), hold:0.55, throwSword:(g.rwThrow||0.7) };
@@ -927,6 +946,37 @@ function pickWeightedReaction(s, type){
   if(fav && pick === fav && Math.random() < (g.counter || 0) + 0.25) s.counterHits = (s.counterHits || 0) + 1; // answered right BECAUSE the counter gene leaned — selection hears about it
   return pick;
 }
+/* --- SKEL ROLL & DASH — shared movement rules ---
+   A roll can NO LONGER cancel a committed move: no rolling out of a charge,
+   a lunge, a jump, a strike or a riposte. Rolls only start from a free body
+   (approach / feint), respect a small cooldown, and end in a short
+   VULNERABLE window (rollVulnT — damage taken there is +35%, see damageSkel).
+   The DASH is the new bolster: a short burst like the player's, in ANY
+   direction, costing NO energy — its frequency is the bred dash gene and
+   the reaction weights, never a script. */
+function canSkelRoll(s){
+  if(!s || s.dead || (s.dodgeCd||0) > 0 || (s.dodgeTime||0) > 0) return false;
+  if(s.freezeT > 0 || (s.stunT||0) > 0 || (s.launchT||0) > 0 || (s.launchH||0) > 4) return false;
+  return s.state === 'approach' || s.state === 'feint';
+}
+function startSkelRoll(s, ang, dur){
+  if(!canSkelRoll(s)) return false;
+  s.dodgeTime = dur || 0.32; s.dodgeDx = Math.cos(ang); s.dodgeDy = Math.sin(ang);
+  return true;
+}
+function canSkelDash(s){
+  if(!s || s.dead || (s.skelDashCd||0) > 0 || (s.skelDashTime||0) > 0) return false;
+  if(s.freezeT > 0 || (s.stunT||0) > 0 || (s.launchT||0) > 0 || (s.launchH||0) > 4 || s.state === 'tossed') return false;
+  return s.state === 'approach' || s.state === 'feint' || s.state === 'recover';
+}
+function startSkelDash(s, ang){
+  if(!canSkelDash(s)) return false;
+  s.skelDashTime = 0.19; s.skelDashDx = Math.cos(ang); s.skelDashDy = Math.sin(ang);
+  s.skelDashCd = rand(1.2, 2.0) - (s.genes.dash || 0) * 0.5; // bred dash gene shortens the wait — and it costs NO energy, like yours
+  s.face = ang;
+  floater(s.x, s.y-22, 'dash!', '#f2c14e');
+  return true;
+}
 function doReaction(s, type){
     if(s.dead || s.reactionCd>0) return;
     var d = Math.hypot(player.x-s.x, player.y-s.y);
@@ -934,8 +984,9 @@ function doReaction(s, type){
     // PARRY READS happen on the threat itself, before the random reaction:
     // an ARMED skel that reads an incoming attack schedules a timed stance
     // (see scheduleParry). Unarmed skels cannot parry — no sword, no guard.
-    if(s.hasSword && (type==='attack' || type==='flurry' || type==='spell' || type==='chain' || type==='beamCharge' || type==='shockwaveWindup' || type==='diagStrike')){
-      scheduleParry(s, type==='beamCharge' || type==='shockwaveWindup' ? 0.45 : 0.12);
+    if(s.hasSword && (type==='attack' || type==='flurry' || type==='spell' || type==='chain' || type==='beamCharge' || type==='beam' || type==='shockwaveWindup' || type==='shockwave' || type==='diagStrike' || type==='flame' || type==='ice' || type==='pillar' || type==='earthPush' || type==='great' || type==='arrowDraw' || type==='pound' || type==='riposte' || type==='soulDrain')){
+      // PARRY ANYTHING: ranged attacks and ALL magic are parry-timing reads too — arrows, bolts, beams, flames, ice, pillars, earth, even a GREAT spell. The stance still has to be up when it lands.
+      scheduleParry(s, (type==='beamCharge' || type==='shockwaveWindup' || type==='great' || type==='pillar') ? 0.45 : 0.12);
     }
     // THE ANSWER IS A WEIGHTED ROLL, not a script (see pickWeightedReaction):
     // the counter gene leans the dice toward the right reply to THIS ability —
@@ -948,23 +999,23 @@ function doReaction(s, type){
     var choice = pickWeightedReaction(s, type);
     var toP = Math.atan2(player.y-s.y, player.x-s.x);
     if(choice==='dodge'){
-      s.dodgeTime=0.34; s.dodges=(s.dodges||0); var side=Math.random()<0.5?1:-1;
+      var side=Math.random()<0.5?1:-1;
       var da = toP + (Math.random()<0.5?Math.PI:side*rand(0.6,1.6));
-      s.dodgeDx=Math.cos(da); s.dodgeDy=Math.sin(da); floater(s.x,s.y-22,'react: roll','#a79f8a');
+      if(startSkelRoll(s, da, 0.34)){ s.dodges=(s.dodges||0); floater(s.x,s.y-22,'react: roll','#a79f8a'); }
     } else if(choice==='parry'){
       if(s.hasSword) scheduleParry(s, 0); // a reaction parry is still a TIMED stance — early or late, it can whiff and be punished
-      else { s.dodgeTime=0.3; s.dodgeDx=Math.cos(toP+Math.PI/2); s.dodgeDy=Math.sin(toP+Math.PI/2); } // unarmed: all it can do is scramble aside
+      else startSkelRoll(s, toP+Math.PI/2, 0.3); // unarmed: all it can do is scramble aside
     } else if(choice==='dashIn'){
-      s.dodgeTime=0.28; s.dodgeDx=Math.cos(toP); s.dodgeDy=Math.sin(toP); floater(s.x,s.y-22,'react: dash in!','#f2c14e');
+      if(!startSkelDash(s, toP)) startSkelRoll(s, toP, 0.28); // a real DASH in — free, any direction, no energy
     } else if(choice==='run'){
       // break into a RUN (handled in updateSkel's approach state) — needs legs, a sword arm free, and stamina in the tank
       if(s.hasSword && s.state==='approach' && (s.runEnergy||100) > 30 && (s.windedT||0) <= 0){ s.running = true; s.runMode = 'chase'; floater(s.x,s.y-22,'react: RUN!','#e05252'); }
-      else { s.dodgeTime=0.28; s.dodgeDx=Math.cos(toP); s.dodgeDy=Math.sin(toP); }
+      else if(!startSkelDash(s, toP)) startSkelRoll(s, toP, 0.28);
     } else if(choice==='lateral'){
-      s.dodgeTime=0.3; var la=toP+(Math.random()<0.5?Math.PI/2:-Math.PI/2)+rand(-0.4,0.4);
-      s.dodgeDx=Math.cos(la); s.dodgeDy=Math.sin(la); floater(s.x,s.y-22,'react: sidestep','#a79f8a');
+      var la=toP+(Math.random()<0.5?Math.PI/2:-Math.PI/2)+rand(-0.4,0.4);
+      if(startSkelRoll(s, la, 0.3)) floater(s.x,s.y-22,'react: sidestep','#a79f8a');
     } else if(choice==='retreat'){
-      s.dodgeTime=0.26; s.dodgeDx=Math.cos(toP+Math.PI+rand(-0.5,0.5)); s.dodgeDy=Math.sin(toP+Math.PI+rand(-0.5,0.5));
+      if(!startSkelDash(s, toP+Math.PI+rand(-0.5,0.5))) startSkelRoll(s, toP+Math.PI+rand(-0.5,0.5), 0.26);
     } else if(choice==='feint' && s.state==='approach'){ s.state='feint'; s.stateT=0.3; }
     else if(choice==='jump' && s.state==='approach' && s.atkCd<=0.2){ s.atkType='jump'; s.state='jumpWindup'; s.stateT=0.46*lenWindup(s.genes)/(s.genes.attackSpeed||1); s.windupHitDone=false; }
     else if(choice==='stab' && s.state==='approach' && s.atkCd<=0.2){ s.atkType='stab'; s.state='stabWindup'; s.stateT=0.34*lenWindup(s.genes)/(s.genes.attackSpeed||1); s.windupHitDone=false; s.stabDx=Math.cos(toP); s.stabDy=Math.sin(toP); }
@@ -979,7 +1030,7 @@ var G = {
   wave:0, generation:1, time:0, betweenTimer:0, state:'menu', // menu | fight | between | over
   genePool:[], lastAverages:null, logLines:[],
   shake:0, flash:0,
-  mode:'survival',           // 'survival' | 'story'
+  mode:'survival',           // 'survival' | 'story' | 'helter' (Helter Skelter — boneless, caps lifted)
   bones:0, totalBones:0,     // story-mode currency (totalBones drives the bone-form)
   duel:false,                // story: master duel in progress
   pendingGenes:null          // exact gene set from a loaded save state, used once
@@ -995,7 +1046,7 @@ function newPlayer(){
     face: -Math.PI/2, speed: 265,
     atkCd:0, atkAnim:0, atkDidHit:false,
     spellCd:0, shockCd:0, shockWindup:0, flashCd:0, arrowCharge:0, arrowCharging:false,
-    beamCd:0, beamCharge:0, beamTime:0, beamHitT:0, beamDir:0, healCd:0, healCast:0, dashCd:0, dashTime:0, dashDx:0, dashDy:0,
+    beamCd:0, beamCharge:0, beamTime:0, beamHitT:0, beamDir:0, healCd:0, healCast:0, dashCd:0, dashTime:0, dashDx:0, dashDy:0, rollTime:0, rollDx:0, rollDy:0, rollCd:0, rollVulnT:0, // DODGE ROLL — the skeletons' own roll, mirrored: same duration, same speed, same end-of-roll vulnerability
     blinkCd:0, parryT:0, parryCd:0, riposteT:0, // BLINK teleport · PARRY window on a fresh shield-raise · optional RIPOSTE window after a parry
     magicMode:false, // SHIFT toggles this: right-hand keys become spells & buffs instead of sword kit
     chainCd:0, flameCd:0, flameTime:0, flameHitT:0, pillarCd:0, iceCd:0, iceTime:0, iceHitT:0,
@@ -1064,7 +1115,7 @@ function makeSkel(genes, x, y){
   if(typeof genes.diveDrive !== 'number') genes.diveDrive = rand(0.04, 0.22);
   if(typeof genes.patience !== 'number') genes.patience = rand(0.1, 0.4);
   if(typeof genes.reactMs !== 'number') genes.reactMs = rand(170, 300); // pre-reaction-time saves seed mid-range; clamped into the tuned human band
-  genes.reactMs = clamp(genes.reactMs, reactRange()[0], reactRange()[1]);
+  genes.reactMs = isHelter() ? clamp(genes.reactMs, 60, 420) : clamp(genes.reactMs, reactRange()[0], reactRange()[1]); // HELTER: reaction limits lifted too
   ['rwDodge','rwLateral','rwParry','rwRun','rwAttack','rwThrow','rwRetreat'].forEach(function(k){ if(typeof genes[k] !== 'number') genes[k] = rand(0.3, 1.2); });
   if(typeof genes.boneSat !== 'number') genes.boneSat = rand(24, 44);
   if(typeof genes.boneLight !== 'number') genes.boneLight = rand(72, 86);
@@ -1081,13 +1132,13 @@ function makeSkel(genes, x, y){
   // while speed scales the other way (sizeSpeed). A wide HP range results — and
   // the biggest, toughest late-wave skels can carry up to 206 HP: the boss's own
   // number of bones, never more.
-  var baseHp = clamp(Math.round((18 + hpBonus) * (genes.vitality || 1) * Math.pow(sz, 1.6)), 8, 206);
+  var baseHp = clamp(Math.round((18 + hpBonus) * (genes.vitality || 1) * Math.pow(sz, 1.6)), 8, isHelter() ? 999 : 206); // HELTER: even the boss's own 206 ceiling is lifted
   return {
     id: nextSkelId++, x:x, y:y, r: Math.max(5, 15*sz), genes:genes,
     hp: baseHp, maxHp: baseHp,
     face: Math.PI/2, state:'approach', stateT: rand(0,0.3),
     atkCd: rand(0.4, 1.4), windupHitDone:false, atkType:'basic',
-    dodgeTime:0, dodgeDx:0, dodgeDy:0,
+    dodgeTime:0, dodgeDx:0, dodgeDy:0, dodgeCd:0, rollVulnT:0, skelDashTime:0, skelDashDx:0, skelDashDy:0, skelDashCd:rand(0.5,1.5), riposteDir:0, riposteDash:false,
     parryTime:0, parryActive:false, parryCd:0, parryIntentT:-1, parryWhiffT:0, parryReadCd:0,
     timedParries:0, baitWins:0, baitChecked:false, coordHits:0, guardHits:0, counterHits:0, runHits:0, tossHits:0, flankSlot: rand(0, TAU), lungeDist:0,
     hazardCd:0, tossCd: rand(1.5, 4), tossT:0, tossDur:0, tossH:0, tossFromX:0, tossFromY:0, tossToX:0, tossToY:0, tossHitDone:false, tossById:null,
@@ -1105,7 +1156,7 @@ function makeSkel(genes, x, y){
   };
 }
 
-function waveSize(n){ return Math.round(TUNING.hordeSize); } // horde size — 12 by default (was 8; user: underwhelming), tunable in the Evolution Tuning panel
+function waveSize(n){ var base = Math.round(TUNING.hordeSize); if(typeof G !== 'undefined' && G.mode !== 'story') base += Math.floor((n || 1) / 10); return Math.min(base, 28); } // horde size — 12 by default, tunable — PLUS survival pressure: every 10 waves adds +1 skel on top of evolution (wave 10: 13, wave 20: 14, wave 100: 22)
 
 function spawnWave(){
   G.wave++;
@@ -1132,17 +1183,9 @@ function spawnWave(){
   if(G.mode === 'story' && G.wave === 2 && !fromSave){
     genesList.forEach(function(g){ dampenGenes(g, 0.72); }); // wave 2 is bred from wave 1's survivors — still shaky on purpose
   }
-  if(G.mode === 'survival' && !fromSave && G.wave >= 8){
-    // STEEPER RAMP — the FRONT-RUNNER: from wave 8, one skel per wave (two from
-    // wave 18) rises "seasoned": its TACTICAL genes nudged up, stats untouched.
-    // Not forced behaviour — just a stronger seed in the pool for selection to judge.
-    var elites = G.wave >= 18 ? 2 : 1;
-    for(var ei = 0; ei < elites && ei < genesList.length; ei++){
-      var eg = genesList[ei];
-      ['parryTiming','coordination','counter','runDrive','rangeSense','flank','bait'].forEach(function(k){ if(typeof eg[k] === 'number') eg[k] = clamp(eg[k] + 0.1, 0, 0.92); });
-      eg.runStamina = clamp((eg.runStamina || 0.9) + 0.15, 0.5, 1.9);
-    }
-  }
+  // NO SEEDED ELITES ANYMORE: the old front-runner nudge (tactical genes +0.1
+  // from wave 8) was a bias favouring particular decisions. It is gone — early
+  // waves are pure natural selection now, and what spreads is what hurt you.
   skels = []; thrownSwords = [];
   G.waveStats = { t0: G.time, actions:0, dmgDealt:0, healed:0, parries:0, ripostes:0, skelDmg:0, swordHits:0, tossHits:0, skelParries:0, kills:0 };
   var wsEl = document.getElementById('wave-stats'); if(wsEl) wsEl.className = '';
@@ -1241,7 +1284,7 @@ function selectAndBreed(){
     // raw damage, because they are the behaviours worth inheriting. Nothing is
     // forced: the roulette below still decides, this only tilts the wheel.
     var engagement = s.dmgDealt*TUNING.fitDmg + s.hits*TUNING.fitHit + s.parries*TUNING.fitParry + (s.timedParries||0)*TUNING.fitTimedParry + (s.ripostes||0)*TUNING.fitRiposte +
-      s.dodges*TUNING.fitDodge + (s.reactions||0)*TUNING.fitReact + (s.baitWins||0)*TUNING.fitBait + (s.coordHits||0)*TUNING.fitTandem + (s.guardHits||0)*TUNING.fitGuard + (s.counterHits||0)*TUNING.fitCounter + (s.runHits||0)*TUNING.fitRun + (s.tossHits||0)*TUNING.fitToss + (s.chargeHits||0)*7 + (s.diveHits||0)*7; // a hit landed by RUNNING the boss down — or by being THROWN at them — pays like a tandem hit: teamwork is what selection rewards. ALL weights live in TUNING (Pause → Evolution Tuning).
+      s.dodges*TUNING.fitDodge + (s.reactions||0)*TUNING.fitReact + (s.baitWins||0)*TUNING.fitBait + (s.coordHits||0)*TUNING.fitTandem + (s.guardHits||0)*TUNING.fitGuard + (s.counterHits||0)*TUNING.fitCounter + (s.runHits||0)*TUNING.fitRun + (s.tossHits||0)*TUNING.fitToss + (s.chargeHits||0)*3 + (s.diveHits||0)*3; // a hit landed by RUNNING the boss down — or by being THROWN at them — pays like a tandem hit: teamwork is what selection rewards. ALL weights live in TUNING (Pause → Evolution Tuning).
     // REACTION SPEED: faster is simply better (as in life) — a small bonus scaled
     // by where the skel's reactMs sits inside the human range, so over generations
     // selection visibly shaves the horde's lag toward the floor.
@@ -1288,7 +1331,7 @@ function updateHUD(){
   document.getElementById('mp-num').textContent = Math.floor(player.mp) + ' / ' + player.maxMp;
   document.getElementById('wave-num').textContent = G.duel ? 'DUEL' : (G.wave || '–');
   document.getElementById('gen-num').textContent = G.generation;
-  document.getElementById('mode-num').textContent = G.mode === 'story' ? 'STORY' : 'SURVIVAL';
+  document.getElementById('mode-num').textContent = G.mode === 'story' ? 'STORY' : (G.mode === 'helter' ? 'HELTER SKELTER' : 'SURVIVAL');
   var bs = document.getElementById('bones-stat');
   bs.style.display = G.mode === 'story' ? '' : 'none';
   document.getElementById('bones-num').textContent = G.bones;
@@ -1340,7 +1383,7 @@ function refreshAbilityBar(){
   }
   else if(player.rekkaWindowT > 0){ setAB('ab-atk', 1, 'CHAIN! next = STEP ' + (player.rekkaStep + 1), 'ready'); setAB('ab-vert', 1, 'CHAIN! next = STEP ' + (player.rekkaStep + 1), 'ready'); }
   else { chip('ab-atk', player.atkCd, 0.45, false, true); chip('ab-vert', player.atkCd, 0.45, false, true); }
-  if(player.arrowCharging) setAB('ab-spell', player.arrowCharge / 0.42, player.arrowCharge >= 0.42 ? '5 ARROWS — RELEASE!' : (player.arrowCharge >= 0.16 ? '3 ARROWS…' : 'DRAWING…'), 'nomp');
+  if(player.arrowCharging) setAB('ab-spell', player.arrowCharge / 2.0, player.arrowCharge >= 2.0 ? 'ITANO CIRCUS — 20 TRACKING — RELEASE!' : (player.arrowCharge >= 1.5 ? '15 ARROWS — RELEASE!' : (player.arrowCharge >= 1.1 ? '10 ARROWS…' : (player.arrowCharge >= 0.75 ? '7 ARROWS…' : (player.arrowCharge >= 0.42 ? '5 ARROWS…' : (player.arrowCharge >= 0.16 ? '3 ARROWS…' : 'DRAWING…'))))), 'nomp');
   else chip('ab-spell', player.spellCd, 0.3, story && !player.unlocks.spell, true); // arrows are FREE — no mana, ever
   if(player.shockWindup > 0) setAB('ab-shock', 1 - player.shockWindup / 0.32, 'WINDING UP…', 'nomp');
   else chip('ab-shock', player.shockCd, 1.6, story && !player.unlocks.shock, player.mp >= 30);
@@ -1353,6 +1396,7 @@ function refreshAbilityBar(){
   chip('ab-earth', player.earthCd, 5, false, player.mp >= 26);
   chip('ab-heal', Math.max(player.healCd, player.healCast), 4.5, story && !player.unlocks.heal, player.mp >= 32);
   chip('ab-dash', player.dashCd, player.unlocks.mob3 ? 0.45 : 0.9, story && !player.unlocks.dash, true);
+  if((player.rollTime||0) > 0) setAB('ab-roll', 1, 'ROLLING!', 'ready'); else if((player.rollVulnT||0) > 0) setAB('ab-roll', 1, 'OPEN — ROLL RECOVERY!', 'cd'); else chip('ab-roll', player.rollCd, 1.0, false, true);
   chip('ab-blink', player.blinkCd, 2.5, story && !player.unlocks.dash, player.mp >= 15);
   if(player.riposteT > 0) setAB('ab-parry', 1, 'RIPOSTE — J!', 'ready');
   else if(player.parryT > 0) setAB('ab-parry', 1, 'PARRYING!', 'ready');
@@ -1434,7 +1478,7 @@ window.addEventListener('keydown', function(e){
   if(e.code === 'Digit2'){ if(magic) tryGreat('ice'); }
   if(e.code === 'Digit3'){ if(magic) tryGreat('thunder'); }
   if(e.code === 'Digit4'){ if(magic) tryGreat('quake'); }
-  if(e.code === 'KeyC') tryGroundPound(); // GROUND POUND trigger, stated plainly: Space again or C while airborne. S is movement only — never a pound.
+  if(e.code === 'KeyC'){ if(player && player.airT > 0) tryGroundPound(); else tryRoll(); } // C: GROUND POUND while airborne — and on the ground, C is your DODGE ROLL, the skeletons' own roll. S is movement only — never a pound.
   if(e.code === 'KeyH'){ if(magic) castBuff('regen'); else tryHeal(); }
   if(e.code === 'KeyK'){ if(magic) tryFlame(); else pressV(); } // K is the VERTICAL rekka now — arrows moved to R. From a standstill, HOLDING K charges the wind-slice slice instead
   if(e.code === 'KeyR'){ if(!magic) startArrowCharge(); } // ARROWS live on R now (free bow, tap/hold-release as before)
@@ -1515,6 +1559,7 @@ function updateTouchLabels(){
   var mg = document.getElementById('tb-magic'); if(mg) mg.classList.toggle('pressed', !!m);
 }
 bindBtn('tb-dash',   function(){ tryDash(); });
+bindBtn('tb-roll',   function(){ if(player && player.airT > 0) tryGroundPound(); else tryRoll(); });
 bindBtn('tb-blink',  function(){ tryBlink(); });
 bindBtn('tb-jump',   function(){ tryJump(); });
 bindBtn('tb-pound',  function(){ tryGroundPound(); });
@@ -1556,11 +1601,13 @@ function releaseAttack(){ releaseMeleeCharge(); } // releasing the mouse ends a 
    While charging you move a little slower (0.72×) — power has a posture. */
 function pressH(){
   if(!player) return;
+  if(player.drainTarget) return; // rooted in the drain — no swinging
   if(player.airT > 0 || player.riposteT > 0 || player.rekkaT > 0 || player.rekkaWindowT > 0) meleePress('H');
   else startMeleeCharge('H');
 }
 function pressV(){
   if(!player) return;
+  if(player.drainTarget) return; // rooted in the drain — no swinging
   if(player.airT > 0 || player.rekkaT > 0 || player.rekkaWindowT > 0) meleePress('V');
   else startMeleeCharge('V');
 }
@@ -1815,6 +1862,7 @@ function kitLocked(what){
   beep(120, 0.12, 'square', 0.04);
 }
 function tryShockwave(){
+  if(playerDraining()) return;
   if(!G.running || G.paused || G.over || !player || player.stagger > 0) return;
   if(G.mode === 'story' && !player.unlocks.shock){ kitLocked('Shockwave'); return; }
   if(player.shockCd > 0 || player.shockWindup > 0 || player.mp < 30 || player.healCast > 0) return;
@@ -1870,6 +1918,7 @@ function fireShockwave(){
    seconds — while blind their vision range collapses (they wander instead of tracking you)
    and most of their swings simply miss. Costly and slow to recharge: it's a reset button. --- */
 function tryFlash(){
+  if(playerDraining()) return;
   if(!G.running || G.paused || G.over || !player || player.stagger > 0) return;
   if(G.mode === 'story' && !player.unlocks.flash){ kitLocked('Solar Flash (Fire tree: Boss Beam tier)'); return; }
   if(player.flashCd > 0 || player.mp < 40 || player.healCast > 0) return;
@@ -1896,6 +1945,7 @@ function tryFlash(){
    while firing. No more firing down an empty straight line. Its total damage
    still loses to the sword up close, on purpose. */
 function tryBeam(){
+  if(playerDraining()) return;
   if(!G.running || G.paused || G.over || !player || player.stagger > 0) return;
   if((player.hitStunT || 0) > 0) return;
   if(G.mode === 'story' && !player.unlocks.beam){ kitLocked('Boss Beam'); return; }
@@ -1948,6 +1998,7 @@ function beamTick(){
    AoEs are big — and every point of it costs real mana. All of it is
    parry-able. Yes, even the lightning. The sword is a concept. */
 function toggleMagic(){
+  if(playerDraining()) return; // swapping hands is doing something else — release the drain with T first
   if(!player || !G.running || G.over) return;
   player.drainTarget = null; // swapping hands drops the soul tether
   player.magicMode = !player.magicMode;
@@ -1961,6 +2012,7 @@ function magicGate(what, ok){
   return false;
 }
 function tryChain(){
+  if(playerDraining()) return;
   if(!G.running || G.paused || G.over || !player || player.stagger > 0) return;
   if((player.hitStunT || 0) > 0) return;
   if(magicGate('Chain Lightning (Fire tree: Arrows tier)', player.unlocks.spell)) return;
@@ -2014,6 +2066,7 @@ function updateChain(dt){
   beep(1180 - cs.hops * 60, 0.07, 'sawtooth', 0.045);
 }
 function tryFlame(){
+  if(playerDraining()) return;
   // HELD CHANNEL: no cooldown, no upfront cost. Hold K (magic) and it burns,
   // draining mana every second, until you let go or the mana runs dry.
   if(!G.running || G.paused || G.over || !player || player.stagger > 0) return;
@@ -2038,7 +2091,7 @@ function flameTick(){
     if(sk.parryTime > 0) return; // holding the parry against the flames — the blade glows, nothing burns
     if(rollParry(sk, 0.3)){ resolveParry(sk, 'flame'); return; }
     if(canEvade(sk)) return;
-    damageSkel(sk, 10, ang, 4); // ~95 total across a full channel, if they just stand in it
+    damageSkel(sk, 15, ang, 4); // BUFFED: 15 a tick (was 10) — ~140 across a full channel if they just stand in it. Flame was underused; now it hurts.
     applyBurn(sk); // and what the flame touches keeps burning after it passes
   });
   for(var i=0;i<4;i++){
@@ -2047,6 +2100,7 @@ function flameTick(){
   }
 }
 function tryIce(){
+  if(playerDraining()) return;
   // HELD CHANNEL, same deal as the flamethrower: hold L (magic), mana drains, breath flows.
   if(!G.running || G.paused || G.over || !player || player.stagger > 0) return;
   if((player.hitStunT || 0) > 0) return;
@@ -2087,6 +2141,7 @@ function iceTick(){
   }
 }
 function tryPillar(){
+  if(playerDraining()) return;
   if(!G.running || G.paused || G.over || !player || player.stagger > 0) return;
   if((player.hitStunT || 0) > 0) return;
   if(magicGate('Fire Pillar (Fire tree: Ember Heart)', player.unlocks.fire3)) return;
@@ -2151,6 +2206,7 @@ function trySoulDrain(){
   var tgt = (player.lockTarget && !player.lockTarget.dead) ? player.lockTarget : nearestSkel(player.x, player.y, 330);
   if(!tgt){ floater(player.x, player.y - 44, 'SOUL DRAIN — no soul in reach', '#a79f8a'); return; }
   if(Math.hypot(tgt.x - player.x, tgt.y - player.y) > 340){ floater(player.x, player.y - 44, 'SOUL DRAIN — too far', '#a79f8a'); return; }
+  if(iceStormActive()){ floater(player.x, player.y - 48, 'SOUL DRAIN — NOT DURING THE ICE STORM', '#5ec8d8'); beep(140, 0.12, 'square', 0.04); return; } // the storm's cold breaks the tether's grip — thunder is fine, ice is not
   cancelSpinForCast();
   player.drainTarget = tgt; player.drainTickT = 0;
   floater(tgt.x, tgt.y - 48, 'SOUL DRAINED — PARALYZED!', '#b26ae0');
@@ -2163,6 +2219,7 @@ function trySoulDrain(){
 function updateSoulDrain(dt){
   var tgt = player.drainTarget;
   if(!tgt) return;
+  if(iceStormActive()){ player.drainTarget = null; floater(player.x, player.y - 48, 'DRAIN BROKEN — THE ICE STORM', '#5ec8d8'); return; }
   if(tgt.dead || Math.hypot(tgt.x - player.x, tgt.y - player.y) > 430){
     player.drainTarget = null;
     floater(player.x, player.y - 48, tgt.dead ? 'SOUL CONSUMED' : 'DRAIN BROKEN — OUT OF RANGE', '#c792ea');
@@ -2199,6 +2256,7 @@ function updateSoulDrain(dt){
    · GREAT EARTHQUAKE (4): the ground erupts around you for ~3s in random
      patches — damage plus a knock-UP. You fight through it. */
 function tryGreat(kind){
+  if(playerDraining()) return; // nothing else during the drain — not even greatness
   if(!G.running || G.paused || G.over || !player || player.stagger > 0) return;
   // NOTE: no hitStunT check — the great spells are UNINTERRUPTIBLE. That is their job.
   if(G.mode === 'story'){ // Story earns its kit — the great spells hang off the same trees as their lesser kin
@@ -2247,11 +2305,11 @@ function updateQuakeSlam(dt){
   if(player.quakeSlamT > 0) return;
   player.jumpH = 0;
   player.quakeFreezeT = 0.55; // frozen in the crater while they fly — the pose is the point
-  shockwaves.push({ x: player.x, y: player.y, r: 24, maxR: 350, life: 0.5, max: 0.5, speed: 700 });
+  shockwaves.push({ x: player.x, y: player.y, r: 24, maxR: 520, life: 0.5, max: 0.5, speed: 1040 }); // MUCH bigger than the other greats now (was 350) — the whole crowd goes up
   skels.forEach(function(s){
     if(s.dead) return;
     var d = Math.hypot(s.x - player.x, s.y - player.y);
-    if(d > 350 + s.r) return; // EVERYONE in the circle, right off the bat — no patches, no luck
+    if(d > 520 + s.r) return; // EVERYONE in the (now much bigger) circle, right off the bat — no patches, no luck
     if(parryCheck(s, 'great')) return;
     var ang = Math.atan2(s.y - player.y, s.x - player.x);
     damageSkel(s, 24, ang, 10);
@@ -2279,7 +2337,7 @@ function updateGreatFlame(dt){
     for(var arm = 0; arm < 3; arm++){
       var aa = player.greatFlameBase + el * 3.6 + arm * (TAU / 3);
       var bx = clampArena(player.x + Math.cos(aa) * rad, player.y + Math.sin(aa) * rad, 24);
-      spellZones.push({ kind:'burst', fire:true, x: bx.x, y: bx.y, r:64, t:0.17, dmg:16, hitIds:[] });
+      spellZones.push({ kind:'burst', fire:true, x: bx.x, y: bx.y, r:64, t:0.17, dmg:21, hitIds:[] }); // Great Flame buffed with the rest of the flame family (was 16)
     }
     spawnParticles(player.x + rand(-30, 30), player.y + rand(-30, 30), '#e07840', 3, 150);
     if(Math.random() < 0.4) beep(90, 0.08, 'sawtooth', 0.025);
@@ -2425,6 +2483,7 @@ function meleeWallCheck(range, arc, spin){
   });
 }
 function tryEarthPush(){
+  if(playerDraining()) return;
   if(!G.running || G.paused || G.over || !player || player.stagger > 0) return;
   if((player.hitStunT || 0) > 0) return;
   if(player.earthCd > 0 || player.mp < 26 || player.healCast > 0) return;
@@ -2433,7 +2492,7 @@ function tryEarthPush(){
   player.earthCd = 5; player.mp -= 26;
   // THE WAVE: born at your feet, rolling forward. Hits resolve in
   // updateEarthWaves() as the front reaches each skel — nothing is instant.
-  earthWaves.push({ x: player.x, y: player.y, face: player.face, r: 12, maxR: 205, arc: 1.08, speed: 240, hitIds: [], done: false });
+  earthWaves.push({ x: player.x, y: player.y, face: player.face, r: 12, maxR: 265, arc: 1.35, speed: 265, hitIds: [], done: false }); // WIDER now: bigger arc (1.35) and longer reach (265) — a real crowd-mover
   floater(player.x, player.y - 50, 'EARTH PUSH — WAVE ROLLING…', '#e0a458');
   beep(70, 0.25, 'sine', 0.09);
   G.shake = Math.max(G.shake, 3);
@@ -2465,11 +2524,11 @@ function updateEarthWaves(dt){
     if(wv.r >= wv.maxR){
       // THE WALL RISES — only now, where the wave spent itself (~150 ahead).
       wv.done = true;
-      var wp0 = clampArena(wv.x + Math.cos(wv.face) * 150, wv.y + Math.sin(wv.face) * 150, 60);
-      walls.push({ x: wp0.x, y: wp0.y, ang: wv.face + Math.PI / 2, half: 80, hp: 3, maxHp: 3, dead: false }); // 3 hits of armor — for now
+      var wp0 = clampArena(wv.x + Math.cos(wv.face) * 195, wv.y + Math.sin(wv.face) * 195, 60);
+      walls.push({ x: wp0.x, y: wp0.y, ang: wv.face + Math.PI / 2, half: 125, hp: 4, maxHp: 4, dead: false }); // BIGGER WALL: 250 wide (was 160), 4 hits of armor to match
       if(walls.length > 2){ var oldW = walls.shift(); floater(oldW.x, oldW.y - 24, 'the oldest wall crumbles', '#a79f8a'); }
       spawnParticles(wp0.x, wp0.y, '#b09a72', 18, 170);
-      floater(wp0.x, wp0.y - 34, 'WALL UP (3 HITS)', '#e0a458');
+      floater(wp0.x, wp0.y - 34, 'WALL UP (4 HITS)', '#e0a458');
       beep(120, 0.18, 'triangle', 0.06);
       G.shake = Math.max(G.shake, 4);
     }
@@ -2485,6 +2544,7 @@ var BUFFS = {
   siphon:{ name:'SIPHON',      cost:45, dur:8, key:'buffSiphonT', unlock:'heal', tree:'Shielding tree: Mend',       color:'#e05252', desc:'lifesteal — 22% of damage dealt returns as HP · but you take +25% damage and mana does not regen while it burns' }
 };
 function castBuff(kind){
+  if(playerDraining()) return;
   if(!G.running || G.paused || G.over || !player || player.stagger > 0) return;
   if((player.hitStunT || 0) > 0) return;
   var b = BUFFS[kind]; if(!b) return;
@@ -2517,6 +2577,7 @@ function tryBuffCycle(){ // touch: one BUFF button walks the four buffs
    (24–48). The bow is for reach, chip, and kiting. The sword is for killing. */
 function trySpell(){ startArrowCharge(); releaseArrows(); } // legacy instant path (mouse right-click): a single tap arrow
 function startArrowCharge(){
+  if(playerDraining()) return;
   if(!G.running || G.paused || G.over || !player || player.stagger > 0) return;
   if((player.hitStunT || 0) > 0) return;
   if(G.mode === 'story' && !player.unlocks.spell){ kitLocked('Arrows (Fire tree, first tier)'); return; }
@@ -2533,23 +2594,42 @@ function releaseArrows(){
   var lt = (player.lockTarget && !player.lockTarget.dead) ? player.lockTarget : null;
   var aim = lt ? Math.atan2(lt.y - player.y, lt.x - player.x) : player.face;
   player.face = aim;
-  var n = player.arrowCharge >= 0.42 ? 5 : (player.arrowCharge >= 0.16 ? 3 : 1);
-  var spreadStep = 0.13;
+  var chg = player.arrowCharge;
+  var itano = chg >= 2.0;
+  var n = itano ? 20 : (chg >= 1.5 ? 15 : (chg >= 1.1 ? 10 : (chg >= 0.75 ? 7 : (chg >= 0.42 ? 5 : (chg >= 0.16 ? 3 : 1)))));
+  var spreadStep = 0.11;
   var dmg = player.unlocks.fire3 ? 9 : 7;
-  for(var i = 0; i < n; i++){
-    var a = aim + (i - (n - 1) / 2) * spreadStep;
-    projectiles.push({ x: player.x + Math.cos(a)*26, y: player.y + Math.sin(a)*26,
-      vx: Math.cos(a)*660, vy: Math.sin(a)*660, r: 8, life: 0.95, dead:false,
-      dmg: dmg, kind:'arrow', homing: (n === 1 ? lt : null) }); // a lone locked arrow still homes; a spread is a spread
+  if(itano){
+    // ITANO CIRCUS: hold the draw long enough and the bow answers with 20
+    // TRACKING arrows in ALL directions — each one picks a skeleton (cycling
+    // the horde) and homes on it. A missile ballet, earned with patience.
+    var aliveSk = skels.filter(function(s){ return !s.dead; });
+    for(var ii = 0; ii < 20; ii++){
+      var ia2 = (ii / 20) * TAU;
+      projectiles.push({ x: player.x + Math.cos(ia2)*26, y: player.y + Math.sin(ia2)*26,
+        vx: Math.cos(ia2)*620, vy: Math.sin(ia2)*620, r: 8, life: 1.7, dead:false,
+        dmg: dmg, kind:'arrow', homing: aliveSk.length ? aliveSk[ii % aliveSk.length] : null });
+    }
+    floater(player.x, player.y - 58, 'ITANO CIRCUS — 20 TRACKING ARROWS!', '#f2c14e');
+    G.shake = Math.max(G.shake, 4);
+  } else {
+    for(var i = 0; i < n; i++){
+      var a = aim + (i - (n - 1) / 2) * spreadStep;
+      projectiles.push({ x: player.x + Math.cos(a)*26, y: player.y + Math.sin(a)*26,
+        vx: Math.cos(a)*660, vy: Math.sin(a)*660, r: 8, life: 0.95, dead:false,
+        dmg: dmg, kind:'arrow', homing: (n === 1 ? lt : null) }); // a lone locked arrow still homes; a spread is a spread
+    }
   }
   player.arrowCharge = 0;
   player.spellCd = 0.3;
-  if(n > 1) floater(player.x, player.y-44, n + '-ARROW SPREAD!', '#e9e2cf');
+  if(itano) floater(player.x, player.y-44, 'the sky fills with arrows…', '#e9e2cf');
+  else if(n > 1) floater(player.x, player.y-44, n + '-ARROW SPREAD!', '#e9e2cf');
   beep(520, 0.07, 'triangle', 0.045);
   emitPlayerAction('spell');
   updateHUD();
 }
 function tryHeal(){
+  if(playerDraining()) return;
   if(!G.running || G.paused || G.over || !player) return;
   if((player.hitStunT || 0) > 0) return;
   if(G.mode === 'story' && !player.unlocks.heal){ if(G.state === 'fight') kitLocked('Mend (Heal)'); return; }
@@ -2558,7 +2638,12 @@ function tryHeal(){
   player.healCast = 0.35; // quicker charge-up (was 0.85) — and you can keep moving while it casts, Skyrim-style
   emitPlayerAction('heal');
 }
+function playerDraining(){ return !!(player && player.drainTarget); }
+function iceStormActive(){ for(var i=0;i<spellZones.length;i++) if(spellZones[i].kind==='icestorm') return true; return false; }
+function greatActive(){ if(!player) return false; if((player.greatFlameT||0)>0 || (player.quakeSlamT||0)>0 || (player.quakeFreezeT||0)>0) return true; for(var i=0;i<spellZones.length;i++) if(spellZones[i].kind==='icestorm' || spellZones[i].kind==='thunderstorm') return true; return false; }
 function tryDash(){
+  if(playerDraining()) return; // SOUL DRAIN LOCKOUT: while the drain holds, you can do NOTHING else — no dash. T releases it, nothing else does.
+  if(greatActive()){ floater(player.x, player.y-46, 'NO DASH DURING A GREAT SPELL', '#e05252'); return; } // the great ultimates own your feet while they rage
   if(!G.running || G.paused || G.over || !player || player.stagger > 0) return;
   if((player.hitStunT || 0) > 0) return; // the dash is a move, not an insta-cast — hitstun holds it. Blink (V) is the stun escape.
   if(G.mode === 'story' && !player.unlocks.dash){ kitLocked('Dash'); return; }
@@ -2573,11 +2658,34 @@ function tryDash(){
   beep(330, 0.06, 'triangle', 0.04);
   emitPlayerAction('dash');
 }
+/* --- DODGE ROLL — C on the ground (touch: ROLL). The skeletons' roll,
+   given to the boss exactly as they have it: 0.38s of tumbling evasion at
+   roll speed in your move/facing direction, a cooldown with a little extra
+   delay, and a short VULNERABLE window as the roll ends (+35% damage taken
+   — the same price their roll now pays). Blocked by the same commitments
+   as the dash: drain, hitstun, finisher recovery, beam, dive. --- */
+function tryRoll(){
+  if(!G.running || G.paused || G.over || !player || player.stagger > 0) return;
+  if(playerDraining()) return;
+  if((player.hitStunT || 0) > 0) return;
+  if(player.rollCd > 0 || player.rollTime > 0 || player.airT > 0) return;
+  if(player.diagTime > 0 || player.recoverT > 0) return;
+  if((player.rekkaRecoveryT || 0) > 0) return;
+  if(player.beamCharge > 0 || player.beamTime > 0) return;
+  var mv = moveInput();
+  var dx = mv ? mv.x : Math.cos(player.face), dy = mv ? mv.y : Math.sin(player.face);
+  var m = Math.hypot(dx, dy) || 1;
+  player.rollDx = dx / m; player.rollDy = dy / m; player.rollTime = 0.38; player.rollCd = 1.0; // a bit more delay before the next roll — the nerf applies to the boss too
+  floater(player.x, player.y - 44, 'ROLL!', '#a79f8a');
+  beep(240, 0.06, 'triangle', 0.035);
+  emitPlayerAction('roll');
+}
 /* --- BLINK — a short-range teleport (V). 250 units in your move/facing
    direction, 15 MP, 2.5s cooldown. In the big circular arena this is the
    repositioning tool: out of a surround, across a gap of swords, gone.
    Committed casts still hold you — no blinking out of a beam or a dive. --- */
 function tryBlink(){
+  if(playerDraining()) return; // nothing else during the drain — blink included
   if(!G.running || G.paused || G.over || !player || player.stagger > 0) return;
   if(G.mode === 'story' && !player.unlocks.dash){ kitLocked('Blink (Mobility tree: Dash)'); return; }
   if(player.blinkCd > 0 || player.mp < 15) return;
@@ -2598,6 +2706,7 @@ function tryBlink(){
 }
 /* --- JUMP and everything out of it --- */
 function tryJump(){
+  if(playerDraining()) return;
   if(!G.running || G.paused || G.over || !player || player.stagger > 0) return;
   if(player.airT > 0) return;
   // hitstun grounds you too — EXCEPT the launcher jump-cancel, which is an escape by design
@@ -2731,7 +2840,7 @@ function doThrow(s){
   // sword lands, the thrower will RUN to fetch it instead of walking. The
   // weight is strongest early (≈42% on wave 1) and fades as waves climb
   // (≈12% floor), after which retrieval is just one option among many.
-  s.fetchRun = Math.random() < clamp(0.44 - G.wave * 0.02, 0.12, 0.44);
+  s.fetchRun = Math.random() < 0.25; // flat, wave-independent — no early-game bias toward fetching
   s.face = ang; s.throws = (s.throws || 0) + 1;
   floater(s.x, s.y-40, mode === 'lead' ? 'THROW — leading you!' : (mode === 'distract' ? 'DECOY THROW!' : 'SWORD THROW!'), '#f2c14e');
   beep(500, 0.08, 'triangle', 0.04);
@@ -2890,15 +2999,23 @@ function decideRiposte(s, kind){
   if(!s.hasSword || s.dead || s.freezeT > 0 || s.stunT > 0.15) return;
   if(s.state === 'riposteWindup' || s.state === 'riposteStrike') return;
   var d = Math.hypot(player.x - s.x, player.y - s.y);
-  var ranged = (kind === 'projectile' || kind === 'chain' || kind === 'beam' || kind === 'pillar' || kind === 'shockwave');
-  if(d > 112){ // parried it — but you're nowhere near. A smart skel holds.
+  var ranged = (kind === 'projectile' || kind === 'chain' || kind === 'beam' || kind === 'pillar' || kind === 'shockwave' || kind === 'flame' || kind === 'ice' || kind === 'great' || kind === 'earth');
+  if(d > 285){ // parried it — but even a dash-riposte can't close that. It holds.
     if(Math.random() < 0.35) floater(s.x, s.y - 40, 'parried — no riposte (out of range)', '#a79f8a');
     return;
   }
   var chance = s.genes.riposte || 0;
-  if(ranged) chance *= 0.55; // even in range, answering a ranged parry is rarer
+  if(ranged) chance *= 0.8; // answering a RANGED parry is a real option now — including a dash-riposte from distance
   if(Math.random() < chance){
     s.ripostes = (s.ripostes || 0) + 1;
+    // RIPOSTE IN ANY DIRECTION: the answer's heading is rolled, not scripted —
+    // straight at you, at your flank, laterally, or anywhere the dice point.
+    // Close up, toward-you weighs in through the extra entries; far away the
+    // riposte becomes a DASH-riposte that travels its rolled direction.
+    var toP2 = Math.atan2(player.y - s.y, player.x - s.x);
+    var dirOpts = [toP2, toP2, toP2 + 0.8, toP2 - 0.8, toP2 + Math.PI/2, toP2 - Math.PI/2, rand(0, TAU)];
+    s.riposteDir = dirOpts[Math.floor(Math.random() * dirOpts.length)];
+    s.riposteDash = d > 112;
     triggerRiposte(s);
   } else if(Math.random() < 0.3){
     floater(s.x, s.y - 40, 'parried — holds', '#a79f8a');
@@ -3005,7 +3122,7 @@ function doRiposte(){
 function triggerRiposte(s){
   if(s.dead || s.state === 'riposteWindup' || s.state === 'riposteStrike') return;
   s.state = 'riposteWindup'; s.stateT = 0.26; s.riposteHitDone = false;
-  s.face = Math.atan2(player.y - s.y, player.x - s.x);
+  s.face = (typeof s.riposteDir === 'number' && s.riposteDir) ? s.riposteDir : Math.atan2(player.y - s.y, player.x - s.x); // the rolled direction, not always straight at the boss
   floater(s.x, s.y-36, 'RIPOSTE!', '#5ec8d8');
 }
 function spinAttackHits(){
@@ -3045,6 +3162,7 @@ function damageSkel(s, dmg, ang, kb){
   if(player && player.buffPowerT > 0) dmg = Math.round(dmg * 1.4); // Might buff: +40% damage
   if(!s.hasSword) dmg = Math.round(dmg * 1.5); // unarmed (sword thrown, not yet fetched) = VULNERABLE
   if((s.parryWhiffT||0) > 0) dmg = Math.round(dmg * 1.35); // caught in parry-whiff recovery = PUNISHED — the stance has a cost
+  if((s.rollVulnT||0) > 0) dmg = Math.round(dmg * 1.35); // caught at the END of a roll = PUNISHED too — the roll has a cost now
   s.hp -= dmg; s.hurtFlash = 0.18;
   if(G.waveStats) G.waveStats.dmgDealt = (G.waveStats.dmgDealt || 0) + dmg;
   if(player && player.buffSiphonT > 0 && player.alive){ // SIPHON lifesteal: your damage feeds you — a heal the swarm can't interrupt, because it's already in the sword
@@ -3084,6 +3202,7 @@ function damagePlayer(dmg, fromAng, kb, melee){
   if(kb === undefined) kb = 13; // their hits shove YOU too — weight on both sides
   if(player.jumpH > 30){ floater(player.x, player.y-34, 'AIRBORNE — MISSED!', '#7bc47f'); return; }
   if(player.dashTime > 0){ floater(player.x, player.y-34, 'DODGED', '#7bc47f'); return; }
+  if((player.rollTime||0) > 0){ floater(player.x, player.y-34, 'ROLLED THROUGH IT!', '#7bc47f'); return; } // mid-roll you are untouchable — exactly like theirs
   if(player.parryT > 0){ // PLAYER PARRY — a fresh shield-raise timed to the blow: nothing lands, the attacker reels, and a riposte window opens
     player.parryT = 0; player.riposteT = 1.1;
     if(G.waveStats) G.waveStats.parries = (G.waveStats.parries || 0) + 1;
@@ -3095,6 +3214,7 @@ function damagePlayer(dmg, fromAng, kb, melee){
     updateHUD();
     return;
   }
+  if((player.rollVulnT||0) > 0) dmg *= 1.35; // END-OF-ROLL VULNERABILITY — the roll's price, same as the skeletons pay
   if(player.buffSiphonT > 0) dmg *= 1.25; // SIPHON trade-off: the hunger leaves you open — hits land harder while it burns
   if(player.buffArmorT > 0){ dmg *= 0.45; kb *= 0.4; } // Armor buff: heavy damage cut, barely shoved
   if(player.shielding && player.mp > 0){ kb *= 0.35;
@@ -3157,6 +3277,9 @@ function updateSkel(s, dt){
   if(s.parryCd > 0) s.parryCd -= dt;
   if(s.parryReadCd > 0) s.parryReadCd -= dt;
   if(s.parryWhiffT > 0) s.parryWhiffT -= dt;
+  if((s.dodgeCd||0) > 0) s.dodgeCd -= dt;
+  if((s.rollVulnT||0) > 0) s.rollVulnT -= dt;
+  if((s.skelDashCd||0) > 0) s.skelDashCd -= dt;
   // a scheduled stance goes up when its moment arrives
   if(s.parryIntentT !== undefined && s.parryIntentT >= 0){
     s.parryIntentT -= dt;
@@ -3257,13 +3380,11 @@ function updateSkel(s, dt){
       if(Math.hypot(pillars[pj].x - s.x, pillars[pj].y - s.y) < pillars[pj].r + 30){ playerThreat = true; threatRange = 200; break; }
     }
   }
-  if(playerThreat && d < threatRange && s.dodgeTime <= 0 && s.state.indexOf('windup') === -1 && s.state !== 'windup' && s.state !== 'jumpAir' && s.state !== 'stabDash'){
+  if(playerThreat && d < threatRange && s.dodgeTime <= 0 && canSkelRoll(s)){ // canSkelRoll is the roll-cancel fix: a skel mid-charge, mid-lunge, mid-jump or mid-strike CANNOT roll out of it anymore
     if(Math.random() < g.dodge * dt * 14){
-      s.dodgeTime = 0.34; s.dodges++;
       var side = Math.random()<0.5 ? 1 : -1;
       var da = toPlayer + Math.PI + side*rand(0.5,1.1); // roll away-sideways
-      s.dodgeDx = Math.cos(da); s.dodgeDy = Math.sin(da);
-      floater(s.x, s.y-22, 'roll!', '#a79f8a');
+      if(startSkelRoll(s, da, 0.34)){ s.dodges++; floater(s.x, s.y-22, 'roll!', '#a79f8a'); }
     } else if(d < Math.max(110, threatRange - 30)){
       scheduleParry(s, 0.14); // reads the threat and commits to a TIMED stance — mistime it and the whiff is punishable
     }
@@ -3282,7 +3403,7 @@ function updateSkel(s, dt){
      dodge + reaction + coordination (capped), with a short per-skel cooldown
      so nobody jitters — and a skel caught DEEP inside a burning pillar
      always tries to get out. Standing in fire was never a tactic. */
-  if(s.hazardCd <= 0 && s.dodgeTime <= 0 && s.state !== 'jumpAir' && s.state !== 'stabDash' && s.state.indexOf('windup') === -1 && (s.blindT || 0) <= 0){
+  if(s.hazardCd <= 0 && s.dodgeTime <= 0 && (s.state === 'approach' || s.state === 'feint') && (s.blindT || 0) <= 0){ // hazards can only be answered by a free body — no hazard-roll cancelling a charge either
     var aware = clamp(0.3 + (g.dodge || 0) * 3.2 + (g.reaction || 0) * 0.9 + (g.coordination || 0) * 0.6, 0, 0.92);
     var hazardDodged = false;
     for(var hz = 0; hz < projectiles.length && !hazardDodged; hz++){
@@ -3295,11 +3416,18 @@ function updateSkel(s, dt){
       var hcx = hp2.x + hvx * ht - s.x, hcy = hp2.y + hvy * ht - s.y;
       if(Math.hypot(hcx, hcy) > s.r + (hp2.r || 8) + 16) continue; // the line misses clean — no need to move
       if(Math.random() < aware){
-        var hside = (hrx * (-hvy / hsp) + hry * (hvx / hsp)) >= 0 ? 1 : -1; // step to whichever side you're already on — the short way out of the line
-        var hda = Math.atan2(hvy, hvx) + hside * Math.PI / 2;
-        s.dodgeTime = 0.32; s.dodges++; s.hazardCd = 0.7;
-        s.dodgeDx = Math.cos(hda); s.dodgeDy = Math.sin(hda);
-        floater(s.x, s.y - 26, 'sidesteps the shot!', '#7bc47f');
+        s.dodges++; s.hazardCd = 0.7;
+        // RANGED PARRY READ: a swordsman can answer a shot with the BLADE instead of the roll. The bred dice (rwParry vs rwDodge) choose, and scheduleParry times the stance to the shot's arrival (ht) — parry timings now work against ranged attacks, not just swords.
+        var parryShare = (g.rwParry||0.7) / ((g.rwParry||0.7) + (g.rwDodge||0.8) + 0.01);
+        if(s.hasSword && Math.random() < parryShare * (0.3 + (g.parryTiming||0.1) * 1.1)){
+          scheduleParry(s, Math.max(0.05, ht));
+          floater(s.x, s.y - 26, 'reads the shot — PARRY!', '#5ec8d8');
+        } else {
+          var hside = (hrx * (-hvy / hsp) + hry * (hvx / hsp)) >= 0 ? 1 : -1; // step to whichever side you're already on — the short way out of the line
+          var hda = Math.atan2(hvy, hvx) + hside * Math.PI / 2;
+          if(startSkelRoll(s, hda, 0.32)) floater(s.x, s.y - 26, 'sidesteps the shot!', '#7bc47f');
+          else if(s.hasSword) scheduleParry(s, Math.max(0.05, ht));
+        }
         hazardDodged = true;
       } else s.hazardCd = 0.25; // noticed too late — re-check soon, don't spam rolls every frame
     }
@@ -3313,18 +3441,52 @@ function updateSkel(s, dt){
         if(deepIn || Math.random() < aware){
           var pea = Math.atan2(s.y - pl2.y, s.x - pl2.x); // straight OUT along the radius
           if(pd3 < 4) pea = toPlayer + Math.PI; // dead centre: any out will do — away from the boss side
-          s.dodgeTime = 0.34; s.dodges++; s.hazardCd = 0.8;
-          s.dodgeDx = Math.cos(pea); s.dodgeDy = Math.sin(pea);
-          floater(s.x, s.y - 26, pl2.state === 'burn' ? 'OUT OF THE FIRE!' : 'pillar — moving!', '#e07840');
+          s.dodges++; s.hazardCd = 0.8;
+          if(startSkelRoll(s, pea, 0.34) || startSkelDash(s, pea)) floater(s.x, s.y - 26, pl2.state === 'burn' ? 'OUT OF THE FIRE!' : 'pillar — moving!', '#e07840');
           hazardDodged = true;
           break;
         } else { s.hazardCd = 0.3; break; }
       }
     }
   }
+  /* --- ULTIMATE AWARENESS — the horde finally answers the GREAT spells ---
+     Standing in an ice storm used to mean freezing on schedule: the storm
+     was never read as a place to LEAVE. Now an active great spell is a
+     danger disc around the boss (ice ~330, flame spiral ~360, thunder a
+     looser scatter pressure), and a skel inside it rolls its bred dice for
+     an answer: dash out, roll out, run, or raise a parry stance against
+     the ticks. No forced answer — RNG and genes decide, selection judges. */
+  var ultR = 0;
+  if((player.greatFlameT||0) > 0) ultR = 360;
+  else for(var uz = 0; uz < spellZones.length; uz++){ if(spellZones[uz].kind === 'icestorm'){ ultR = 335; break; } if(spellZones[uz].kind === 'thunderstorm') ultR = Math.max(ultR, 210); }
+  if(ultR > 0 && d < ultR && s.hazardCd <= 0 && (s.state === 'approach' || s.state === 'feint')){
+    s.hazardCd = 0.9;
+    if(Math.random() < clamp(0.3 + (g.reaction||0) * 0.8 + (g.counter||0) * 0.6, 0, 0.92)){
+      var ua = toPlayer + Math.PI + rand(-0.6, 0.6); // OUT — away from the boss and the weather around them
+      var uPick = Math.random();
+      if(uPick < 0.38 && startSkelDash(s, ua)) floater(s.x, s.y-26, 'ULT — DASHING OUT!', '#5ec8d8');
+      else if(uPick < 0.68 && startSkelRoll(s, ua, 0.34)) floater(s.x, s.y-26, 'ULT — ROLLING OUT!', '#5ec8d8');
+      else if(s.hasSword){ scheduleParry(s, 0.3); floater(s.x, s.y-26, 'ULT — GUARD UP!', '#5ec8d8'); } // weather can be parried too — the sword is a concept
+      else startSkelDash(s, ua);
+    }
+  }
+  /* --- SKEL DASH — the movement bolster: a short burst at the player's own
+     dash speed, in ANY direction the dice pick, costing NO energy. Ambient
+     dashes fire from approach, weighted by the bred dash gene. --- */
+  if((s.skelDashTime||0) > 0){
+    s.skelDashTime -= dt;
+    s.x += s.skelDashDx * 680 * dt; s.y += s.skelDashDy * 680 * dt;
+    if(Math.random() < dt * 18) spawnParticles(s.x, s.y + 6, '#a79f8a', 1, 50);
+    clampToField(s); return;
+  }
+  if(s.state === 'approach' && (s.skelDashCd||0) <= 0 && Math.random() < (g.dash||0) * dt * 1.5){
+    var dashOpts = [toPlayer, toPlayer + Math.PI, toPlayer + Math.PI/2, toPlayer - Math.PI/2, toPlayer + rand(0.7, 1.2), toPlayer - rand(0.7, 1.2), rand(0, TAU)]; // toward, away, lateral, diagonal, anywhere — RNG picks, genes set how often
+    startSkelDash(s, dashOpts[Math.floor(Math.random() * dashOpts.length)]);
+  }
   if(s.dodgeTime > 0){
     s.dodgeTime -= dt;
-    s.x += s.dodgeDx * 300 * dt; s.y += s.dodgeDy * 300 * dt;
+    if(s.dodgeTime <= 0){ s.dodgeTime = 0; s.rollVulnT = 0.30; s.dodgeCd = 0.55; floater(s.x, s.y-30, 'roll spent — OPEN!', '#e05252'); } // THE ROLL NERF: a vulnerable beat at the end of every roll, and a little extra delay before the next one
+    s.x += s.dodgeDx * 275 * dt; s.y += s.dodgeDy * 275 * dt; // and the roll itself is a touch slower than it was (300 → 275)
     // TRUE BAIT — the strict definition: the boss WHIFFED (registerWhiff opened
     // this window), and this skel is SHIMMYING — moving mostly SIDEWAYS, a
     // movement choice — out of the whiffed attack's range, with room to punish.
@@ -3646,7 +3808,7 @@ function updateSkel(s, dt){
       // The feint still has a job — it burns your attention and repositions.
       if(s.stateT <= 0){
         var sa = toPlayer + (Math.random()<0.5?1:-1) * Math.PI/2;
-        s.dodgeTime = 0.22; s.dodgeDx = Math.cos(sa); s.dodgeDy = Math.sin(sa);
+        startSkelRoll(s, sa, 0.22);
         s.state = 'approach'; s.atkCd = rand(0.25, 0.6) * (1.2 - g.aggression*0.5);
       }
       break;
@@ -3700,13 +3862,16 @@ function updateSkel(s, dt){
       if(s.stateT <= 0){ s.state = 'approach'; s.atkCd = rand(0.15, 0.7) * (1.3 - g.aggression*0.6) * lenCycle(g); } // a long sword is slower to bring around again — attack SPEED lives in the blade as much as the arm
       break;
     case 'riposteWindup':
-      s.face = angleLerp(s.face, toPlayer, 0.35);
+      if(s.riposteDash){ s.x += Math.cos(s.face) * 620 * dt; s.y += Math.sin(s.face) * 620 * dt; } // a dash-riposte TRAVELS its rolled direction while it winds up
+      else s.face = angleLerp(s.face, toPlayer, 0.35);
       if(s.stateT <= 0){ s.state='riposteStrike'; s.stateT=0.13; }
       break;
     case 'riposteStrike': {
+      if(s.riposteDash){ s.x += Math.cos(s.face) * 620 * dt; s.y += Math.sin(s.face) * 620 * dt; }
       if(!s.riposteHitDone){
         s.riposteHitDone = true;
-        if(d < 88 + player.r){
+        var rEffD = s.riposteDash ? Math.hypot(player.x - s.x, player.y - s.y) : d; // distance AFTER the dash travel — the hit is judged where the riposte actually arrives
+        if(rEffD < 88 + player.r){
           var ra = Math.atan2(player.y-s.y, player.x-s.x);
           var rd = Math.abs(((ra - s.face)%TAU + TAU*1.5)%TAU - Math.PI);
           if(rd < 1.2 && !blindMiss(s)){ s.hits++; var rdmg=13; noteTandemHit(s); s.dmgDealt += (player.shielding ? rdmg*0.12 : rdmg); damagePlayer(rdmg, ra, undefined, true); floater(s.x, s.y-30, 'RIPOSTE HIT', '#e05252'); }
@@ -3846,6 +4011,8 @@ function update(dt){
   if(player.buffRegenT > 0){ player.buffRegenT -= dt; player.hp = Math.min(player.maxHp, player.hp + 5 * dt); } // slow regen buff
   if(player.healCd > 0) player.healCd -= dt;
   if(player.dashCd > 0) player.dashCd -= dt;
+  if((player.rollCd||0) > 0) player.rollCd -= dt;
+  if((player.rollVulnT||0) > 0) player.rollVulnT -= dt;
   if(player.blinkCd > 0) player.blinkCd -= dt;
   if(player.parryCd > 0) player.parryCd -= dt;
   if(player.parryT > 0) player.parryT -= dt;
@@ -3990,7 +4157,7 @@ function update(dt){
   if(player.flashCd > 0) player.flashCd -= dt;
   if(G.flash > 0) G.flash = Math.max(0, G.flash - dt * 2.2);
   /* arrow charge (physical K): builds while held, capped — released in releaseArrows() */
-  if(player.arrowCharging) player.arrowCharge = Math.min(0.6, player.arrowCharge + dt);
+  if(player.arrowCharging) player.arrowCharge = Math.min(2.2, player.arrowCharge + dt); // the draw now builds for up to ~2.2s — the long holds buy the huge spreads (see releaseArrows)
   pillars.forEach(function(pl){
     if(pl.state === 'burn'){
       // the lasting hitbox: burn ticks + a fountain of embers until it dies down
@@ -4064,6 +4231,13 @@ function update(dt){
     player.dashTime -= dt;
     player.x += player.dashDx * 680 * dt; player.y += player.dashDy * 680 * dt;
     player.face = Math.atan2(player.dashDy, player.dashDx);
+  } else if((player.rollTime||0) > 0){
+    // THE ROLL — same body rules as a skel's roll: 300 u/s tumble, and when
+    // it ends the vulnerable window opens (rollVulnT, +35% damage taken).
+    player.rollTime -= dt;
+    player.x += player.rollDx * 300 * dt; player.y += player.rollDy * 300 * dt;
+    player.face = Math.atan2(player.rollDy, player.rollDx);
+    if(player.rollTime <= 0){ player.rollTime = 0; player.rollVulnT = 0.28; }
   } else if(mv && player.stagger <= 0 && player.diagTime <= 0 && player.recoverT <= 0 && player.beamCharge <= 0 && player.beamTime <= 0 && (player.hitStunT || 0) <= 0 && !player.drainTarget && (player.greatFlameT || 0) <= 0 && (player.quakeSlamT || 0) <= 0 && (player.quakeFreezeT || 0) <= 0){
     // …and no moving in hitstun, while soul-draining (rooted by the channel), or while Great Flame uncoils (rooted by the cast)
     // No steering mid-dive, no moving during landing recovery OR a finisher's end recovery, and feet stay planted for the beam — all commitments. (Jump-canceling the launcher clears rekkaRecoveryT first, so air movement after the chase-jump is free.)
@@ -4303,7 +4477,7 @@ function drawSkel(s){
   if(s.jumpH) p = {x:p.x, y:p.y - s.jumpH*0.85};
   if((s.launchH||0) > 0) p = {x:p.x, y:p.y - s.launchH*0.85}; // LAUNCHED by the boss's launcher — drawn up in the air, shadow left on the ground
   if((s.tossH||0) > 0) p = {x:p.x, y:p.y - s.tossH*0.85}; // TOSSED by a partner — same deal: body up in the arc, shadow on the ground, very much a live hitbox
-  if(s.running){ // RUNNING: speed streaks trailing behind — a running skel should READ as a threat at a glance
+  if(s.running || (s.skelDashTime||0) > 0){ // RUNNING / DASHING: speed streaks trailing behind — a moving skel should READ as a threat at a glance
     ctx.strokeStyle = 'rgba(224,82,82,.5)'; ctx.lineWidth = 2;
     var bx = -Math.cos(s.face), by = -Math.sin(s.face);
     for(var rl = 0; rl < 3; rl++){
@@ -4489,6 +4663,7 @@ function drawPlayer(){
   }
   ctx.save(); ctx.translate(p.x, p.y);
   if(player.dashTime > 0) ctx.globalAlpha = 0.65;
+  if((player.rollTime||0) > 0){ var prp = clamp(1 - player.rollTime / 0.38, 0, 1); var prd = ((player.rollDx||0) * Math.cos(player.face) + (player.rollDy||0) * Math.sin(player.face)) >= 0 ? 1 : -1; ctx.rotate(prd * prp * TAU); } // the boss tumbles too — a full roll, readable like theirs
   // body hitbox ring
   ctx.strokeStyle = 'rgba(242,193,78,.30)'; ctx.setLineDash([4,4]); ctx.lineWidth = 1;
   ctx.beginPath(); ctx.ellipse(0, -8, 21, 16, 0, 0, TAU); ctx.stroke(); ctx.setLineDash([]);
@@ -5258,7 +5433,7 @@ function parseSaveCode(txt){
   if(!obj) throw new Error('empty save');
   obj.wave = clamp(parseInt(obj.wave, 10) || 1, 1, 100000);
   obj.generation = clamp(parseInt(obj.generation, 10) || 1, 1, 100000);
-  obj.mode = obj.mode === 'story' ? 'story' : 'survival';
+  obj.mode = obj.mode === 'story' ? 'story' : (obj.mode === 'helter' ? 'helter' : 'survival');
   if(obj.full){
     if(!obj.player || !Array.isArray(obj.skels)) throw new Error('bad full save');
     if(!obj.skels.length && obj.state === 'fight') throw new Error('no horde in save');
@@ -5357,7 +5532,7 @@ function loadSaveObject(obj){
     });
     // Boss Heart no longer raises max HP on load either — 206 is 206, at all times.
   }
-  if(G.mode === 'survival'){ player.unlocks.spell = true; player.unlocks.shock = true; player.unlocks.beam = true; player.unlocks.flash = true; player.unlocks.heal = true; player.unlocks.dash = true; }
+  if(G.mode !== 'story'){ player.unlocks.spell = true; player.unlocks.shock = true; player.unlocks.beam = true; player.unlocks.flash = true; player.unlocks.heal = true; player.unlocks.dash = true; } // Survival AND Helter Skelter both start with the full kit
   player.hp = clamp(obj.hp || player.maxHp, 30, player.maxHp);
   G.bones = obj.bones || 0; G.totalBones = obj.totalBones || 0;
   player.boneStage = boneStageFor(G.totalBones);
@@ -5479,11 +5654,12 @@ document.getElementById('load-file').addEventListener('change', function(){
 /* ----- front menu ----- */
 var MENU_HTML =
   '<div class="menu-title">SKELETON <span class="gold">SWORD</span></div>' +
-  '<div class="menu-version">Version 18 &middot; Alpha</div>' +
+  '<div class="menu-version">Version 19 &middot; Alpha</div>' +
   '<p class="menu-sub">Every skeleton with a sword you ever cut down as fodder is back — and between waves, they breed. You are the final boss. They are the ones who learn.</p>' +
   '<div class="mode-grid">' +
     '<button class="mode-btn under-construction" id="menu-story" type="button" disabled aria-disabled="true"><span class="m-name">📖 Story Mode</span><span class="construction-sign">Under Construction</span><span class="m-desc">This mode is still being built and isn&rsquo;t playable yet. Survival Mode is open below &mdash; jump in there.</span></button>' +
-    '<button class="mode-btn" id="menu-survival" type="button"><span class="m-name">⚔ Survival Mode</span><span class="m-desc">The main mode. Full kit from the first second — rekka sword combos, bow, shockwave, shield, heal, dash. Twelve skeletons a wave, no healing between waves, constant evolution — and the ramp is steeper now: tighter selection, closer spawns, and skels that learn to RUN. How many generations can the boss survive?</span></button>' +
+    '<button class="mode-btn" id="menu-survival" type="button"><span class="m-name">⚔ Survival Mode</span><span class="m-desc">The main mode. Full kit from the first second — rekka sword combos, bow, shockwave, shield, heal, dash. Twelve skeletons a wave, no healing between waves, constant evolution — and the ramp is steeper now: tighter selection, closer spawns, and skels that learn to RUN. Every 10 waves the horde also grows by one. How many generations can the boss survive?</span></button>' +
+    '<button class="mode-btn" id="menu-helter" type="button"><span class="m-name">💀 Helter Skelter</span><span class="m-desc">BONELESS mode — open now for playtesters. The skeletons are lifted out of ALL their limits: no caps on any stat, sword length and move speed included. Same evolution, no ceiling. A crazy mode for skilled players who reached too far in Survival and want the horde unchained.</span></button>' +
   '</div>' +
   '<div class="menu-sec" id="menu-quick-sec" style="display:none"><h3>↩ RESUME QUICK SAVE</h3>' +
   '<p id="menu-quick-label"></p>' +
@@ -5503,6 +5679,7 @@ function renderMenu(){
   document.getElementById('overlay').classList.remove('hidden');
   document.getElementById('menu-story').addEventListener('click', function(){ startRun('story'); });
   document.getElementById('menu-survival').addEventListener('click', function(){ startRun('survival'); });
+  document.getElementById('menu-helter').addEventListener('click', function(){ startRun('helter'); });
   if(quickSaveObj){
     document.getElementById('menu-quick-sec').style.display = '';
     document.getElementById('menu-quick-label').textContent = 'You left a fight standing: ' + quickSaveLabel + '. Pick it up at the exact moment you saved it.';
